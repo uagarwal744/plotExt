@@ -12,7 +12,7 @@ def centroid_histogram(clt):
 	for i in range(len(ret_labels)):
 		if(ret_labels[i] not in bw_labels):
 			labels.append(ret_labels[i])
-	numLabels = np.arange(0, len(np.unique(labels)) + 3)
+	numLabels = np.arange(0, len(np.unique(labels)))
 	(hist, _) = np.histogram(labels, bins = numLabels)
 	print hist
 	hist = hist.astype("float")
