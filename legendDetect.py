@@ -32,9 +32,9 @@ def mod(a):
 #returns true is the vertical strip contains only white or black pixels
 def isWhiteOrBlack(x,y,height, w,b, clt,image):
 	cnt = 0
-
 	for i in range(height):	
 		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
+		#print "curr_label = ", curr_label
 		if(curr_label != w and curr_label != b):
 			del current_color[:]
 			current_color.append(image[y+i][x][0])
@@ -44,6 +44,22 @@ def isWhiteOrBlack(x,y,height, w,b, clt,image):
 	if(cnt>0):
 		return 0			
 	return 1
+def isBlack(x,y,height,b,clt,image):
+	cnt = 0
+	for i in range(height):	
+		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
+		if(curr_label == b):
+			cnt = cnt+1
+	if(cnt>0):
+		return 1			
+	return 0
+
+def isPresent(rect, y, height):
+	for i in range(len(rect)):
+		mid = (rect[i][1]+rect[i][3])/2
+		if(y<mid and y+height>mid):
+			return 1
+	return 0
 
 def makeWhite(x,y,height,image):
 	for i in range(height):
@@ -52,7 +68,7 @@ def makeWhite(x,y,height,image):
 		image[y+i][x][2] = 255
 
 
-def parse_hocr(filename):
+def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	warnings.filterwarnings("ignore")
 
@@ -71,6 +87,7 @@ def parse_hocr(filename):
 				continue	
 			
 			#removes words which contain no alphabet
+			'''
 			word = i.text.strip(" ")			
 			flag = 0;
 			for j in range(len(word)):
@@ -82,6 +99,7 @@ def parse_hocr(filename):
 					break				
 			if(flag==0):
 				continue
+			'''
 			#remove ends
 
 			count += 1
@@ -94,18 +112,19 @@ def parse_hocr(filename):
 
 	
 
-	image=cv2.imread("graph1.jpg",cv2.IMREAD_COLOR)
+	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	
 	
 	#coordinates of the bounding box
 
 	#horizontal is x
-	out_x = bound_x
-	out_y = bound_y
+	#out_x = bound_x
+	#out_y = bound_y
 	out = []
 
 	#removes text outside the bounding box
 	for i in range(len(rect)):
-		if(rect[i][0]>out_x and rect[i][1]<out_y):
+		if(rect[i][0]>x_min and rect[i][1]<y_max and rect[i][0]<x_max and rect[i][1]>y_min):
 			out.append(i)
 
 	#temp_rect contains the text only inside the bounding box
@@ -117,11 +136,8 @@ def parse_hocr(filename):
 	arr=[]
 	for i in range(len(temp_rect)):		
 		for j in range(i+1,len(temp_rect)):			
-			print i,j
-			print mod(temp_rect[i][1]-temp_rect[j][1]), temp_rect[i][3]-temp_rect[i][1]
 			if(mod(temp_rect[i][1]-temp_rect[j][1])<(temp_rect[i][3]-temp_rect[i][1])):
 				found = 0
-				print i,j
 				for k in range(len(arr)):
 					for l in range(len(arr[k])):
 						if(arr[k][l]==i or arr[k][l]==j):
@@ -186,9 +202,159 @@ def parse_hocr(filename):
 	ret_labels=clt.labels_
 
 	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
+	b = clt.predict([0.0,0.0,0.0])
 	
 	
-	
+	#code for detecting legends not detected by ocr
+
+	maxY = new_rect[0][1]
+	pos = 0
+	for i in range(len(new_rect)):
+		if(maxY < new_rect[i][1]):
+			maxY = new_rect[i][1]
+			pos = i
+
+	height = new_rect[pos][3]-new_rect[pos][1] + 5
+	mid = (new_rect[pos][2]+new_rect[pos][0])/2
+	y = maxY
+
+	#moving down
+	while(1):
+		y = y+height
+		not_found = 0
+		if(y+height < y_max):
+			if(isPresent(new_rect,y,height)==1):
+				continue
+			else:
+				temp_x = mid
+				cnt1 = 0
+				cnt2 = 0
+				while(1):
+					if(isBlack(temp_x,y,height,b,clt,image)==0):
+						cnt1 = cnt1+1
+						temp_x += 1
+						print cnt1
+						if(cnt1>10):
+							not_found = 1
+							break
+					else:
+						cnt2 = cnt2+1
+						temp_x += 1
+						if(cnt2>5):
+							break;
+				if(not_found==1):
+					break
+				else:	
+					quad = []	
+
+					#move_right								
+					cnt=0
+					temp_x = mid
+					while(1):
+						if(isBlack(temp_x,y,height,b,clt,image)==0):
+							cnt += 1
+							temp_x += 1
+							if(cnt>10):
+								break
+						else:
+							cnt = 0
+							temp_x += 1
+
+					x2 = temp_x
+
+					#move_left
+					cnt=0
+					temp_x = mid
+					while(1):
+						if(isBlack(temp_x,y,height,b,clt,image)==0):
+							cnt += 1
+							temp_x -= 1
+							if(cnt>10):
+								break
+						else:
+							cnt = 0
+							temp_x -= 1
+
+					x1 = temp_x
+					quad.append(x1)
+					quad.append(y)
+					quad.append(x2)
+					quad.append(y+height)
+					new_rect.append(quad)
+
+		else:
+			break
+
+	#moving_up
+	y = maxY
+
+	while(1):
+		y = y-height
+		not_found = 0
+		if(y-height > y_min):
+			if(isPresent(new_rect,y,height)==1):
+				continue
+			else:
+				temp_x = mid
+				cnt1 = 0
+				cnt2 = 0
+				while(1):					
+					if(isBlack(temp_x,y,height,b,clt,image)==0):
+						cnt1 = cnt1+1
+						temp_x += 1
+						if(cnt1>10):
+							not_found = 1
+							break
+					else:
+						cnt2 = cnt2+1
+						temp_x += 1
+						if(cnt2>5):
+							break;
+				if(not_found==1):
+					break
+				else:	
+					quad = []	
+
+					#move_right								
+					cnt=0
+					temp_x = mid
+					while(1):
+						if(isBlack(temp_x,y,height,b,clt,image)==0):
+							cnt += 1
+							temp_x += 1
+							if(cnt>10):
+								break
+						else:
+							cnt = 0
+							temp_x += 1
+
+					x2 = temp_x
+
+					#move_left
+					cnt=0
+					temp_x = mid
+					while(1):
+						if(isBlack(temp_x,y,height,b,clt,image)==0):
+							cnt += 1
+							temp_x -= 1
+							if(cnt>10):
+								break
+						else:
+							cnt = 0
+							temp_x -= 1
+
+					x1 = temp_x
+					quad.append(x1)
+					quad.append(y)
+					quad.append(x2)
+					quad.append(y+height)
+					new_rect.append(quad)
+
+		else:
+			break
+
+
+
 	#code for removing the legend
 	#first we traverse left and right to see where the legend is
 	#then we go on making the legend white till we encounter a continuos strip of 40 white pixels
@@ -210,35 +376,47 @@ def parse_hocr(filename):
 				pos = 2
 				break
 			j = j+1
-			print j
 
 		if(pos==1):
 			cnt = 0
-			while(cnt<1):
+			while(cnt<40):
 				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image)==0):	
 					makeWhite(x1-j,y1,height,image)
 				j= j+1
 				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image)!=0):
 					cnt = cnt+1
-					print cnt;
 		if(pos==2):
 			cnt = 0
-			while(cnt<1):
+			while(cnt<40):
 				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image)==0):			
 					makeWhite(x2+j,y2,height,image)
 				j = j+1
 				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image)!=0):
 					cnt = cnt+1
-					print cnt;
 		
 		colors.append(current_color)
 
 	
-	draw_rectangles(image,new_rect)
+	#draw_rectangles(image,new_rect)
 	'''
 	cv2.imshow("as",image)
 	cv2.waitKey(0)
 	'''
+
+	#removing the text
+	
+	for i in range(len(new_rect)):
+		for j in range(new_rect[i][1], new_rect[i][3]):
+			for k in range(new_rect[i][0], new_rect[i][2]):
+				image[j][k][0] = 255;
+				image[j][k][1] = 255;
+				image[j][k][2] = 255;
+	
+	'''
+	cv2.imshow("as",image)
+	cv2.waitKey(0)
+	'''
+	cv2.imwrite("out.jpg", image);
 	legend_info = []
 	for i in range(len(new_rect)):
 		temp = []
@@ -249,11 +427,11 @@ def parse_hocr(filename):
 	return legend_info	
 
 #horizontal is x
-def legend_detect(img, bound_x, bound_y):
+def legend_detect(img, x_min, x_max, y_min, y_max):
 	os.system("tesseract " + img + " scan hocr")
-	parse_hocr("scan.hocr", bound_x, bound_y)
+	parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("graph1.jpg", 50, 500)
+#legend_detect("graph3.jpg", 115, 650, 68, 415)
 
 	
 
