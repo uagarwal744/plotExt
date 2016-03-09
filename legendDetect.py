@@ -432,7 +432,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max):
 	os.system("tesseract " + img + " scan hocr")
 	parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
-legend_detect("graph3.jpg", 115, 650, 68, 415)
+#legend_detect("graph3.jpg", 115, 650, 68, 415)
 
 	
 
