@@ -1,0 +1,12 @@
+The procedure is for legend detection and removal is as follows:
+1)First run tesseract on the image and detect the text part using ocr
+2)Retreive the bounding boxes of all the rectangles from the .hocr file
+3)Ignore the text which is detected outside the bounding box of the graph
+4)Merge the detected bounding boxes of text which are in the same horizontal line. For this, we group the rectangles into sets based on their 'y' extent and finally merge them.
+5)Apply KMeans and divide the pixels into different classes.
+6)Detect the text which is not detected by ocr by traversing up and down from the lowermost detected rectangle
+7)For each rectangle, traverse left and rigth till you encounter a non black or white pixel. We also store the color of legend in this step
+8)From the above step, we will come to know whether the legend is to the left or right. Then, we will delete the legend by moving left or right(based on above step) till we find a continuous strip of white pixels over a threshold length of pixels.
+9)Finally, we also delete the text and return the (img,array(rect,color))
+
+Note: To improve the code, you can change the two paramters in step 7 and 8. Namely, 'j' and 'cnt'. 'j'specifies the distance away from the text you should start searching for the legend. 'cnt' specifies the threshold distance after which you should stop if you don't find a colored pixel.

@@ -7,7 +7,7 @@ from pyPdf import PdfFileReader
 import os,sys
 
 class pdfwithgraph:
-    def __init__(self,pdfFile,minLineLength,maxLineGap,threshArea,percent,ang_prec=2,det_prec=0.5,density="300"):
+    def __init__(self,pdfFile,minLineLength,maxLineGap,threshArea,percent,ang_prec=180,det_prec=0.25,density="300"):
         """Initializes the class
         Keyword arguments:
         filename -- actual image of the entire pdf
@@ -29,6 +29,7 @@ class pdfwithgraph:
         self.det_prec = det_prec  
         self.density = density  
         self.pdfImage = []  
+        self.graphArray = []
 
     
     def houghp(self):
@@ -40,14 +41,18 @@ class pdfwithgraph:
         gray = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV,11,7)
         kernel = np.zeros((5,5),np.uint8)
         gray = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
-        gray = cv2.morphologyEx(gray, cv2.MORPH_OPEN, kernel)
+        #gray = cv2.morphologyEx(gray, cv2.MORPH_GRADIENT, kernel)
+        #gray = cv2.filter2D(gray,-1,kernel)
+        #gray = cv2.blur(gray,(5,5))
+        #gray = cv2.medianBlur(gray,5)
+        #gray = cv2.bilateralFilter(gray,9,75,75)
         gray = cv2.GaussianBlur(gray,(5,5),0)
         #edges = cv2.Canny(gray,50,150,apertureSize = 3)
-        lines = cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,50,self.minLineLength,self.maxLineGap)
+        lines = cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,100,self.minLineLength,self.maxLineGap)
         im2 = np.zeros((h,w,channel),np.uint8)
         for x1,y1,x2,y2 in lines[0]:
             cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)
-        cv2.imwrite(self.graphfolder+"/houghp.png",im2)
+        #cv2.imwrite(self.graphfolder+"/houghp.png",im2)
         return im2
 
     
@@ -62,15 +67,13 @@ class pdfwithgraph:
         h,w,channel = image.shape
         hi,wi = h,w
         count_graph = 1
-        f = open("contours.txt","wb")
-        
+        #f = open("contours.txt","wb")
         
 
         for c in cnts:
             if cv2.contourArea(c) >self.threshArea:
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
-                #if len(approx)<10 and len(approx)>2:
-                if 1:
+                if len(approx)<10 and len(approx)>2:
                     x,y,w,h = cv2.boundingRect(c)
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
@@ -79,26 +82,28 @@ class pdfwithgraph:
                     if(self.aspectRatio(w,h) == True and h < 0.95*hi and w < 0.95*wi):
                         #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                         #graph = img[y-a:y+h+a,x-2*a:x+w+a]
-                        cv2.drawContours(img, [c], -1, (0, 0, 255), 2)
+                        #scv2.drawContours(img, [c], -1, (0, 0, 255), 2)
                         percentin = 0.2
                         xstart = max(0,x-percentin*w)
                         xend = min(wi,x+w+percentin*w)
                         ystart = max(0,y-percentin*h)
                         yend = min(hi,y+h+percentin*h)
                         graph = img[ystart:yend,xstart:xend]
+                        self.graphArray.append(graph)
                         #print graph.shape
                         # cv2.imshow("window",graph)
                         # cv2.waitKey(0)
                         # cv2.destroyAllWindows()
                         cv2.imwrite(self.graphfolder+"/"+str(count_graph)+".png",graph)
-                        specify = ""#str(tuple((2*a,a,w,h)))
-                        f.write(specify)
-                        f.write('\n')
+                        #specify = ""#str(tuple((2*a,a,w,h)))
+                        #f.write(specify)
+                        #f.write('\n')
                         #self.count_graph = self.count_graph + 1
                         count_graph = count_graph + 1
 
 
-        cv2.imwrite(self.graphfolder+"/contour.png",img)
+        #cv2.imwrite(self.graphfolder+"/contour.png",img)
+
 
     def pdf_to_img(self): 
         """Convert pdf to png image
@@ -136,11 +141,15 @@ class pdfwithgraph:
                 os.makedirs(self.graphfolder)
             self.pageImage = self.pdfImage[self.countPage]
             self.polydp(self.houghp())
+
+        return self.graphArray
+
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
     G = pdfwithgraph(pdfName,200,50,1500,70)
-    G.graphextract()
+    ga = G.graphextract()
+
 
 if __name__=='__main__':
     main()
