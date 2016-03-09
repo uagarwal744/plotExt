@@ -416,7 +416,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	cv2.imshow("as",image)
 	cv2.waitKey(0)
 	'''
-	cv2.imwrite("out.jpg", image);
+	#cv2.imwrite("out.jpg", image);
 	legend_info = []
 	for i in range(len(new_rect)):
 		temp = []
@@ -424,8 +424,11 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		temp.append(colors[i])
 		legend_info.append(temp)
 
+	image_info = []
+	image_info.append(image)
+	image_info.append(legend_info)
 
-	return legend_info	
+	return image_info	
 
 #horizontal is x
 def legend_detect(img, x_min, x_max, y_min, y_max):
