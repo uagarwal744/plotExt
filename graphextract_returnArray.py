@@ -82,7 +82,7 @@ class pdfwithgraph:
                     if(self.aspectRatio(w,h) == True and h < 0.95*hi and w < 0.95*wi):
                         #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                         #graph = img[y-a:y+h+a,x-2*a:x+w+a]
-                        cv2.drawContours(img, [c], -1, (0, 0, 255), 2)
+                        #scv2.drawContours(img, [c], -1, (0, 0, 255), 2)
                         percentin = 0.2
                         xstart = max(0,x-percentin*w)
                         xend = min(wi,x+w+percentin*w)
