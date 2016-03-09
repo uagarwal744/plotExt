@@ -13,8 +13,7 @@ import warnings
 
 current_color = []
 
-def draw_rectangles(img,pos):
-	
+def draw_rectangles(img,pos):	
 	for x in pos:
 		cv2.rectangle(img,(x[0],x[1]),(x[2],x[3]),(0,255,0),2)
 	
@@ -30,16 +29,16 @@ def mod(a):
 	return a
 
 #returns true is the vertical strip contains only white or black pixels
-def isWhiteOrBlack(x,y,height, w,b, clt,image):
+def isWhiteOrBlack(x,y,height, w,b, clt,image,colour_found):
 	cnt = 0
 	for i in range(height):	
 		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
-		#print "curr_label = ", curr_label
 		if(curr_label != w and curr_label != b):
-			del current_color[:]
-			current_color.append(image[y+i][x][0])
-			current_color.append(image[y+i][x][1])
-			current_color.append(image[y+i][x][2])
+			if(colour_found == 0):
+				del current_color[:]
+				current_color.append(image[y+i][x][0])
+				current_color.append(image[y+i][x][1])
+				current_color.append(image[y+i][x][2])
 			cnt = cnt+1
 	if(cnt>0):
 		return 0			
@@ -369,10 +368,12 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		pos = 0
 
 		while(1):
-			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image)==0):
+			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
+				isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color
 				pos = 1
 				break;
-			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image)==0):
+			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
+				isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color				
 				pos = 2
 				break
 			j = j+1
@@ -380,23 +381,22 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(pos==1):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image)==0):	
+				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):	
 					makeWhite(x1-j,y1,height,image)
 				j= j+1
-				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image)!=0):
+				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
 					cnt = cnt+1
 		if(pos==2):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image)==0):			
+				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):			
 					makeWhite(x2+j,y2,height,image)
 				j = j+1
-				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image)!=0):
+				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
 					cnt = cnt+1
 		
-		colors.append(current_color)
+		colors.append(list(current_color))
 
-	
 	#draw_rectangles(image,new_rect)
 	'''
 	cv2.imshow("as",image)
@@ -424,6 +424,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		temp.append(colors[i])
 		legend_info.append(temp)
 
+
 	return legend_info	
 
 #horizontal is x
@@ -431,7 +432,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max):
 	os.system("tesseract " + img + " scan hocr")
 	parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("graph3.jpg", 115, 650, 68, 415)
+legend_detect("graph3.jpg", 115, 650, 68, 415)
 
 	
 
