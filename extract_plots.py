@@ -35,7 +35,7 @@ def extract_plots(filename):
 		cv2.imwrite(mask_name,mask)
 	return mask_names,masks
 
-extract_plots("p3.png")
+#extract_plots("p3.png")
 
 
 #res = cv2.bitwise_and(image,image, mask= mask)
