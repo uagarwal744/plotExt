@@ -30,6 +30,7 @@ class pdfwithgraph:
         self.density = density  
         self.pdfImage = []  
         self.graphArray = []
+        self.graphName = []
 
     
     def houghp(self):
@@ -88,8 +89,9 @@ class pdfwithgraph:
                         xend = min(wi,x+w+percentin*w)
                         ystart = max(0,y-percentin*h)
                         yend = min(hi,y+h+percentin*h)
-                        graph = img[ystart:yend,xstart:xend]
+                        graph = img[int(ystart):int(yend),int(xstart):int(xend)]
                         self.graphArray.append(graph)
+                        self.graphName.append(self.graphfolder+"/"+str(count_graph)+".png")
                         #print graph.shape
                         # cv2.imshow("window",graph)
                         # cv2.waitKey(0)
@@ -142,7 +144,7 @@ class pdfwithgraph:
             self.pageImage = self.pdfImage[self.countPage]
             self.polydp(self.houghp())
 
-        return self.graphArray
+        return self.graphArray,self.graphName
 
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
