@@ -2,14 +2,15 @@ import cv2
 from sklearn.cluster import KMeans
 import numpy as np 
 
-def extract_plots(filename):
+def extract_plots(filename,clusters):
 	image=cv2.imread(filename)
+	print filename
 	#image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
 
 	img_array = image.reshape((image.shape[0] * image.shape[1], 3))
 
-	clt = KMeans(n_clusters = 6)
+	clt = KMeans(n_clusters = clusters)
 	
 	clt.fit(img_array)
 
@@ -25,6 +26,7 @@ def extract_plots(filename):
 			labels.append(ret_labels[i])
 
 	clt_image=clt.labels_.reshape((image.shape[0],image.shape[1],1))
+	#return clt_image,bw_labels
 	mask_names=[]
 	masks=[]
 	for label in np.unique(labels):
@@ -33,9 +35,10 @@ def extract_plots(filename):
 		mask_names.append(mask_name)
 		masks.append(mask)
 		cv2.imwrite(mask_name,mask)
-	return mask_names,masks
+	print mask_names	
+	return clt_image,bw_labels,mask_names,masks
 
-#extract_plots("p3.png")
+#extract_plots("pic5.png")
 
 
 #res = cv2.bitwise_and(image,image, mask= mask)
