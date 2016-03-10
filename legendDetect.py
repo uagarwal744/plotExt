@@ -109,9 +109,12 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 			print k,i.text,len(i.text)
 
 
-	
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	print('fooooooooooooooooooooooooo')
+	print(image.shape,x_min,x_max,y_min,y_max)
+	#cv2.imshow("as",image)
+	#cv2.waitKey(0)
 	
 	
 	#coordinates of the bounding box
@@ -130,6 +133,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	temp_rect = []
 	for i in range(len(out)):
 		temp_rect.append(rect[out[i]])
+
+	print "After removal of boundary"
+	print len(temp_rect)
 
 	#we create a array of sets to merge text in the same line
 	arr=[]
@@ -189,7 +195,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		new_rect.append(rect_bound)
 
 	
-	
+	print "After merging"
+	print new_rect
 	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
 
 	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
@@ -370,6 +377,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	#code for removing the legend
 	#first we traverse left and right to see where the legend is
 	#then we go on making the legend white till we encounter a continuos strip of 40 white pixels
+
+	print "after up down"
+	print new_rect
+
 	colors = []
 	for i in range(len(new_rect)):
 		x1 = new_rect[i][0]
@@ -379,7 +390,6 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		height = new_rect[i][3]-new_rect[i][1]
 		j=10
 		pos = 0
-
 		while(1):
 			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color
@@ -426,7 +436,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				image[j][k][2] = 255;
 	
 	'''
-	cv2.imshow("as",image)
+	cv2.imshow("as",img_arrae)
 	cv2.waitKey(0)
 	'''
 	cv2.imwrite("out.jpg", image);
@@ -438,14 +448,17 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		legend_info.append(temp)
 
 
-	return legend_info	
+     
+	return image,legend_info
 
 #horizontal is x
 def legend_detect(img, x_min, x_max, y_min, y_max):
+	
 	os.system("tesseract " + img + " scan hocr")
-	parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
+	return parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
-legend_detect("graph4.jpg", 133, 852, 74, 524)
+#legend_detect("input2.png", 251, 1510, 162, 944)
+
 
 	
 

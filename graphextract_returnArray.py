@@ -91,12 +91,15 @@ class pdfwithgraph:
                         yend = min(hi,y+h+percentin*h)
                         graph = img[int(ystart):int(yend),int(xstart):int(xend)]
                         self.graphArray.append(graph)
-                        self.graphName.append(self.graphfolder+"/"+str(count_graph)+".png")
+                        filename = self.graphfolder+"/"+str(count_graph)+".png"
+                        self.graphName.append(filename)
                         #print graph.shape
                         # cv2.imshow("window",graph)
                         # cv2.waitKey(0)
                         # cv2.destroyAllWindows()
-                        cv2.imwrite(self.graphfolder+"/"+str(count_graph)+".png",graph)
+                        cv2.imwrite(filename,graph)
+                        os.system("convert -resize 25% "+filename+" "+filename)
+
                         #specify = ""#str(tuple((2*a,a,w,h)))
                         #f.write(specify)
                         #f.write('\n')

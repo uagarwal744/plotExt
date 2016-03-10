@@ -9,6 +9,7 @@ from graphextract_returnArray import pdfwithgraph
 import axis
 import legendDetect
 import hough
+import tables
 
 class Graph:
     def __init__(self,image,outer_image_file):
@@ -16,7 +17,8 @@ class Graph:
         self.outer_image_file = outer_image_file
 
     def axis_detection(self):
-        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.image)
+        self.resized_image=cv2.imread(self.outer_image_file)
+        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.resized_image)
         print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2
     
     def legend_detection(self):
@@ -24,9 +26,11 @@ class Graph:
         #cv2.imshow("image",self.image_without_legend)
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
+    def value_calculation(self):
+        tables.run(self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2)
     
     def scale_detection(self):
-        self.inner_image,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image)
+        self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image)
     
     def run(self):
         self.axis_detection()
@@ -36,14 +40,16 @@ class Graph:
         #cv2.imshow("image",graph)
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
-        #self.legend_detection()
+        self.legend_detection()
         self.scale_detection()
+        self.value_calculation()
 
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
     G = pdfwithgraph(pdfName,200,50,1500,70)
     ga,na = G.graphextract()
+    print(ga,na)
     graphImages = []
     for i in range(len(ga)):
         graphImages.append(Graph(ga[i],na[i]))
