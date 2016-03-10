@@ -21,6 +21,7 @@ def final_scale(img,clusters=2) :
 	arrayv = []
 	image1 = img
 	image2 = img
+	tempimg = img
 	xth = 0.25 * cols
 	yth = 0.25 * rows
 	xmax = -1
@@ -76,24 +77,25 @@ def final_scale(img,clusters=2) :
 			k=k+1
 
 		if line[0] == line[2] and (pixel[line[1]-5][k] == example[0] or pixel[line[3]+5][line[2]] == example[0] or pixel[(line[1]+line[3])/2][(line[0]+line[2])/2] == example[0]):
-			if dist > ymax1  and not (pt1,pt2) == ypt1 and abs(ypt1[0][0]-line[0]) > xth and dist > 0.7*ymax :
+			if dist > ymax1  and not (pt1,pt2) == ypt1 and abs(ypt1[0][0]-line[0]) > xth and dist > 0.7*yth :
 				ymax1 = dist
 				ypt2 = (pt1,pt2)
 
 			#cv2.line(img,pt1,pt2,(0,0,255),2)
 		if line[1] == line[3] and (pixel[line[1]-5][line[0]] == example[0] or pixel[line[3]+5][line[2]] == example[0] or pixel[(line[1]+line[3])/2][(line[0]+line[2])/2] == example[0]):
 			#if dist > xmax1 and not (pt1,pt2) == xpt1 and abs(pt1[1]-xpt1[0][1]) > yth:
-			if dist > xmax1  and not (pt1,pt2) == xpt1 and abs(xpt1[0][1]-line[1]) > yth and dist > 0.7*xmax :
+			if dist > xmax1  and not (pt1,pt2) == xpt1 and abs(xpt1[0][1]-line[1]) > yth and dist > 0.7*xth :
 				xmax1 = dist
 				xpt2 = (pt1,pt2)
-
+	'''
 	cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)	
 	cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
+	
 	if not xmax1 == -1 :
 		cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
 	if not ymax1 == 1 :	
 		cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)
-		
+	'''	
 	#cv2.line(img,(549,397),(549,24),(0,0,255),2)
 	'''
 	i= 24
@@ -145,6 +147,8 @@ def final_scale(img,clusters=2) :
 	#cv2.line(image1,(bot_left),(top_right),(0,0,255),2)
 	y_pos = []
 	x_pos = []
+	cv2.rectangle(tempimg,(bot_left),(top_right),(0,255,0),3)
+	#cv2.imwrite('temp6.jpg',tempimg)
 	testing.extract_y_scale(input_file,int(ans1),'test3.png',yarr,int(ans),y_pos)
 
 	x_scale.extract_x_scale(input_file,int(ans),'test2.png',xarr,x_pos)

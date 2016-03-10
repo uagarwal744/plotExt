@@ -58,13 +58,23 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 	a = []
 	soup = BeautifulSoup(data)
 	for i in soup.find_all('span',{'class':'ocrx_word'}) :
-		output_array.append(i.text)
+		
+		print 'ndns'
 		print i.text
 		h= i.get('title').split(' ')
 		k= h[1:5]
 		k[-1]=k[-1][:-1]
+		x = ''
+		for char in i.text :
+			if char == 'O' or char =='o':
+				x+='0'
+			else :
+				x+=char	
+		print x
+				
 		y_pos.append((int(k[1])+int(k[3]))/2)
-		a.append(float(i.text))
+		output_array.append(float(x))
+		a.append(float(x))
 		
 	h= i.get('title').split(' ')
 	k= h[1:5]
