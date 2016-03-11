@@ -1,32 +1,26 @@
-import PyPDF2, numpy as np
 from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib.units import inch,cm
+import numpy as np
 
-#Name of output pdf
-x='ne2.pdf'
-
-c=canvas.Canvas(x)
-
-#Final output array
-ar=np.zeros((40,2))
-
-#End Horizontal Lines of the table
-c.drawString(203,820,'_'*28)
-c.drawString(203,793-len(ar)*16,'_'*28)
-
-#All Vertical Lines of the table
-for i in xrange(0,18+len(ar)*16,8):
-	c.drawString(200,810-i,'|')
-	c.drawString(295,810-i,'|')
-	c.drawString(390,810-i,'|')
-
-#Name of the X and Y axis (to be changed accordingly)
-c.drawString(230, 800, "X Value")
-c.drawString(325, 800, "Y Value")
-
-#Writing the values of array in the table
+x='new.pdf'
+c=canvas.Canvas(x,pagesize=A4)
+width, height=A4
+ar=np.zeros((40,4))
+c.translate(0,height)
+title=['X Value']
+for i in xrange(len(ar[0])-1):
+	title.append('Y ' + str(i+1) + " Value")
+for i in xrange(len(ar[0])):
+	c.drawString((i+1.1)*inch,-1.5*cm,title[i])
+xlist=[]
+for i in xrange(len(ar[0])+1):
+	xlist.append((i+1)*inch)
+ylist=[]
 for i in xrange(len(ar)):
-	c.drawString(245,780-i*16,str(ar[i][0]))
-	c.drawString(203,780-i*16+14,'_'*28)
-	c.drawString(340,780-i*16,str(ar[i][1]))
+	ylist.append(-(i+1)*cm)
+c.grid(xlist, ylist)
 
+
+c.showPage()
 c.save()
