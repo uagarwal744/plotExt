@@ -51,8 +51,10 @@ def main():
     ga,na = G.graphextract()
     print(ga,na)
     graphImages = []
+    
     for i in range(len(ga)):
-        graphImages.append(Graph(ga[i],na[i]))
+        for j in range(len(ga[i])):
+            graphImages.append(Graph(ga[i][j],na[i][j]))
     for G in graphImages:
         G.run()
         break;
