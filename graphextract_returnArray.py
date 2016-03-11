@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
 import math
-from wand.image import Image
+#from wand.image import Image
 import PythonMagick
 from pyPdf import PdfFileReader
 import os,sys
 
-class pdfwithgraph:
-    def __init__(self,pdfFile,minLineLength,maxLineGap,threshArea,percent,ang_prec=180,det_prec=0.25,density="300"):
+class PlotExtractor:
+    def __init__(self,pagelist,minLineLength=200,maxLineGap=50,threshArea=1500,percent=70,ang_prec=180,det_prec=0.25,density="300"):
         """Initializes the class
         Keyword arguments:
         filename -- actual image of the entire pdf
@@ -19,7 +19,7 @@ class pdfwithgraph:
         det_prec -- detail precision of HoughLinesP function
         density -- parameter for the quality of image. TO BE ENTERED IN STRING FORMAT
         """
-        self.pdfFile = pdfFile
+        self.pagelist = pagelist
 
         self.minLineLength = minLineLength
         self.maxLineGap = maxLineGap
@@ -102,7 +102,9 @@ class pdfwithgraph:
                         # cv2.waitKey(0)
                         # cv2.destroyAllWindows()
                         cv2.imwrite(filename,graph)
-                        os.system("convert -resize 25% "+filename+" "+filename)
+                        #os.system("convert -resize 25% "+filename+" "+filename)
+                        if(graph.shape[1]>900):
+                            os.system("convert -resize 900 "+filename+" "+filename)
 
                         #specify = ""#str(tuple((2*a,a,w,h)))
                         #f.write(specify)
@@ -140,17 +142,18 @@ class pdfwithgraph:
             return False
         return True
 
-    def graphextract(self,pagelist):
+    def graphextract(self):
         """Wrapper function for extracting the images"""
         #self.pdf_to_img()
         #self.count_graph=1
+        pagelist = self.pagelist
         self.numPages = len(pagelist)
         
 
-        for i in range len(pagelist):
-            #self.graphfolder = "output_page_"+str(self.countPage)
-            #if(not os.path.exists(self.graphfolder)):
-            #    os.makedirs(self.graphfolder)
+        for i in range(len(pagelist)):
+            self.graphfolder = "output_page_"+str(i)
+            if(not os.path.exists(self.graphfolder)):
+                os.makedirs(self.graphfolder)
             self.pageImage = pagelist[i]
             #self.pagecount = i
             list,list2 = self.polydp(self.houghp())
@@ -163,8 +166,8 @@ class pdfwithgraph:
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
-    G = pdfwithgraph(pdfName,200,50,1500,70)
-    ga = G.graphextract()
+    #G = pdfwithgraph(pdfName,200,50,1500,70)
+    #ga = G.graphextract()
 
 
 if __name__=='__main__':
