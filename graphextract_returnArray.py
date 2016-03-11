@@ -29,8 +29,9 @@ class pdfwithgraph:
         self.det_prec = det_prec  
         self.density = density  
         self.pdfImage = []  
-        self.graphArray = []
+        #self.graphArray = []
         self.graphName = []
+        self.graphList = []
 
     
     def houghp(self):
@@ -70,7 +71,8 @@ class pdfwithgraph:
         count_graph = 1
         #f = open("contours.txt","wb")
         
-
+        list = []
+        list2 = []
         for c in cnts:
             if cv2.contourArea(c) >self.threshArea:
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
@@ -90,9 +92,11 @@ class pdfwithgraph:
                         ystart = max(0,y-percentin*h)
                         yend = min(hi,y+h+percentin*h)
                         graph = img[int(ystart):int(yend),int(xstart):int(xend)]
-                        self.graphArray.append(graph)
+                        #self.graphArray.append(graph)
+                        list.append(graph)
                         filename = self.graphfolder+"/"+str(count_graph)+".png"
-                        self.graphName.append(filename)
+                        #self.graphName.append(filename)
+                        list2.append(filename)
                         #print graph.shape
                         # cv2.imshow("window",graph)
                         # cv2.waitKey(0)
@@ -108,7 +112,7 @@ class pdfwithgraph:
 
 
         #cv2.imwrite(self.graphfolder+"/contour.png",img)
-
+        return list,list2
 
     def pdf_to_img(self): 
         """Convert pdf to png image
@@ -136,18 +140,25 @@ class pdfwithgraph:
             return False
         return True
 
-    def graphextract(self):
+    def graphextract(self,pagelist):
         """Wrapper function for extracting the images"""
-        self.pdf_to_img()
+        #self.pdf_to_img()
         #self.count_graph=1
-        for self.countPage in range(self.numPages):
-            self.graphfolder = "output_page_"+str(self.countPage)
-            if(not os.path.exists(self.graphfolder)):
-                os.makedirs(self.graphfolder)
-            self.pageImage = self.pdfImage[self.countPage]
-            self.polydp(self.houghp())
+        self.numPages = len(pagelist)
+        
 
-        return self.graphArray,self.graphName
+        for i in range len(pagelist):
+            #self.graphfolder = "output_page_"+str(self.countPage)
+            #if(not os.path.exists(self.graphfolder)):
+            #    os.makedirs(self.graphfolder)
+            self.pageImage = pagelist[i]
+            #self.pagecount = i
+            list,list2 = self.polydp(self.houghp())
+            self.graphList.append(list)
+            self.graphName.append(list2)
+            #self.polydp(self.houghp())
+
+        return self.graphList,self.graphName
 
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
