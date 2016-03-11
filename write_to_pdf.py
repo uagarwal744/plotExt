@@ -1,3 +1,4 @@
+#mine
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.units import inch,cm
@@ -20,7 +21,7 @@ c.drawString(width/3,-inch,"Input Page")
 c.setFont("Times-Roman", 10)
 
 #Image Print
-im=ImageReader('b.jpg')
+im=ImageReader('0002.jpg')
 w=im.getSize()[0]
 h=im.getSize()[1]
 c.drawImage(im,(width-.75*w)/2,-(height+.75*h)/2,.75*w,.75*h)
@@ -31,34 +32,35 @@ c.showPage()
 #New Page
 
 #Array to be printed
-ar=np.zeros((50,3))
-
+ar=np.zeros((10,10))
+W = width/(len(ar[0])+2)
+H = height/(len(ar)+3)
 c.translate(0,height)
 
 #Title of the Graph
-c.drawString(2*inch,-.4*cm,"Title of the Plot")
+c.drawString(2*inch,-.4*H,"Title of the Plot")
 
 #Title of X and Y axes
 title=['X Value']
 for i in xrange(len(ar[0])-1):
 	title.append('Y ' + str(i+1) + " Value")
 for i in xrange(len(ar[0])):
-	c.drawString((i+1.1)*inch,-cm,title[i])
+	c.drawString((i+1.1)*W,-1.5*H,title[i])
 
 #Size of the Grid
 xlist=[]
 for i in xrange(len(ar[0])+1):
-	xlist.append((i+1)*inch)
+	xlist.append(W*(i+1))
 ylist=[]
 for i in xrange(len(ar)+2):
-	ylist.append(-(i+1)*0.6*cm)
+	ylist.append(-(i+1)*H)
 #Creating the Grid
 c.grid(xlist, ylist)
 
 #Printing the Output Array
 for i in xrange(len(ar)):
 	for j in xrange(len(ar[0])):
-		c.drawString((j+1.1)*inch,-cm*(1.6+0.6*i),str(ar[i][j]))
+		c.drawString((j+1.1)*W,-H*(2.5+i),str(ar[i][j]))
 
 c.showPage()
 
