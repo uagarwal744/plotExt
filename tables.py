@@ -125,21 +125,21 @@ def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_
 		if (prevval==(-(sys.maxint)))and(nextval!=(-(sys.maxint))):
 			val=nextval
 			trueval=(float(val)/rectsize_y)*(ydiv*scale_y)+start_y
-			fx.append(trueval)
-			x_.append(x)
+			fx.append(str(trueval))
+			x_.append(str(x))
 		elif (prevval!=(-(sys.maxint)))and(nextval==(-(sys.maxint))):
 			val=prevval
 			trueval=(float(val)/rectsize_y)*(ydiv*scale_y)+start_y
-			fx.append(trueval)
+			fx.append(str(trueval))
 			x_.append(x)
 		elif(prevval==(-(sys.maxint)))and(nextval==(-(sys.maxint))):
-			fx.append(-(sys.maxint))
-			x_.append(x)
+			fx.append("--")
+			x_.append(str(x))
 		else:
 			val=float(prevval+nextval)/2
 			trueval=(float(val)/rectsize_y)*(ydiv*scale_y)+start_y
-			fx.append(trueval)
-			x_.append(x)
+			fx.append(str(trueval))
+			x_.append(str(x))
 		r+=1
 	#print x_
 	#print fx	
