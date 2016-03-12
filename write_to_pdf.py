@@ -74,3 +74,28 @@ c.showPage()
 
 #Save PDF
 c.save()
+for i in xrange(len(ar[0])-1):
+	title.append('Y ' + str(i+1) + " Value")
+for i in xrange(len(ar[0])):
+	c.drawCentredString((i+1.5)*W,-inch-.7*H,title[i])
+
+#Size of the Grid
+xlist=[]
+for i in xrange(len(ar[0])+1):
+	xlist.append(W*(i+1))
+ylist=[]
+for i in xrange(len(ar)+2):
+	ylist.append(-i*H-inch)
+#Creating the Grid
+c.grid(xlist, ylist)
+
+#Printing the Output Array
+for i in xrange(len(ar)):
+	for j in xrange(len(ar[0])):
+		c.drawCentredString((j+1.5)*W,-H*(1.7+i)-inch,str(ar[i][j]))
+
+c.showPage()
+
+
+#Save PDF
+c.save()
