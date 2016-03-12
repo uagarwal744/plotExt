@@ -1,4 +1,3 @@
-#mine
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.units import inch,cm
@@ -23,7 +22,10 @@ c.drawString(width/3,-.5*inch,"Input Page")
 im=ImageReader('b.jpg')
 w=im.getSize()[0]
 h=im.getSize()[1]
-c.drawImage(im,(width-.75*w)/2,-(height+.75*h)/2,.75*w,.75*h)
+r=(width-2*cm)/w
+w= width-2*cm
+c.drawImage(im,(width-w)/2,-(height+h*r)/2,w,r*h)
+
 
 #Save Page
 c.showPage()
