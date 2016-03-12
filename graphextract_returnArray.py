@@ -20,7 +20,7 @@ class PlotExtractor:
         density -- parameter for the quality of image. TO BE ENTERED IN STRING FORMAT
         """
         self.pagelist = pagelist
-
+        #self.pdfFile = pdfFile
         self.minLineLength = minLineLength
         self.maxLineGap = maxLineGap
         self.threshArea = threshArea
@@ -48,7 +48,7 @@ class PlotExtractor:
         #gray = cv2.blur(gray,(5,5))
         #gray = cv2.medianBlur(gray,5)
         #gray = cv2.bilateralFilter(gray,9,75,75)
-        gray = cv2.GaussianBlur(gray,(5,5),0)
+        #gray = cv2.GaussianBlur(gray,(5,5),0)
         #edges = cv2.Canny(gray,50,150,apertureSize = 3)
         lines = cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,100,self.minLineLength,self.maxLineGap)
         im2 = np.zeros((h,w,channel),np.uint8)
@@ -73,47 +73,102 @@ class PlotExtractor:
         
         list = []
         list2 = []
+
+        self.x = []
+        self.y = []
+        self.w = []
+        self.h = []
+        self.cont = []
+        self.cflag = []
+
         for c in cnts:
             if cv2.contourArea(c) >self.threshArea:
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
                 if len(approx)<10 and len(approx)>2:
-                    x,y,w,h = cv2.boundingRect(c)
+                    x_,y_,w_,h_  = cv2.boundingRect(c)
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                     #graph = img[y-a:y+h+a,x-2*a:x+w+a]
                     
-                    if(self.aspectRatio(w,h) == True and h < 0.95*hi and w < 0.95*wi):
+                    if(self.aspectRatio(w_,h_) == True and h_ < 0.95*hi and w_ < 0.95*wi):
+                        
+                        self.cont.append([c])
+                        self.x.append(x_)
+                        self.y.append(y_)
+                        self.h.append(h_)
+                        self.w.append(w_)
+                        self.cflag.append("1")
+
+
                         #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                         #graph = img[y-a:y+h+a,x-2*a:x+w+a]
                         #scv2.drawContours(img, [c], -1, (0, 0, 255), 2)
-                        percentin = 0.2
-                        xstart = max(0,x-percentin*w)
-                        xend = min(wi,x+w+percentin*w)
-                        ystart = max(0,y-percentin*h)
-                        yend = min(hi,y+h+percentin*h)
-                        graph = img[int(ystart):int(yend),int(xstart):int(xend)]
+                        
+                        ##percentin = 0.2
+                        ##xstart = max(0,x-percentin*w)
+                        ##xend = min(wi,x+w+percentin*w)
+                        ##ystart = max(0,y-percentin*h)
+                        ##yend = min(hi,y+h+percentin*h)
+                        ##graph = img[int(ystart):int(yend),int(xstart):int(xend)]
+                        
                         #self.graphArray.append(graph)
-                        list.append(graph)
-                        filename = self.graphfolder+"/"+str(count_graph)+".png"
+                        
+                        ##list.append(graph)
+                        ##filename = self.graphfolder+"/"+str(count_graph)+".png"
+                        
                         #self.graphName.append(filename)
-                        list2.append(filename)
+                        
+                        ##list2.append(filename)
+                        
                         #print graph.shape
                         # cv2.imshow("window",graph)
                         # cv2.waitKey(0)
                         # cv2.destroyAllWindows()
-                        cv2.imwrite(filename,graph)
+                        
+                        ##cv2.imwrite(filename,graph)
+                        
                         #os.system("convert -resize 25% "+filename+" "+filename)
-                        if(graph.shape[1]>900):
-                            os.system("convert -resize 900 "+filename+" "+filename)
+                        
+                        ##if(graph.shape[1]>900):
+                        ##    os.system("convert -resize 900 "+filename+" "+filename)
 
                         #specify = ""#str(tuple((2*a,a,w,h)))
                         #f.write(specify)
                         #f.write('\n')
                         #self.count_graph = self.count_graph + 1
-                        count_graph = count_graph + 1
+                        
+                        ##count_graph = count_graph + 1
 
+        for i in range(len(self.x)):
+            x_,y_,w_,h_ = self.x[i],self.y[i],self.w[i],self.h[i]
+            for j in range(len(self.x)):
+                if j==i:
+                    continue
+                if x_>=self.x[j] and y_>=self.y[j] and (x_+w_)<=(self.x[j]+self.w[j]) and (y_+h_)<=(self.y[j]+self.h[j]):
+                    self.cflag[i]="0"
+        
+        for i in range(len(self.cflag)): 
+            if(self.cflag[i]=="0"):
+                continue
 
-        #cv2.imwrite(self.graphfolder+"/contour.png",img)
+            #cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
+            percentin = 0.2
+            xstart = max(0,self.x[i]-percentin*self.w[i])
+            xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
+            ystart = max(0,self.y[i]-percentin*self.h[i])
+            yend = min(hi,self.y[i]+self.h[i]+percentin*self.h[i])
+            
+            graph = img[ystart:yend,xstart:xend]
+
+            list.append(graph)
+            filename = self.graphfolder+"/"+str(count_graph)+".png"
+            list2.append(filename)
+            cv2.imwrite(filename,graph)
+            if(graph.shape[1]>900):
+                os.system("convert -resize 900 "+filename+" "+filename)
+
+            count_graph = count_graph + 1
+        
         return list,list2
 
     def pdf_to_img(self): 
@@ -133,7 +188,7 @@ class PlotExtractor:
             img.write(self.folder_name+"/page_"+str(i)+".png".format(self.pdfFile,i))
             
             #self.pdfImage = self.folder_name+"/page_"+str(i)+".png"
-            self.pdfImage.append(self.folder_name+"/page_"+str(i)+".png")
+            self.pagelist.append(self.folder_name+"/page_"+str(i)+".png")
             #return img
  
     def aspectRatio(self,w,h):
@@ -146,6 +201,7 @@ class PlotExtractor:
         """Wrapper function for extracting the images"""
         #self.pdf_to_img()
         #self.count_graph=1
+        
         pagelist = self.pagelist
         self.numPages = len(pagelist)
         
@@ -166,7 +222,7 @@ class PlotExtractor:
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
-    #G = pdfwithgraph(pdfName,200,50,1500,70)
+    #G = PlotExtractor(pdfName,200,50,1500,70)
     #ga = G.graphextract()
 
 
