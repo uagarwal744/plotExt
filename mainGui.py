@@ -79,6 +79,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def getGraphs(self):
         images,files = graphextract_returnArray.PlotExtractor(self.listOfFiles).graphextract()
+        print images
+        print files
         for i in range(len(images)):
             new_list=[]
             for j in range(len(images[i])):
@@ -126,7 +128,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
         item=QtGui.QListWidgetItem(QtGui.QIcon('cd'+str(pg_no)+'.png'),QtCore.QString('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
         self.graphlistWidget.addItem(item)
-        self.plots.append(image_class.Graph('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png','graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+        self.plots[int(pg_no)-1].append(image_class.Graph(graph,'graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
 
 
     def enableDrag(self):
@@ -208,7 +210,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         z=QtCore.QFileInfo(self.x)     #z stores only the file name
         
         #y stores the number of pages in the pdf 
-        y=pdf_to_img.pdf_to_img1(self.x,"200")
+        y=pdf_to_img.pdf_to_img1(self.x,"300")
         for i in range(y):
             self.graph_per_page.append(0)
         self.pdflistWidget.clear()

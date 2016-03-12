@@ -225,9 +225,10 @@ class PlotExtractor:
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
-    G = PlotExtractor(pdfName,200,50,1500,70)
-    ga = G.graphextract()
-
+    G = PlotExtractor(pdfName)
+    ga,na = G.graphextract()
+    print ga
+    print na
 
 if __name__=='__main__':
     main()
