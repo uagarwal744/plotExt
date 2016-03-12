@@ -192,11 +192,11 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 		table.append(fx)
 	print 'hi'
 	print len(table[1])
-	for j in range(len(table[0])):
-		for i in range(len(table)):
-			print table[i][j],
-		print '\n'	
-	plot(table[0] , table[2])
+	# for j in range(len(table[0])):
+	# 	for i in range(len(table)):
+	# 		print table[i][j],
+	# 	print '\n'	
+	# plot(table[0] , table[2])
 	return table
 
 def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2):

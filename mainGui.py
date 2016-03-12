@@ -48,6 +48,15 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
+        self.pushButton_5.clicked.connect(self.getTables)
+
+
+    def getTables(self):
+        for plots in self.plots:
+            for plot in plots:
+                plot.run()
+                print(plot.table)
+                return
 
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
@@ -123,12 +132,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         ystart=int(top_left.y()*y_ratio)
         xend=int(bottom_right.x()*x_ratio)
         yend=int(bottom_right.y()*y_ratio)
-        print xstart, ystart, xend, yend
         graph = img[int(ystart):int(yend),int(xstart):int(xend)]  
         cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
         item=QtGui.QListWidgetItem(QtGui.QIcon('cd'+str(pg_no)+'.png'),QtCore.QString('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
         self.graphlistWidget.addItem(item)
         self.plots[int(pg_no)-1].append(image_class.Graph(graph,'graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+
 
 
     def enableDrag(self):

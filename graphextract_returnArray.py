@@ -162,13 +162,16 @@ class PlotExtractor:
             yend = min(hi,self.y[i]+self.h[i]+percentin*self.h[i])
             
             graph = img[ystart:yend,xstart:xend]
-
-            list.append(graph)
             filename = self.graphfolder+"/"+str(count_graph)+".png"
-            list2.append(filename)
-            cv2.imwrite(filename,graph)
+            
             if(graph.shape[1]>900):
                 os.system("convert -resize 900 "+filename+" "+filename)
+                graph = cv2.imread(filename)
+
+            list.append(graph)
+            list2.append(filename)
+            cv2.imwrite(filename,graph)
+
 
             count_graph = count_graph + 1
         

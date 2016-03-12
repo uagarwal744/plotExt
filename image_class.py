@@ -18,8 +18,8 @@ class Graph:
         self.outer_image_file = outer_image_file
 
     def axis_detection(self):
-        self.resized_image=cv2.imread(self.outer_image_file)
-        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.resized_image)
+        #self.resized_image=cv2.imread(self.outer_image_file)
+        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.image)
         print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2
     
     def legend_detection(self):
@@ -35,6 +35,7 @@ class Graph:
     
     def scale_detection(self):
         self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image)
+        #print(hough.final_scale(self.image))
     
     def run(self):
         self.axis_detection()

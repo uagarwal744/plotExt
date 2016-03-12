@@ -106,7 +106,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 			k[-1]=k[-1][:-1]
 			k=[int(x) for x in k]
 			rect.append(k)
-			print k,i.text,len(i.text)
+			#print k,i.text,len(i.text)
 
 
 
