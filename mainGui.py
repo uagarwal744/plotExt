@@ -25,10 +25,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graph_per_page=[]
         self.plot_dic={}
 
-        
-
-        self.ratio_x=0.0
-        self.ratio_y=0.0
 
         self.pdfSelectBtn.clicked.connect(self.openfile)
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
@@ -49,9 +45,14 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_y1.setEnabled(False)
         self.btn_y2.setEnabled(False)
         self.proceed_btn.setEnabled(False)
-        self.display_item.btnReleased.connect(self.addGraphItem)
+        self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
+        self.display_item.resizeEvent = self.onResize
 
+    def onResize(self, event):
+        items=self.pdflistWidget.selectedItems()
+        print items
+        self.pdfItem_click(items[0])
     def removePlot(self,filename):
         print(self.plot_dic)
         print(self.plots)
@@ -61,13 +62,20 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 plots.remove(self.plot_dic[str(filename)])
         print(self.plots)
 
-    def changeEvent(self, event):
-        if event.type() == QtCore.QEvent.WindowStateChange:
-            if self.windowState() & QtCore.Qt.WindowMinimized:
-                print('changeEvent: Minimized')
-            elif event.oldState() & QtCore.Qt.WindowMinimized:
-                print('changeEvent: Normal/Maximised/FullScreen')
+    '''def changeEvent(self, event):
         QtGui.QMainWindow.changeEvent(self, event)
+        if event.type() == QtCore.QEvent.WindowStateChange:
+        #print QtCore.Qt.WindowFullScreen
+            if self.windowState() & QtCore.Qt.WindowMaximized:
+                print 'a'
+
+                items=self.pdflistWidget.selectedItems()
+                print items
+                self.pdfItem_click(items[0])
+            elif event.oldState() & QtCore.Qt.WindowMaximized:
+                items=self.pdflistWidget.selectedItems()
+                print items, 'b'
+                self.pdfItem_click(items[0])'''
 
     def getGraphs(self):
         images,files = graphextract_returnArray.PlotExtractor(self.listOfFiles).graphextract()
@@ -88,17 +96,37 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.graphlistWidget.addItem(self.deletedItems.pop())
 
     def addGraphItem(self, plot):
+        item=QtGui.QListWidgetItem(QtGui.QIcon(plot.outer_image_file), QString(plot.outer_image_file))
+        self.graphlistWidget.addItem(item)
+
+    def manualAddGraph(self):
         self.selectAreaBtn.setChecked(False)
         self.display_item.isEnabled=False
-        cropQPixmap = self.display_item.pixmap().copy(self.display_item.currentQRect)
+        rect=self.display_item.currentQRect
         pdf_item=self.pdflistWidget.selectedItems()
         pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
         self.graph_per_page[int(pg_no)-1]+=1
-        #cropQPixmap.save('graph_pg'+pg_no+'_'+str(self.graph_per_page[int(pg_no)-1])+'.png')
-        #item=QtGui.QListWidgetItem(QtGui.QIcon('graph_pg'+pg_no+'_'+str(self.graph_per_page[int(pg_no)-1])+'.png'),QtCore.QString('graph_pg'+pg_no+'_'+str(self.graph_per_page[int(pg_no)-1])))
-        #self.graphlistWidget.addItem(item)
-        item=QtGui.QListWidgetItem(QtGui.QIcon(plot.outer_image_file), QString(plot.outer_image_file))
+        img = cv2.imread(str(self.x)+str(int(pg_no)-1)+'.png')
+        height, width = img.shape[:2]     # dimensions of original image
+        #size of pixmap
+        h=self.display_item.pixmap().height()
+        w=self.display_item.pixmap().width()
+        #multiplying ratio to convert pixels of pixmap to original image
+        y_ratio=float(height)/h            
+        x_ratio=float(width)/w
+
+        top_left=QtCore.QPoint(rect.topLeft())
+        bottom_right=QtCore.QPoint(rect.bottomRight())
+        xstart=int(top_left.x()*x_ratio)
+        ystart=int(top_left.y()*y_ratio)
+        xend=int(bottom_right.x()*x_ratio)
+        yend=int(bottom_right.y()*y_ratio)
+        print xstart, ystart, xend, yend
+        graph = img[int(ystart):int(yend),int(xstart):int(xend)]  
+        cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
+        item=QtGui.QListWidgetItem(QtGui.QIcon('cd'+str(pg_no)+'.png'),QtCore.QString('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
         self.graphlistWidget.addItem(item)
+        self.plots.append(image_class.Graph('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png','graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
 
 
     def enableDrag(self):
@@ -165,7 +193,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def graphItem_click(self, item):
         self.display_item.setPixmap(QtGui.QPixmap(item.text()).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
     def pdfItem_click(self, item):
-        loc=self.x+str(int(item.text())-1)+".png"
+        loc=self.x+str(int(item.text())-1)+"new.png"
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
 
     def openfile(self):
@@ -187,13 +215,16 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
         
         for i in range(y):
-            w=self.x+str(i)+".png"
-            self.listOfFiles.append(str(w))
+            w=self.x+str(i)+"new.png"
+            
             self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(i+1)))
             self.pdflistWidget.addItem(self.item)
 
+        for i in range(y):
+            w=self.x+str(i)+".png"
+            self.listOfFiles.append(str(w))
         self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
-        self.display_item.setPixmap(QtGui.QPixmap(self.x+"0.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
         self.runBtn.setEnabled(True)
         self.btn_x1.setEnabled(True)
         self.btn_x2.setEnabled(True)
