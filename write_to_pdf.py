@@ -32,7 +32,6 @@ def pdfoutput(c,img,ar):
 	w= width-2*cm
 	c.drawImage(im,(width-w)/2,-(height+h*r)/2,w,r*h)
 
-
 	#Save Page
 	c.showPage()
 
@@ -51,12 +50,20 @@ def pdfoutput(c,img,ar):
 	#c.drawString(width/3,-.9*inch,"Title of the Plot")
 	c.drawCentredString(width/2, -.9*inch, "Title of the Plot")
 
-	c.setFont("Times-Roman", 16-.1*len(ar))
+	c.setFont("Times-Roman", max(16-.1*len(ar),6))
+	fontsize=max(16-.1*len(ar),6)
+	if len(ar[0])>6 and len(ar)<40:
+		c.setFont("Times-Roman", 15-.5*len(ar[0]))
+		fontsize=15-.5*len(ar[0])
 
 	#Title of X and Y axes
 	title=['X Value']
 	for i in xrange(len(ar[0])-1):
 		title.append('Y ' + str(i+1) + " Value")
+	for t in xrange(len(title)):
+		if W/(len(title[t])*fontsize) < .5249:
+			maxtext=int(W/(fontsize*.524)) - 2
+			title[t]=title[t].replace(title[t][maxtext:],"...")
 	for i in xrange(len(ar[0])):
 		c.drawCentredString((i+1.5)*W,-inch-.7*H,title[i])
 
