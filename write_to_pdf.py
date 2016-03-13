@@ -61,8 +61,8 @@ def pdfoutput(c,img,ar):
 	for i in xrange(len(ar[0])-1):
 		title.append('Y ' + str(i+1) + " Value")
 	for t in xrange(len(title)):
-		if W/(len(title[t])*fontsize) < .5249:
-			maxtext=int(W/(fontsize*.524)) - 2
+		if W/(len(title[t])*fontsize) < .55:
+			maxtext=int(W/(fontsize*.55)) - 1
 			title[t]=title[t].replace(title[t][maxtext:],"...")
 	for i in xrange(len(ar[0])):
 		c.drawCentredString((i+1.5)*W,-inch-.7*H,title[i])
