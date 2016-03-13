@@ -305,6 +305,7 @@ class GraphThread(QtCore.QThread):
 
     def houghp(self):
         """Does a Hough Transform (probabilistic) on the image given"""
+        global img
         img = cv2.imread(self.pageImage)
         #print self.pdfImage
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -317,7 +318,7 @@ class GraphThread(QtCore.QThread):
         #gray = cv2.blur(gray,(5,5))
         #gray = cv2.medianBlur(gray,5)
         #gray = cv2.bilateralFilter(gray,9,75,75)
-        gray = cv2.GaussianBlur(gray,(5,5),0)
+        gray = cv2.GaussianBlur(gray,(3,3),0)
         #edges = cv2.Canny(gray,50,150,apertureSize = 3)
         lines = cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,100,self.minLineLength,self.maxLineGap)
         im2 = np.zeros((h,w,channel),np.uint8)
@@ -332,8 +333,9 @@ class GraphThread(QtCore.QThread):
         Keyword arguments:
         image -- image returned by the houghp()
         """
-        img = cv2.imread(self.pageImage)
+        #img = cv2.imread(self.pageImage)
         gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        cv2.imwrite(self.graphfolder+"/gray.png",gray)
         (cnts, _) = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         h,w,channel = image.shape
         hi,wi = h,w
@@ -352,10 +354,11 @@ class GraphThread(QtCore.QThread):
 
         for c in cnts:
             if cv2.contourArea(c) >self.threshArea:
-            # if 1:
+            #if 1:
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
                 if len(approx)<10 and len(approx)>2:
                     x_,y_,w_,h_  = cv2.boundingRect(c)
+                    #cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                     #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -368,7 +371,8 @@ class GraphThread(QtCore.QThread):
                         self.h.append(h_)
                         self.w.append(w_)
                         self.cflag.append("1")
-
+                   # else:
+                  #      self.cflag.append("0")
 
                         #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                         #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -409,6 +413,9 @@ class GraphThread(QtCore.QThread):
                         
                         ##count_graph = count_graph + 1
 
+        for i in range(len(self.x)):
+            if(self.w[i]*self.h[i]<self.threshArea):
+                self.cflag[i]=0
         '''
         for i in range(len(cflag)):
             xstart = max(0,self.x[i])
@@ -423,9 +430,13 @@ class GraphThread(QtCore.QThread):
         '''
 
         for i in range(len(self.x)):
+            if(self.cflag[i]==0):
+                continue
             x_,y_,w_,h_ = self.x[i],self.y[i],self.w[i],self.h[i]
             for j in range(len(self.x)):
                 if j==i:
+                    continue
+                if self.cflag[j] == 0:
                     continue
                 if x_>=self.x[j] and y_>=self.y[j] and (x_+w_)<=(self.x[j]+self.w[j]) and (y_+h_)<=(self.y[j]+self.h[j]):
                     self.cflag[i]="0"
@@ -437,21 +448,24 @@ class GraphThread(QtCore.QThread):
             #cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
             percentin = 0.2
             xstart = max(0,self.x[i]-percentin*self.w[i])
-            xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
+            #xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
+            xend = min(wi,self.x[i]+self.w[i]+0.05*self.w[i])
             ystart = max(0,self.y[i]-percentin*self.h[i])
             yend = min(hi,self.y[i]+self.h[i]+percentin*self.h[i])
             
             graph = img[ystart:yend,xstart:xend]
 
-            list1.append(graph)
+            # list1.append(graph)
             filename = self.graphfolder+"/"+str(count_graph)+".png"
             list2.append(filename)
             cv2.imwrite(filename,graph)
             if(graph.shape[1]>900):
                 os.system("convert -resize 900 "+filename+" "+filename)
+                graph = cv2.imread(filename)
+            list1.append(graph)
 
             count_graph = count_graph + 1
-        
+        cv2.imwrite(self.graphfolder+"/contour_next.png",img)
         return list1,list2
 
     def pdf_to_img(self): 

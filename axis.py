@@ -92,11 +92,16 @@ def axis(img) :
 		i = i+1
 			
 
-	cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
-	cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
-	cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
-	cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
+	# cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
+	# cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
+	# cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
+	# cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
 	cv2.imwrite('temp6.png',img)
+	print 'the points are'
+	print xpt1
+	print xpt2
+	print ypt1
+	print ypt2
 	ans1 = ypt1[0][0]
 	ans3 = ypt2[0][0]
 	ans2 = xpt1[0][1]
@@ -120,7 +125,7 @@ def axis(img) :
 			
 			#cv2.rectangle(img,(int(k[0]),int(k[1])),(int(k[2]),int(k[3])),(0,255,0),3)
 					
-	cv2.imwrite('temp6.png',img)
+	#cv2.imwrite('temp6.png',img)
 	
 	if flag == box_l-1 :
 		image3 = image3[ans2+2:ans-2,ans1+2:ans3-3]

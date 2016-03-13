@@ -46,6 +46,7 @@ def isWhiteOrBlack(x,y,height, w,b, clt,image,colour_found):
 def isBlack(x,y,height,b,clt,image):
 	cnt = 0
 	for i in range(height):	
+		print x,y,height,image.shape
 		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
 		if(curr_label == b):
 			cnt = cnt+1
@@ -86,7 +87,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				continue	
 			
 			#removes words which contain no alphabet
-			'''
+			
 			word = i.text.strip(" ")			
 			flag = 0;
 			for j in range(len(word)):
@@ -98,7 +99,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					break				
 			if(flag==0):
 				continue
-			'''
+			
 			#remove ends
 
 			count += 1
@@ -111,6 +112,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	draw_rectangles(image, rect)
+	cv2.imshow("as",image)
+	cv2.waitKey(0)
 	print('fooooooooooooooooooooooooo')
 	print(image.shape,x_min,x_max,y_min,y_max)
 	#cv2.imshow("as",image)
@@ -381,6 +385,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	print "after up down"
 	print new_rect
 
+	
+	
 	colors = []
 	for i in range(len(new_rect)):
 		x1 = new_rect[i][0]
@@ -435,10 +441,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				image[j][k][1] = 255;
 				image[j][k][2] = 255;
 	
-	'''
-	cv2.imshow("as",img_arrae)
-	cv2.waitKey(0)
-	'''
+	
+	
 	cv2.imwrite("out.jpg", image);
 	legend_info = []
 	for i in range(len(new_rect)):
@@ -453,7 +457,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 #horizontal is x
 def legend_detect(img, x_min, x_max, y_min, y_max):
-	
+	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	cv2.imshow("lol",image)
 	os.system("tesseract " + img + " scan hocr")
 	return parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 

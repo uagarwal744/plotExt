@@ -49,7 +49,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
-        self.manual.clicked.connect(self.manual_fun)
+        #self.manual.clicked.connect(self.manual_fun)
         self.contin.clicked.connect(self.getTables)
 
 
@@ -167,7 +167,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.graphlistWidget.addItem(self.deletedItems.pop())
 
     def addGraphItem(self, plot):
-        print plot.outer_image_file
         item=QtGui.QListWidgetItem(QtGui.QIcon(plot.outer_image_file), QString(plot.outer_image_file))
         self.graphlistWidget.addItem(item)
 
@@ -176,8 +175,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.isEnabled=False
         rect=self.display_item.currentQRect
         pdf_item=self.pdflistWidget.selectedItems()
-        pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
-        self.graph_per_page[int(pg_no)-1]+=1
+        #pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
+        #self.graph_per_page[int(pg_no)-1]+=1
         img = cv2.imread(str(self.x)+str(int(pg_no)-1)+'.png')
         height, width = img.shape[:2]     # dimensions of original image
         #size of pixmap
@@ -195,7 +194,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         yend=int(bottom_right.y()*y_ratio)
         graph = img[int(ystart):int(yend),int(xstart):int(xend)]  
         cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
-        item=QtGui.QListWidgetItem(QtGui.QIcon('cd'+str(pg_no)+'.png'),QtCore.QString('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+        item=QtGui.QListWidgetItem(QtGui.QIcon('cd1.png'),QtCore.QString('outt.png'))
         self.graphlistWidget.addItem(item)
         self.plots[int(pg_no)-1].append(image_class.Graph(graph,'graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
 
