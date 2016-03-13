@@ -210,10 +210,14 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 #	print z
 	masks=[]
 	for i in range(len(legend)):
+		print legend[i][0]
 		b=legend[i][1][0]
 		g=legend[i][1][1]
 		r=legend[i][1][2]
-		masks.append(hsv.mark(image_without_legend,b,g,r))
+		plotImg = hsv.mark(image_without_legend,b,g,r)
+		print r,g,b
+		masks.append(plotImg)
+		cv2.imwrite("mask %d.png"%(i),plotImg)
 	print 'below'
 	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
 	

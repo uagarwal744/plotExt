@@ -112,9 +112,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
-	draw_rectangles(image, rect)
-	cv2.imshow("as",image)
-	cv2.waitKey(0)
+	# draw_rectangles(image, rect)
+	# cv2.imshow("as",image)
+	# cv2.waitKey(0)
 	print('fooooooooooooooooooooooooo')
 	print(image.shape,x_min,x_max,y_min,y_max)
 	#cv2.imshow("as",image)
@@ -458,7 +458,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 #horizontal is x
 def legend_detect(img, x_min, x_max, y_min, y_max):
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
-	cv2.imshow("lol",image)
+	# cv2.imshow("lol",image)
 	os.system("tesseract " + img + " scan hocr")
 	return parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
