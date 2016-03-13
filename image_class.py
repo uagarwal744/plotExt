@@ -9,6 +9,7 @@ from graphextract_returnArray import PlotExtractor
 import axis
 import legendDetect
 import hough
+
 import tables
 
 class Graph:
@@ -17,9 +18,9 @@ class Graph:
         self.outer_image_file = outer_image_file
 
     def axis_detection(self):
-        self.resized_image=cv2.imread(self.outer_image_file)
-        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.resized_image)
-        print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2
+        #self.resized_image=cv2.imread(self.outer_image_file)
+        self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.image)
+        print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,'axxxxxxxis'
     
     def legend_detection(self):
         self.image_without_legend,self.legend = legendDetect.legend_detect(self.outer_image_file,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2)
@@ -27,10 +28,14 @@ class Graph:
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
     def value_calculation(self):
-        tables.run(self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2)
+        self.inner_image_without_legend = self.image_without_legend[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
+        cv2.imwrite("inner_image_without_legend.png",self.inner_image_without_legend)
+        self.inner_image_file_without_legend = "inner_image_without_legend.png"
+        self.table = tables.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2)
     
     def scale_detection(self):
         self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image)
+        #print(hough.final_scale(self.image))
     
     def run(self):
         self.axis_detection()
@@ -40,8 +45,8 @@ class Graph:
         #cv2.imshow("image",graph)
         #cv2.waitKey(0)
         #cv2.destroyAllWindows()
-        self.legend_detection()
         self.scale_detection()
+        self.legend_detection()
         self.value_calculation()
 
 def main():

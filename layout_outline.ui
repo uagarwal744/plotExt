@@ -329,14 +329,14 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_5">
+         <widget class="QPushButton" name="contin">
           <property name="text">
            <string>Automatic</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_4">
+         <widget class="QPushButton" name="manual">
           <property name="text">
            <string>Manual</string>
           </property>

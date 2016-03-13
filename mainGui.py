@@ -4,9 +4,10 @@ import os
 import layout_gene
 import qdarkstyle
 import pdf_to_img
+from pdf_to_img import ImageThread, ResultObj
 from multiprocessing import Pool
 from PyQt4.QtCore import *
-import graphextract_returnArray
+from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
 #import image_class
 
@@ -48,10 +49,56 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
+        self.manual.clicked.connect(self.manual_fun)
+        self.contin.clicked.connect(self.getTables)
 
+
+    def getTables(self):
+        for plots in self.plots:
+            for plot in plots:
+                plot.run()
+                self.tableWidget.setColumnCount(len(plot.table)) #rows and columns of table
+                self.tableWidget.setRowCount(len(plot.table[0]))
+                for row in range(len(plot.table[0])): # add items from array to QTableWidget
+                    for column in range(len(plot.table)):
+                        #item = self.array[0] # each item is a QTableWidgetItem
+                        # add the QTableWidgetItem to QTableWidget, but exception thrown
+                        self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(plot.table[column][row]))            
+                        
+                return'''
+        table=[]
+        for plots in self.plots:
+            for plot in plots:
+                plot.run()
+                table.append(plot.table)
+                break
+        print table
+        self.tableWidget.setColumnCount(len(table)) #rows and columns of table
+        self.tableWidget.setRowCount(len(table[0]))
+        for row in range(len(table[0])): # add items from array to QTableWidget
+            for column in range(len(table)):
+                #item = self.array[0] # each item is a QTableWidgetItem
+                # add the QTableWidgetItem to QTableWidget, but exception thrown
+                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(table[column][row])) '''          
+                        
+                
+
+    def manual_fun(self):
+        self.btn_x1.show()
+        self.btn_x2.show()
+        self.btn_y1.show()
+        self.btn_y2.show()
+        self.contin.hide()
+        self.lineEdit.show()
+        self.lineEdit_2.show()
+        self.lineEdit_3.show()
+        self.lineEdit_4.show()
+        self.label_2.show()
+        self.proceed_btn.show()
+        self.selectAreaBtn.show()
+        self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
-        print items
         self.pdfItem_click(items[0])
     def removePlot(self,filename):
         print(self.plot_dic)
@@ -77,17 +124,41 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 print items, 'b'
                 self.pdfItem_click(items[0])'''
 
+    
+    #def loadingFinished(self):
+
+    def progress_of_extract(self, result):
+        images=result.list1
+        files=result.list2
+        # images.append(result.list1)
+        # files.append(result.list2)
+        print result.page_no
+        print result.list2
+        print "**************"
+        new_list=[]
+        for j in range(len(images)):
+            new_list.append(image_class.Graph(images[j],files[j]))
+            print new_list
+            self.addGraphItem(new_list[-1])
+            self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
+
+        self.plots.append(new_list)
     def getGraphs(self):
-        images,files = graphextract_returnArray.PlotExtractor(self.listOfFiles).graphextract()
+
+        self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract)
+        self.gthread.start()
+
+        '''images,files = graphextract_returnArray1.PlotExtractor(self.listOfFiles).graphextract()
         for i in range(len(images)):
             new_list=[]
+            print i,images[i]
             for j in range(len(images[i])):
                 new_list.append(image_class.Graph(images[i][j],files[i][j]))
                 self.addGraphItem(new_list[-1])
                 self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
             self.plots.append(new_list)
 
-        print self.plots
+        print self.plots'''
 
 
 
@@ -96,6 +167,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.graphlistWidget.addItem(self.deletedItems.pop())
 
     def addGraphItem(self, plot):
+        print plot.outer_image_file
         item=QtGui.QListWidgetItem(QtGui.QIcon(plot.outer_image_file), QString(plot.outer_image_file))
         self.graphlistWidget.addItem(item)
 
@@ -110,7 +182,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         height, width = img.shape[:2]     # dimensions of original image
         #size of pixmap
         h=self.display_item.pixmap().height()
-        w=self.display_item.pixmap().width()
+        w=self.display_item.pixmap().width()        
         #multiplying ratio to convert pixels of pixmap to original image
         y_ratio=float(height)/h            
         x_ratio=float(width)/w
@@ -121,12 +193,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         ystart=int(top_left.y()*y_ratio)
         xend=int(bottom_right.x()*x_ratio)
         yend=int(bottom_right.y()*y_ratio)
-        print xstart, ystart, xend, yend
         graph = img[int(ystart):int(yend),int(xstart):int(xend)]  
         cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
         item=QtGui.QListWidgetItem(QtGui.QIcon('cd'+str(pg_no)+'.png'),QtCore.QString('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
         self.graphlistWidget.addItem(item)
-        self.plots.append(image_class.Graph('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png','graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+        self.plots[int(pg_no)-1].append(image_class.Graph(graph,'graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+
 
 
     def enableDrag(self):
@@ -196,19 +268,10 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         loc=self.x+str(int(item.text())-1)+"new.png"
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
 
-    def openfile(self):
-        
-        self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
-        #self.x stores the address of the chosen pdf
-        print self.x
-        if self.x=="":      # No file is Chosen
-            return
-
-
-        z=QtCore.QFileInfo(self.x)     #z stores only the file name
-        
-        #y stores the number of pages in the pdf 
-        y=pdf_to_img.pdf_to_img1(self.x,"200")
+    def loadingFinished(self, result):
+        '''self.numpages = result.val
+        y = self.numpages
+        #y=pdf_to_img.pdf_to_img1(self.x, "300")
         for i in range(y):
             self.graph_per_page.append(0)
         self.pdflistWidget.clear()
@@ -225,12 +288,46 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.listOfFiles.append(str(w))
         self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
         self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        '''
+        self.statusbar.clearMessage()
         self.runBtn.setEnabled(True)
         self.btn_x1.setEnabled(True)
         self.btn_x2.setEnabled(True)
         self.btn_y1.setEnabled(True)
         self.btn_y2.setEnabled(True)
         self.proceed_btn.setEnabled(True)
+        self.pdfSelectBtn.setEnabled(True)
+        #print result.val
+
+    def progress_handle(self, result):
+        
+        self.statusbar.showMessage(QString(' Loading '+str(result.val+2)+' page ....'))
+        w=self.x+str(result.val)+"new.png"
+            
+        self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(result.val+1)))
+        self.pdflistWidget.addItem(self.item)
+
+        w=self.x+str(result.val)+".png"
+        self.listOfFiles.append(str(w))
+
+        if result.val==0:
+            self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
+            self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        
+
+
+    def openfile(self):
+        
+        self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
+        #self.x stores the address of the chosen pdf
+        print self.x
+        if self.x=="":      # No file is Chosen
+            return
+        z=QtCore.QFileInfo(self.x)     #z stores only the file name
+        self.pdfSelectBtn.setEnabled(False)
+        self.statusbar.showMessage(QString(' Loading '+'1'+' page ....'))
+        self.ithread = ImageThread(self.x,"300", self.loadingFinished, self.progress_handle)
+        self.ithread.start()
 
 class MySplashScreen(QtGui.QSplashScreen):
     def __init__(self, animation, flags=None):
