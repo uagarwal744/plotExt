@@ -4,18 +4,17 @@ from reportlab.lib.units import inch,cm
 from reportlab.lib.utils import ImageReader
 import numpy as np
 
-x='new.pdf'
-
-#Size of Canvas
-c=canvas.Canvas(x,pagesize=A4)
 width, height=A4
 
+def createpdf(x):
+	#Size of Canvas
+	c=canvas.Canvas(x,pagesize=A4)
+	return c
 
-def pdfoutput(img,ar):
+def pdfoutput(c,img,ar):
 	#Name of Output PDF
 	global z
 	global x
-	global c
 	global width
 	global height
 	
@@ -45,6 +44,8 @@ def pdfoutput(img,ar):
 	#Array to be printed
 	W = width/(len(ar[0])+2)
 	H = (height-inch)/(len(ar)+2)
+	if H>inch:
+		H=inch
 
 	#Title of the Graph
 	#c.drawString(width/3,-.9*inch,"Title of the Plot")
@@ -85,5 +86,3 @@ img = 'b.jpg'
 ar=np.zeros((100,8))
 ar[2][4]=2985.5258
 z=0
-pdfoutput(img,ar)
-pdfoutput(img,ar)
