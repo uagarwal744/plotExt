@@ -4,12 +4,11 @@ import os
 import layout_gene
 import qdarkstyle
 import pdf_to_img
-#from pdf_to_img import imageThread
+from pdf_to_img import ImageThread, ResultObj
 from multiprocessing import Pool
 from PyQt4.QtCore import *
-import graphextract_returnArray1
+from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
-import thread
 #import image_class
 
 import cv2
@@ -100,7 +99,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
-        print items
         self.pdfItem_click(items[0])
     def removePlot(self,filename):
         print(self.plot_dic)
@@ -126,9 +124,31 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 print items, 'b'
                 self.pdfItem_click(items[0])'''
 
+    
+    #def loadingFinished(self):
+
+    def progress_of_extract(self, result):
+        images=result.list1
+        files=result.list2
+        # images.append(result.list1)
+        # files.append(result.list2)
+        print result.page_no
+        print result.list2
+        print "**************"
+        new_list=[]
+        for j in range(len(images)):
+            new_list.append(image_class.Graph(images[j],files[j]))
+            print new_list
+            self.addGraphItem(new_list[-1])
+            self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
+
+        self.plots.append(new_list)
     def getGraphs(self):
-        images,files = graphextract_returnArray1.PlotExtractor(self.listOfFiles).graphextract()
-        print files
+
+        self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract)
+        self.gthread.start()
+
+        '''images,files = graphextract_returnArray1.PlotExtractor(self.listOfFiles).graphextract()
         for i in range(len(images)):
             new_list=[]
             print i,images[i]
@@ -138,7 +158,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
             self.plots.append(new_list)
 
-        print self.plots
+        print self.plots'''
 
 
 
@@ -147,6 +167,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.graphlistWidget.addItem(self.deletedItems.pop())
 
     def addGraphItem(self, plot):
+        print plot.outer_image_file
         item=QtGui.QListWidgetItem(QtGui.QIcon(plot.outer_image_file), QString(plot.outer_image_file))
         self.graphlistWidget.addItem(item)
 
@@ -247,23 +268,10 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         loc=self.x+str(int(item.text())-1)+"new.png"
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
 
-    def openfile(self):
-        
-        self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
-        #self.x stores the address of the chosen pdf
-        print self.x
-        if self.x=="":      # No file is Chosen
-            return
-
-
-        z=QtCore.QFileInfo(self.x)     #z stores only the file name
-        '''y = 0
-        #y stores the number of pages in the pdf 
-        pt = imageThread(1,"image",y,self.x,"300")
-        pt.start()
-        #pt = thread.start_new_thread(pdf_to_img.pdf_to_img1, (self.x,"300", y))
-        pt.join()'''
-        y=pdf_to_img.pdf_to_img1(self.x, "300")
+    def loadingFinished(self, result):
+        '''self.numpages = result.val
+        y = self.numpages
+        #y=pdf_to_img.pdf_to_img1(self.x, "300")
         for i in range(y):
             self.graph_per_page.append(0)
         self.pdflistWidget.clear()
@@ -280,12 +288,46 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.listOfFiles.append(str(w))
         self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
         self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        '''
+        self.statusbar.clearMessage()
         self.runBtn.setEnabled(True)
         self.btn_x1.setEnabled(True)
         self.btn_x2.setEnabled(True)
         self.btn_y1.setEnabled(True)
         self.btn_y2.setEnabled(True)
         self.proceed_btn.setEnabled(True)
+        self.pdfSelectBtn.setEnabled(True)
+        #print result.val
+
+    def progress_handle(self, result):
+        
+        self.statusbar.showMessage(QString(' Loading '+str(result.val+2)+' page ....'))
+        w=self.x+str(result.val)+"new.png"
+            
+        self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(result.val+1)))
+        self.pdflistWidget.addItem(self.item)
+
+        w=self.x+str(result.val)+".png"
+        self.listOfFiles.append(str(w))
+
+        if result.val==0:
+            self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
+            self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        
+
+
+    def openfile(self):
+        
+        self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
+        #self.x stores the address of the chosen pdf
+        print self.x
+        if self.x=="":      # No file is Chosen
+            return
+        z=QtCore.QFileInfo(self.x)     #z stores only the file name
+        self.pdfSelectBtn.setEnabled(False)
+        self.statusbar.showMessage(QString(' Loading '+'1'+' page ....'))
+        self.ithread = ImageThread(self.x,"300", self.loadingFinished, self.progress_handle)
+        self.ithread.start()
 
 class MySplashScreen(QtGui.QSplashScreen):
     def __init__(self, animation, flags=None):
