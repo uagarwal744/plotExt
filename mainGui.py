@@ -4,10 +4,12 @@ import os
 import layout_gene
 import qdarkstyle
 import pdf_to_img
+#from pdf_to_img import imageThread
 from multiprocessing import Pool
 from PyQt4.QtCore import *
-import graphextract_returnArray
+import graphextract_returnArray1
 import image_class
+import thread
 #import image_class
 
 import cv2
@@ -48,16 +50,54 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
-        self.pushButton_5.clicked.connect(self.getTables)
+        self.manual.clicked.connect(self.manual_fun)
+        self.contin.clicked.connect(self.getTables)
 
 
     def getTables(self):
         for plots in self.plots:
             for plot in plots:
                 plot.run()
-                print(plot.table)
-                return
+                self.tableWidget.setColumnCount(len(plot.table)) #rows and columns of table
+                self.tableWidget.setRowCount(len(plot.table[0]))
+                for row in range(len(plot.table[0])): # add items from array to QTableWidget
+                    for column in range(len(plot.table)):
+                        #item = self.array[0] # each item is a QTableWidgetItem
+                        # add the QTableWidgetItem to QTableWidget, but exception thrown
+                        self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(plot.table[column][row]))            
+                        
+                return'''
+        table=[]
+        for plots in self.plots:
+            for plot in plots:
+                plot.run()
+                table.append(plot.table)
+                break
+        print table
+        self.tableWidget.setColumnCount(len(table)) #rows and columns of table
+        self.tableWidget.setRowCount(len(table[0]))
+        for row in range(len(table[0])): # add items from array to QTableWidget
+            for column in range(len(table)):
+                #item = self.array[0] # each item is a QTableWidgetItem
+                # add the QTableWidgetItem to QTableWidget, but exception thrown
+                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(table[column][row])) '''          
+                        
+                
 
+    def manual_fun(self):
+        self.btn_x1.show()
+        self.btn_x2.show()
+        self.btn_y1.show()
+        self.btn_y2.show()
+        self.contin.hide()
+        self.lineEdit.show()
+        self.lineEdit_2.show()
+        self.lineEdit_3.show()
+        self.lineEdit_4.show()
+        self.label_2.show()
+        self.proceed_btn.show()
+        self.selectAreaBtn.show()
+        self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
         print items
@@ -87,10 +127,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 self.pdfItem_click(items[0])'''
 
     def getGraphs(self):
-        images,files = graphextract_returnArray.PlotExtractor(self.listOfFiles).graphextract()
+        images,files = graphextract_returnArray1.PlotExtractor(self.listOfFiles).graphextract()
         print files
         for i in range(len(images)):
             new_list=[]
+            print i,images[i]
             for j in range(len(images[i])):
                 new_list.append(image_class.Graph(images[i][j],files[i][j]))
                 self.addGraphItem(new_list[-1])
@@ -216,9 +257,13 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
 
         z=QtCore.QFileInfo(self.x)     #z stores only the file name
-        
+        '''y = 0
         #y stores the number of pages in the pdf 
-        y=pdf_to_img.pdf_to_img1(self.x,"300")
+        pt = imageThread(1,"image",y,self.x,"300")
+        pt.start()
+        #pt = thread.start_new_thread(pdf_to_img.pdf_to_img1, (self.x,"300", y))
+        pt.join()'''
+        y=pdf_to_img.pdf_to_img1(self.x, "300")
         for i in range(y):
             self.graph_per_page.append(0)
         self.pdflistWidget.clear()
