@@ -6,7 +6,7 @@ import testing
 import x_scale
 import sys
 import axis
-
+import h_scale
 def final_scale(img,clusters=2) :
 
 	#img = cv2.imread(input_file)
@@ -32,19 +32,19 @@ def final_scale(img,clusters=2) :
 	x_pos = []
 	cv2.rectangle(tempimg,(bot_left),(top_right),(0,255,0),3)
 	cv2.imwrite('temp6.jpg',tempimg)
+	markings = h_scale.h_scale(input_file,ans,ans3,ans1)
 	try :
 		testing.extract_y_scale(input_file,int(ans1),'test3.png',yarr,int(ans),y_pos)
-
 		x_scale.extract_x_scale(input_file,int(ans),'test2.png',xarr,x_pos)
-	
 		cv2.imwrite('line4.jpg',image1)
 	#cv2.imwrite('line5.jpg',image2)
-	
+		print yarr
+		print xarr
 		scale_y = abs(float(yarr[2])-float(yarr[1]))
 		scale_x = abs(float(xarr[2])-float(xarr[1]))
 	except :
 		print 'error occured'
-		return 'scale error'	
+		return markings	
 	'''
 	print 'x scale'
 	print scale_x
@@ -55,6 +55,11 @@ def final_scale(img,clusters=2) :
 	print top_right
 	print y_pos[0]
 	'''
+	
+	
+
+	print 'markings are'
+	print markings
 	cv2.imwrite('houghlines3.jpg',img)
 	[x,y,z ] = image2.shape
 	print (x,y)
@@ -63,6 +68,7 @@ def final_scale(img,clusters=2) :
 	image2 = image2[ans2+2:ans-2,ans1+2:ans3-2]
 	cv2.imwrite('line5.jpg',image2)
 	x_len = len(xarr)
+
 	print xarr[x_len-1]
 	print xarr[x_len-2]
 	print bot_left,top_right
@@ -77,7 +83,6 @@ def final_scale(img,clusters=2) :
 			print i,
 
 	i = x_len-1
-
 	x1 = xarr[x_len-1]
 	while i >=0 :
 		try :
@@ -85,9 +90,14 @@ def final_scale(img,clusters=2) :
 			break
 		except :
 			i = i-1
+	l = len(markings)		
+	for j in range(l) :
+		if markings[j]<x_pos[i][1] and markings[j]>x_pos[i][0] :
+			pos1 = j		
+
 
 	#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
-	return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
+	return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),yarr[0],yarr[1],markings[pos1],markings[pos1-1],y_pos[0],y_pos[1]
 	#cv2.imwrite(output_file,img)
 
 if __name__ == '__main__':
