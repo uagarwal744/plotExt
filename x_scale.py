@@ -7,7 +7,7 @@ import sys
 #import ocr_parse
 from bs4 import BeautifulSoup
 
-def extract_x_scale(input_file,coordinate,output_file,output_array,x_pos) :
+def extract_x_scale(input_file,coordinate,output_file,output_array,xpos) :
 	img = cv2.imread(input_file,cv2.IMREAD_GRAYSCALE)
 	rows,cols = img.shape
 	img = img[coordinate:rows,0:cols]
@@ -44,22 +44,10 @@ def extract_x_scale(input_file,coordinate,output_file,output_array,x_pos) :
 		if int(k[3])<min :
 			min = int(k[3])
 	'''
-	#cv2.rectangle(img,(int(k[0]),int(k[1])),(int(k[2]),int(k[3])),(0,255,0),3)
-	#print min
-	#cv2.rectangle(img,(294,60),(394,75),(0,255,0),3)
-	#cv2.imwrite(temp1_file,img)	
-	#cv2.rectangle(img,(int(k[0]),int(k[1])),(int(k[2]),int(k[3])),(0,255,0),3)
-	#cv2.imwrite(output_file,img)
-	'''
-	img = img[min:rows,0:cols]
-	cv2.imwrite(temp_file,img)
-	rotation.rotate(temp_file,output_file,0)
-	'''
 	os.system("tesseract "+output_file+" out3 hocr")
 	f = open('out3.hocr','r')
 	data=f.read()
 	soup = BeautifulSoup(data)
-	
 	for i in soup.find_all('span',{'class':'ocrx_word'}) :
 		flag = 0
 		#print 'dnsk'
@@ -68,19 +56,15 @@ def extract_x_scale(input_file,coordinate,output_file,output_array,x_pos) :
 			#print char
 			#print type(char)
 			#print char
-			if char.isalpha() :
-				flag = 1
-				break
-		if flag == 0 :
-			#print 'ji'	
-			j = i.text
 			h= i.get('title').split(' ')
 			k= h[1:5]
 			k[-1]=k[-1][:-1]
-			#if j == ' ' :
-			#	j='0'	
-			output_array.append(j)
-			x_pos.append((int(k[0])+int(k[2]))/2)
+			if char.isalpha() :
+				flag = 1
+				break	
+		if flag == 0 :
+			output_array.append(i.text)
+			xpos.append((int(k[0]),int(k[2])))
 
 	
 

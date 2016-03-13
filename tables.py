@@ -6,6 +6,7 @@ import copy
 import math
 import hough
 import extract_plots
+import hsv
 import matplotlib.pyplot as plt
 count =0
 
@@ -202,11 +203,17 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	# plot(table[0] , table[2])
 	return table
 
-def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2):
+def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend):
 	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = findParameters(int(x1),int(p_x1),int(y1),int(p_y1),int(x2),int(p_x2),int(y2),int(p_y2),int(scale_x),int(scale_y),bottom_left,top_right)
 	print 'above'
-	(x,y,z,masks) = extract_plots.extract_plots(input_file,8)
-	print z
+#	(x,y,z,masks) = extract_plots.extract_plots(input_file,8)
+#	print z
+	masks=[]
+	for i in range(len(legend)):
+		b=legend[i][1][0]
+		g=legend[i][1][1]
+		r=legend[i][1][2]
+		masks.append(hsv.mark(image_without_legend,b,g,r))
 	print 'below'
 	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
 	
