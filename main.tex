@@ -1,0 +1,147 @@
+\documentclass[12pts]{scrreprt} 
+
+\usepackage[left=10mm,right=10mm,top=1in,bottom=1in]{geometry}
+\usepackage{pseudocode}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{graphicx}
+\usepackage{underscore}
+\usepackage{amssymb}
+\usepackage{pseudocode}
+
+\date{}
+
+
+\begin{document} 
+
+\begin{titlepage}
+    \vspace*{\fill}
+    \begin{center}
+      \textcolor{black}{{\Huge {\textbf{Plot to Tables}}}}\\[0.5cm]
+      \textcolor{black}{{\Huge {\textbf{Report}}}}\\[0.5cm]
+    \end{center}
+    \vspace*{\fill}
+\end{titlepage}
+
+
+\tableofcontents 
+
+\chapter{Installation } 
+
+\section{Downloading}
+
+\paragraph{}
+This document describes the software requirements, algorithm, results obtained on different test cases and future scope of AutoMosaic Software. This software is a standalone application designed to restore a torn document from the pieces. The specified requirements are of high priority and AutoMosaic Software works best when they are followed.
+
+\section{Installing Prerequisites} 
+\paragraph{}
+The product stitches randomly torn paper documents in an automated fashion. This product is useful for recovering documents in archival study and investigation science. The product helps in automating the recovery of torn documents, which requires a lot of manual effort otherwise.
+
+\section{Installing ....} 
+
+
+
+
+\chapter{User Manual} 
+
+\section{Running the Application}
+\paragraph{}
+This software takes individual images of the torn fragments of a document as input, and returns an output merged image. Mosaicing of torn documents is an important and indispensable labour in the field of the forensics or archival study. The manual process being quite tedious, automation of the same utilizing this software can result in a phenomenal increase in efficiency.
+
+
+
+\section{User Interface}
+\paragraph{}
+This software has been exported into an executable file and hence is compatible with Windows OS. It runs on all Windows OS version above Windows XP.
+
+\section{Keyboard Shortcuts}
+
+\begin{itemize}
+
+\item The images of the fragments, which are provided as the input must be taken against a white background for an efficient extraction of the fragment contours.
+
+\item There is a considerable amount of error in presence of white regions inside the fragment contour.
+
+\item To tackle the issue of memory overload due to high resolution images, we resize the images for convenience and final image is constructed retaining original image size, which may result a small amount of inaccuracy.
+
+\end{itemize}
+  
+
+\section{Functions And their usage}
+\paragraph{}
+A user manual in pdf format would be made available along with the software.
+\begin{itemize}
+   \item Document pieces do not contain any straight line cut as they are hand cut.
+   \item Documents are not torn using a shredder.
+\end{itemize}
+
+\chapter{Description of Algorithms used}
+
+\section{Getting all images from the pdf}
+\subsection{Converting pdf file to images}
+\paragraph{}
+To extract all the graphs from a pdf file, first convert all the pdf pages to images. To do this two modules have been used namely PythonMagick and pyPdf. And PdfFileReader is imported from pyPdf module.
+\paragraph{}
+Firstly a blank image file has been created using PythonMagick and required density is assigned to it. When the pdf page is read using this image file, it reads in the specified density. After that all pdf pages are written in image format.
+
+\begin{pseudocode}{pdf_to_img}{ }
+/\mbox{*}$Creating an image file using PythonMagick and assigning density to it.\\img.read reads the input_file in the specified density(say 200) and \\img.write writes the pdf file in image format.$ \mbox{*}/\\
+$img $ \GETS $ PythonMagick.Image() $\\
+$img $ \cdot $ density(density) $\\
+$my\_file $ \GETS $ PdfFileReader(file("\{0\}".format(input\_file),"r")) $\\
+$numpages $ \GETS $ my\_file.getNumPages() $\\
+$file $ \GETS $ [ ] $\\ 
+\FOR i \GETS 0 \TO numpages \DO
+\BEGIN
+$img.read("\{0\}[\{1\}]".format(input\_file,i))$\\
+$img.wrire("\{0\}\_image\{1\}.jpg".format(input\_file,i))$\\
+$file.append("\{0\}\_image\{1\}.jpg".format(input\_file,i))$\\
+\END
+\end{pseudocode}
+\subsection{Extracting graphs from an image}
+\paragraph{}
+After converting the pdf file to images all the graphs are extracted from each image file. To do this six modules have been used namely cv2, numpy, math, wand.image, os, sys. Image has been imported from wand.image.
+\paragraph{}
+At first a function is defined which does the probabilistic Hough transform on the image given. In this the image file is read and converted to a gray-scale image using cv2.cvtColor(). After that Adaptive Thresholding, which converts gray-scale image to binary one, is done using cv2.adaptiveThreshold() followed by morphological transformation using cv2.morphologyEx(). And then Image blurring/smoothing is done using cv2.GaussianBlur() followed by straight lines detection using cv2.HoughLinesP().
+\paragraph{}
+After the Hough Transform is done, a function is defined to approximate the shape on the contours detected. In this function contours are detected using cv2.findContours and stored in a list. Now for each contour detected in this list contour area is calculated using cv2.contourArea() and is compared with the threshold area. If this area is greater than the threshold area, the shape of the contour is approximated using cv2.approxPolyDp(). /* If the length of this approximated shape is between two and ten the coordinates of the bounding rectangle of this contour is found using cv2.boundingRect().*/ After doing this the coordinates of the graph were found and this portion of the image is stored in the graphArray and all such graphs were appended to this array.
+\begin{pseudocode}{pdfwithgraph}
+$def \_\_init\_\_$\\
+
+
+
+
+\end{pseudocode}
+
+
+\section{Getting different color plot projections from an image}
+\subsection{Python 2.7}
+\paragraph{}
+Python is a widely used general-purpose, high-level programming language.
+Python supports multiple programming paradigms, including object-oriented, imperative and functional programming or procedural styles. It features a dynamic type system and automatic memory management and has a large and comprehensive standard library.
+\paragraph{}
+Like other dynamic languages, Python is often used as a scripting language, but is also used in a wide range of non-scripting contexts. Using third-party tools, such as Py2exe, or Pyinstaller, Python code can be packaged into standalone executable programs. Python interpreters are available for many operating systems.
+
+\section{Getting the scale from the graph}
+\paragraph{}
+For the scale detection part at first the axis of the graph was determined and then its coordinates were used to extract out the scales. This determination of the coordinates of the axis was done via the hough transfrom algorithm.The corresponding function used was cv2.HoughLinesP.
+Now once the axis was determined the image containing the graph was cropped below the coordinates of the lower x – axis and then the OCR was done on this cropped image to get out the x-scale values.
+\paragraph{}
+For the extraction of the y-scale,as done previously the original image was cropped such that the new image contained only the region left to the leftmost axis.Now the OCR could not be done directly on this cropped image as it contains texts to the left of the scale.So to crop out the texts the image was first rotated by 90 degrees in the clockwise direction.The corresponding functions used for rotation were cv2.transpose
+ and cv2.flip. Now on this rotated image OCR was run to determine the coordinates of the text.This text region was then cropped out of the image and then this image was re-roted again by 90 degrees in the clockwise direction.OCR was finally done on this image to return the corresponding y-scale values of the graph.
+\section{Getting the table values}
+\paragraph{}
+To obtain tables from plots, it is assumed that the plots are binary images. For this, a K means clustering algorithm is applied to the graphs and binary colour detected images are found out. Each of these images are expected to contain the plot of a single variable. Each of these plots are sent as input to the function approxTable(). The function approxTable() returns the table from the plot of a single variable. The function takes the binary image of the plot as input. We traverse the image along the x-axis, and for a particular x, the value for y=f(x) is found by traversing along the y-axis and finding out the white pixel in that particular column. If there are multiple white pixels for a given x, the value of y=f(x) is the average of those pixel values. If there are no white pixels detected for a particular x, then the function has a discontinuity at that point and a "null" value is returned.
+\paragraph{}
+To remove the discontinuities created due to noise or if the graph lines are dotted, line interpolation is used. The line interpolation function joins discontinuities by a straight lines if the length of the discontinuity is below a particular threshold distance. This is done to overcome the problems created if the plot lines are dotted or due to noise. The  function "lineInterpolation_x" and "lineInterpolation_y" serve this purpose.
+\paragraph{}
+The function approxtable() is used to get the tabulated form of the plot. To this function interpolated plots are given as inputs. The parameters are interpolated plot image, number of pixels between two consecutive x-axis divisions, number of pixels between two consecutive y-axis, the length of the bounding box of the graph along the x-axis, the length of the bounding box of the graph along y-axis, the coordinate from where x-axis starts, the coordinate from where y-axis starts, units per division on the x-axis, units per division on the y-axis.
+The function starts from the leftmost point on the x-axis and each time proceeds one-tenth of the minimum marked division on the x-axis, and finds the corresponding y=f(x) value in pixels. Then from the scale values the pixels are converted into actual values. The function then returns two lists - x and f(x).
+  
+\chapter{Code Modules and Architectural Diagram}
+
+\chapter{Test Plan}
+
+\end{document}
+
