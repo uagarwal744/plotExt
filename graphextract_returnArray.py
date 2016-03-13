@@ -7,7 +7,7 @@ from pyPdf import PdfFileReader
 import os,sys
 
 class PlotExtractor:
-    def __init__(self,pagelist,minLineLength=200,maxLineGap=50,threshArea=1500,percent=70,ang_prec=180,det_prec=0.25,density="300"):
+    def __init__(self,pdfFile,minLineLength=100,maxLineGap=50,threshArea=1500,percent=70,ang_prec=180,det_prec=0.25,density="300"):
         """Initializes the class
         Keyword arguments:
         filename -- actual image of the entire pdf
@@ -19,11 +19,11 @@ class PlotExtractor:
         det_prec -- detail precision of HoughLinesP function
         density -- parameter for the quality of image. TO BE ENTERED IN STRING FORMAT
         """
-        self.pagelist = pagelist
+        self.pagelist =[]# pagelist
 
         print self.pagelist
         
-        #self.pdfFile = pdfFile
+        self.pdfFile = pdfFile
         self.minLineLength = minLineLength
         self.maxLineGap = maxLineGap
         self.threshArea = threshArea
@@ -39,6 +39,7 @@ class PlotExtractor:
     
     def houghp(self):
         """Does a Hough Transform (probabilistic) on the image given"""
+        global img
         img = cv2.imread(self.pageImage)
         #print self.pdfImage
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -51,13 +52,13 @@ class PlotExtractor:
         #gray = cv2.blur(gray,(5,5))
         #gray = cv2.medianBlur(gray,5)
         #gray = cv2.bilateralFilter(gray,9,75,75)
-        #gray = cv2.GaussianBlur(gray,(5,5),0)
+        gray = cv2.GaussianBlur(gray,(3,3),0)
         #edges = cv2.Canny(gray,50,150,apertureSize = 3)
         lines = cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,100,self.minLineLength,self.maxLineGap)
         im2 = np.zeros((h,w,channel),np.uint8)
         for x1,y1,x2,y2 in lines[0]:
             cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)
-        #cv2.imwrite(self.graphfolder+"/houghp.png",im2)
+        cv2.imwrite(self.graphfolder+"/houghp.png",im2)
         return im2
 
     
@@ -66,15 +67,16 @@ class PlotExtractor:
         Keyword arguments:
         image -- image returned by the houghp()
         """
-        img = cv2.imread(self.pageImage)
+        #img = cv2.imread(self.pageImage)
         gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+        cv2.imwrite(self.graphfolder+"/gray.png",gray)
         (cnts, _) = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         h,w,channel = image.shape
         hi,wi = h,w
         count_graph = 1
         #f = open("contours.txt","wb")
         
-        list = []
+        list1 = []
         list2 = []
 
         self.x = []
@@ -86,9 +88,11 @@ class PlotExtractor:
 
         for c in cnts:
             if cv2.contourArea(c) >self.threshArea:
+            #if 1:
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
                 if len(approx)<10 and len(approx)>2:
                     x_,y_,w_,h_  = cv2.boundingRect(c)
+                    cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                     #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -101,7 +105,8 @@ class PlotExtractor:
                         self.h.append(h_)
                         self.w.append(w_)
                         self.cflag.append("1")
-
+                   # else:
+                  #      self.cflag.append("0")
 
                         #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                         #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -143,9 +148,29 @@ class PlotExtractor:
                         ##count_graph = count_graph + 1
 
         for i in range(len(self.x)):
+            if(self.w[i]*self.h[i]<self.threshArea):
+                self.cflag[i]=0
+        '''
+        for i in range(len(cflag)):
+            xstart = max(0,self.x[i])
+            xend = min(wi,self.x[i]+self.w[i])
+            ystart = max(0,self.y[i])
+            yend = min(hi,self.y[i]+self.h[i])
+            graph = img[ystart:yend,xstart:xend]
+            gray1 = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+            (cnts1, _) = cv2.findContours(gray1, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+            if len(cnts1) >=5 :
+                cflag[i]=0
+        '''
+
+        for i in range(len(self.x)):
+            if(self.cflag[i]==0):
+                continue
             x_,y_,w_,h_ = self.x[i],self.y[i],self.w[i],self.h[i]
             for j in range(len(self.x)):
                 if j==i:
+                    continue
+                if self.cflag[j] == 0:
                     continue
                 if x_>=self.x[j] and y_>=self.y[j] and (x_+w_)<=(self.x[j]+self.w[j]) and (y_+h_)<=(self.y[j]+self.h[j]):
                     self.cflag[i]="0"
@@ -154,28 +179,26 @@ class PlotExtractor:
             if(self.cflag[i]=="0"):
                 continue
 
-            #cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
+            cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
             percentin = 0.2
             xstart = max(0,self.x[i]-percentin*self.w[i])
-            xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
+            #xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
+            xend = min(wi,self.x[i]+self.w[i]+0.05*self.w[i])
             ystart = max(0,self.y[i]-percentin*self.h[i])
             yend = min(hi,self.y[i]+self.h[i]+percentin*self.h[i])
             
             graph = img[ystart:yend,xstart:xend]
-            filename = self.graphfolder+"/"+str(count_graph)+".png"
-            
-            if(graph.shape[1]>900):
-                os.system("convert -resize 900 "+filename+" "+filename)
-                graph = cv2.imread(filename)
 
-            list.append(graph)
+            list1.append(graph)
+            filename = self.graphfolder+"/"+str(count_graph)+".png"
             list2.append(filename)
             cv2.imwrite(filename,graph)
-
+            if(graph.shape[1]>900):
+                os.system("convert -resize 900 "+filename+" "+filename)
 
             count_graph = count_graph + 1
-        
-        return list,list2
+        cv2.imwrite(self.graphfolder+"/contour_next.png",img)
+        return list1,list2
 
     def pdf_to_img(self): 
         """Convert pdf to png image
@@ -205,7 +228,7 @@ class PlotExtractor:
 
     def graphextract(self):
         """Wrapper function for extracting the images"""
-        #self.pdf_to_img()
+        self.pdf_to_img()
         #self.count_graph=1
         
         pagelist = self.pagelist
@@ -218,8 +241,8 @@ class PlotExtractor:
                 os.makedirs(self.graphfolder)
             self.pageImage = pagelist[i]
             #self.pagecount = i
-            list,list2 = self.polydp(self.houghp())
-            self.graphList.append(list)
+            list1,list2 = self.polydp(self.houghp())
+            self.graphList.append(list1)
             self.graphName.append(list2)
             #self.polydp(self.houghp())
 
@@ -228,10 +251,15 @@ class PlotExtractor:
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""
     pdfName  = raw_input()
+    name = ["output_ps/test.pdf0.png","output_ps/test.pdf1.png","output_ps/test.pdf2.png","output_ps/test.pdf3.png","output_ps/test.pdf4.png"]
+    #page = []
+    #for n in name:
+    #    page.append(cv2.imread(n))
+    #G = PlotExtractor(name)
     G = PlotExtractor(pdfName)
+    
     ga,na = G.graphextract()
-    print ga
-    print na
+    print ga,na
 
 if __name__=='__main__':
     main()
