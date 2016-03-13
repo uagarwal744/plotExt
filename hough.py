@@ -75,8 +75,19 @@ def final_scale(img,clusters=2) :
 	print '\nyscales are'
 	for i in yarr :
 			print i,
-	return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
 
+	i = x_len-1
+
+	x1 = xarr[x_len-1]
+	while i >=0 :
+		try :
+			x1 = float(xarr[i])
+			break
+		except :
+			i = i-1
+
+	#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
+	return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
 	#cv2.imwrite(output_file,img)
 
 if __name__ == '__main__':
@@ -86,7 +97,8 @@ if __name__ == '__main__':
 	yarr = []
 	print x
 	img = cv2.imread(x)
-	final_scale(img)
+	out = final_scale(img)
+	print out
 	
 	
 	
