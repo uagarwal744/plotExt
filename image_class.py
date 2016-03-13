@@ -20,7 +20,7 @@ class Graph:
     def axis_detection(self):
         #self.resized_image=cv2.imread(self.outer_image_file)
         self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2 = axis.axis(self.image)
-        print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2
+        print self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,'axxxxxxxis'
     
     def legend_detection(self):
         self.image_without_legend,self.legend = legendDetect.legend_detect(self.outer_image_file,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2)

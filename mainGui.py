@@ -88,7 +88,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def getGraphs(self):
         images,files = graphextract_returnArray.PlotExtractor(self.listOfFiles).graphextract()
-        print images
         print files
         for i in range(len(images)):
             new_list=[]
@@ -121,7 +120,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         height, width = img.shape[:2]     # dimensions of original image
         #size of pixmap
         h=self.display_item.pixmap().height()
-        w=self.display_item.pixmap().width()
+        w=self.display_item.pixmap().width()        
         #multiplying ratio to convert pixels of pixmap to original image
         y_ratio=float(height)/h            
         x_ratio=float(width)/w

@@ -147,6 +147,10 @@ def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_
 
 
 def findParameters(x1,p_x1,y1,p_y1,x2,p_x2,y2,p_y2,scale_x,scale_y,bottom_left,top_right):
+	print "X1 = "+str(x1)
+	print "P_X1 = "+str(p_x1)
+	print "X2 = "+str(x2)
+	print "P_X2 = "+str(p_x2)
 	rectsize_x=top_right[0]-bottom_left[0]
 	rectsize_y=top_right[1]-bottom_left[0]
 	x_div=math.fabs(x2-x1)/scale_x
@@ -185,8 +189,7 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 		masks[i]=lineInterpolation_y(masks[i])
 	for i in range(len(masks)):
 		(x_,fx)=approxTable(masks[i],ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
-		#print x_
-		#print fx
+
 		if(i==0):
 			table.append(x_)
 		table.append(fx)
