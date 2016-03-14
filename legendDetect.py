@@ -386,7 +386,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	print new_rect
 
 	
-	
+	draw_rectangles(image, new_rect)
+	cv2.imshow("as",image)
+	cv2.waitKey(0)
 	colors = []
 	for i in range(len(new_rect)):
 		x1 = new_rect[i][0]
