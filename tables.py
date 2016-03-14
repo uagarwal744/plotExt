@@ -8,29 +8,18 @@ import hough
 import extract_plots
 import hsv
 import matplotlib.pyplot as plt
-count =0
 
 def findValue(img,jo,start_x,start_y):
 	a=[]
-	global count
-	if count==2 :
-		cv2.imwrite('test_image.jpg',img)
-		print 'the pixels are '
-		print jo
-	count = count+1	
 	for i in range(len(img)):
 		if img[i,jo]>=240:
 			a.append(i)
-	if count == 3 :
-		print len(a)		
 	if len(a)==0:
 		return -(sys.maxint)
 	else:
 		sum=0;
 		for k in range(len(a)):
 			sum+=len(img)-a[k]
-		if count == 3 :
-			print (sum/len(a))
 		return (sum/len(a))
 
 
@@ -226,7 +215,7 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 def main():
 	xarr=[]
 	yarr=[]
-	(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2) = hough.final_scale('pic13.jpg','houghlines3.jpg',xarr,yarr)
+	(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2) = hough.final_scale('a.jpg')
 	img = cv2.imread(input_file)
 	print 'hi'
 	print bottom_left
