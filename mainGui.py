@@ -13,21 +13,19 @@ import image_class
 
 import cv2
 
-class pageThread(QtCore.QThread):
+class plotThread(QtCore.QThread):
 
     table_completed = QtCore.pyqtSignal(object, object)
-    def __init__(self, plots, index):
+    def __init__(self, plot, index):
         QtCore.QThread.__init__(self)
-        self.plots=plots
+        self.plot=plot
         self.index=index
 
     def run(self):
-        table=[]
-        for plot in self.plots:
-            plot.run()
-            table.append(plot.table)
-            print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
-            print table
+        self.plot.run()
+        table=self.plot.table
+        print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
+        print table
         self.table_completed.emit(table, self.index)
 
 
@@ -43,7 +41,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graph_per_page=[]
         self.plot_dic={}
 
-        self.tables=[]
+        #self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
         self.btn_x1.clicked.connect(self.Coordinate)
@@ -94,12 +92,13 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         item=items[0]
         self.graphItem_click(item)
     def getTables(self):
+        #self.tables = [0 for plot in self.plots ]
         
-        self.thread_per_page=[]
-        for plots in self.plots:
-            temp_thread=pageThread(plots,self.plots.index(plots))
+        self.thread_per_plot=[]
+        for plot in self.plots:
+            temp_thread=plotThread(plot,self.plots.index(plot))
             temp_thread.table_completed.connect(self.on_table_completion)
-            self.thread_per_page.append(temp_thread)
+            self.thread_per_plot.append(temp_thread)
             temp_thread.start()
 
 
@@ -114,9 +113,10 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 return'''
 
     def on_table_completion(self, table, index):
-        self.tables[index]=table
+        pass
+        #self.tables[index]=table
         print '())()()())()^^^^^^()()()()()'
-        print self.tables
+        #print self.tables
 
         '''def table_progress(self, result):
         print '$$$$$$$'
@@ -153,10 +153,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def removePlot(self,filename):
         print(self.plot_dic)
         print(self.plots)
-        for plots in self.plots:
-            plot = (self.plot_dic[str(filename)])
-            if plot in plots:
-                plots.remove(self.plot_dic[str(filename)])
+        plot = (self.plot_dic[str(filename)])
+        self.plots.remove(plot)
         print(self.plots)
 
     '''def changeEvent(self, event):
@@ -187,14 +185,15 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         print "**************"
         new_list=[]
         for j in range(len(images)):
-            new_list.append(image_class.Graph(images[j],files[j]))
+            plot = image_class.Graph(images[j],files[j])
+            #new_list.append(image_class.Graph(images[j],files[j]))
             #print new_list
-            self.addGraphItem(new_list[-1])
-            self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
+            self.addGraphItem(plot)
+            self.plot_dic[plot.outer_image_file]=plot
+            self.plots.append(plot)
         self.progressBar.setValue(self.progressBar.value()+1)
         self.statusbar.showMessage('Extracting Graphs from '+str(result.page_no+2)+' page ...')
 
-        self.plots.append(new_list)
         print self.plots
     def finished_extracting(self, result):
         self.statusbar.clearMessage()
@@ -261,7 +260,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         cv2.imwrite(p, graph)
         item=QtGui.QListWidgetItem(QtGui.QIcon(p),QtCore.QString(p))
         self.graphlistWidget.addItem(item)
-        self.plots[int(pg_no)-1].append(image_class.Graph(graph,p))
+        plot = image_class.Graph(graph,p)
+        self.plots.append(plot)
+        self.plot_dic[p]=plot
         #print self.plots
 
 
@@ -329,18 +330,19 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def graphItem_click(self, item):
         self.display_item.setPixmap(QtGui.QPixmap(item.text()).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
-        row=self.graphlistWidget.row(item)
-        print row
-        self.tableWidget.setColumnCount(len(self.tables[1][0])) #rows and columns of table
-        self.tableWidget.setRowCount(len(self.tables[1][0][0]))
-        if len(self.tables[1])!=0:
-            print len(self.tables[1][0])
-            print len(self.tables[1][0][0])
-            for column in range(len(self.tables[1][0])): # add items from array to QTableWidget
-                for row in range(len(self.tables[1][0][0])):
-                    #item = self.array[0] # each item is a QTableWidgetItem
-                    # add the QTableWidgetItem to QTableWidget, but exception thrown
-                    self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.tables[1][0][column][row]))
+        ind=self.graphlistWidget.row(item)
+        print ind
+        print (self.plots)
+        if(not hasattr( self.plots[ind],'table')):
+            return
+
+        self.tableWidget.setColumnCount(len(self.plots[ind].table)) #rows and columns of table
+        self.tableWidget.setRowCount(len(self.plots[ind].table[0]))
+        for column in range(len(self.plots[ind].table)): # add items from array to QTableWidget
+            for row in range(len(self.plots[ind].table[0])):
+                #item = self.array[0] # each item is a QTableWidgetItem
+                # add the QTableWidgetItem to QTableWidget, but exception thrown
+                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
             
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
@@ -376,8 +378,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.proceed_btn.setEnabled(True)
         self.pdfSelectBtn.setEnabled(True)
         self.progressBar.hide()
-        self.tables=[[]]*(result.numPages)
-        print self.tables
+        #self.tables=[[]]*(result.numPages)
+        #print self.tables
         #print result.val
 
     def progress_handle(self, result):
