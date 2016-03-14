@@ -8,13 +8,13 @@ import sys
 import axis
 import h_scale
 def final_scale(img,clusters=2) :
-
+	
 	#img = cv2.imread(input_file)
 	xarr=[]
 	yarr=[]
 	output_file = 'houghlines3.png'
 	input_file ='input.png'
-	cv2.imwrite(input_file,img)
+	#cv2.imwrite(input_file,img)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	edges = cv2.Canny(gray,80,120)
 	rows, cols ,channels= img.shape
