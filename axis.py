@@ -9,6 +9,7 @@ def axis(img) :
 
 	#img = cv2.imread(input_file)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+	gray = cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,11,2)
 	edges = cv2.Canny(gray,80,120)
 	rows, cols ,channels= img.shape
 	lines = cv2.HoughLinesP(edges,1,np.pi/2,2,None,30,20)
@@ -17,6 +18,7 @@ def axis(img) :
 	image1 = img
 	image2 = img
 	image3 = img
+	image4 = img
 	xth = 0.25 * cols
 	yth = 0.25 * rows
 	xmax = -1
@@ -32,6 +34,7 @@ def axis(img) :
 	cv2.imwrite(input_file,img)
 	#pixel,example,a,b = extract_plots.extract_plots(input_file,2)
 	for line in lines[0]:
+		#cv2.line(image4,(line[0],line[1]),(line[2],line[3]),(0,0,255),2)
 		pt1 = (line[0],line[1])
 		pt2 = (line[2],line[3])
 			
@@ -42,6 +45,7 @@ def axis(img) :
 			arrayv.append(temp)
 
 		if line[1] == line[3] and int(line[1])>4 and int(line[1])<rows-4:#and (pixel[line[1]][line[0]] == example[0] or pixel[line[3]][line[2]] == example[0] or pixel[(line[1]+line[3])/2][(line[0]+line[2])/2] == example[0]):
+			
 			'''
 			if dist > xmax and int(line[1])>4 and int(line[1])<rows-4:
 				xmax = dist
@@ -52,7 +56,7 @@ def axis(img) :
 			
 	
 	#cv2.line(img,(135,71),(849,71),(0,0,255),2)
-	
+	#cv2.imwrite('temp9.png',image4)
 	arrayv.sort(key = lambda tup : tup[0] , reverse = True)
 	arrayh.sort(key = lambda tup : tup[0] , reverse = True)
 	ypt1 = (arrayv[0][1],arrayv[0][2])
@@ -79,35 +83,52 @@ def axis(img) :
 		i = i+1
 	
 	i = 1
-	while i<len(arrayh) and arrayh[i][0] > 0.8*float(xmax):
+	print 'the top is '
+	print xtop
+	while i<len(arrayh) and arrayh[i][0] > 0.6*float(xmax):
 		if arrayh[i][1][1] < xtop :
 			xtop = arrayh[i][1][1]
 			
 			xpt1 = (arrayh[i][1],arrayh[i][2])
 
 		if arrayh[i][1][1] > xbottom :
-			xbottom = arrayv[i][1][1]
+			xbottom = arrayh[i][1][1]
 		
 			xpt2 = (arrayh[i][1],arrayh[i][2])
 		i = i+1
 			
-
-	# cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
-	# cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
-	# cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
-	# cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
+	'''	
+	cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
+	cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
+	cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
+	cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
 	cv2.imwrite('temp6.png',img)
-	print 'the points are'
-	print xpt1
-	print xpt2
+	'''
+	print 'the lines are'
 	print ypt1
 	print ypt2
-	ans1 = ypt1[0][0]
-	ans3 = ypt2[0][0]
-	ans2 = xpt1[0][1]
-	ans = xpt2[0][1]
-	
-	
+	print xpt1
+	print xpt2
+	'''
+	y1_bot = min(ypt1[0][1],ypt1[1][1])
+	y1_top = max(ypt1[0][1],ypt1[1][1])
+	y2_bot = min(ypt2[0][1],ypt2[1][1])
+	y2_top = max(ypt2[0][1],ypt2[1][1])
+	x1_left = min(xpt1[0][0],xpt1[1][0])
+	x1_right = max(xpt1[0][0],xpt1[1][0])
+	x2_left = min(xpt2[0][0],xpt2[1][0])
+	x2_right = max(xpt2[0][0],ypt2[1][0])
+	'''
+	ans1 = max(ypt1[0][0],xpt1[0][0],xpt2[0][0])
+	ans3 = min(ypt2[0][0],xpt1[1][0],xpt2[1][0])
+	#ans1 = ypt1[0][0]
+	#ans3 = ypt2[0][0]
+	ans2 = max(xpt1[0][1],ypt1[1][1],ypt2[1][1])
+	#ans2 = xpt1[0][1]
+	#ans = xpt2[0][1]
+	ans = min(xpt2[0][1],ypt1[0][1],ypt2[0][1])
+	#img1 = img[ans2:ans,ans1:ans3]
+	#cv2.imwrite("bound.png",img1) 
 	os.system("tesseract "+input_file+" out5 hocr")
 	f = open('out5.hocr','r')
 	data=f.read()
@@ -139,7 +160,7 @@ def axis(img) :
 		print b
 		print c
 		print d
-		cv2.imwrite('temp7.png',img)
+		#cv2.imwrite('temp7.png',img)
 		return ans1+a+2,ans1+b+2,ans2+c+2,ans2+d+2
 	else :
 		print 'no'
