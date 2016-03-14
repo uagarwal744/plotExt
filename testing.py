@@ -8,7 +8,7 @@ import y_scale_length
 #import ocr_parse
 from bs4 import BeautifulSoup
 
-def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y_pos) :
+def extract_y_scale(input_file,coordinate,output_file) :
 	img = cv2.imread(input_file,cv2.IMREAD_GRAYSCALE)
 	rows,cols = img.shape
 	img = img[0:rows,0:coordinate]
@@ -22,7 +22,8 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 	rows,cols = img.shape
 	os.system("tesseract "+output_file+" out1 hocr")
 	#os.rename('out.hocr','out.xml')
-	
+	output_array = []
+	y_pos=[]
 	f = open('out1.hocr','r')
 	data=f.read()
 	soup = BeautifulSoup(data)
@@ -34,7 +35,6 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 	print k
 	'''
 	mini = 1000000000
-	
 	for i in soup.find_all('span',{'class':'ocr_line'}) :
 		h= i.get('title').split(' ')
 		k= h[1:5]
@@ -56,7 +56,9 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 	f = open('out.hocr','r')
 	data=f.read()
 	a = []
+	index = []
 	soup = BeautifulSoup(data)
+	count = 0
 	for i in soup.find_all('span',{'class':'ocrx_word'}) :
 		
 		print 'ndns'
@@ -71,11 +73,23 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 			else :
 				x+=char	
 		print x
-				
-		y_pos.append((int(k[1])+int(k[3]))/2)
-		output_array.append(float(x))
-		a.append(float(x))
-		
+		count = count+1		
+		try :
+			y = float(x)
+			output_array.append(float(x))
+			y_pos.append((int(k[1])+int(k[3]))/2)
+			index.append(count)
+
+		except :
+			continue
+
+	y1 = output_array[0]
+	y2 = output_array[1]
+	pos1 = y_pos[0]
+	pos2 = y_pos[1]
+	scale = abs(y1-y2)/abs(index[0]-index[1])	
+	return y1,y2,pos1,pos2,scale
+	'''	
 	h= i.get('title').split(' ')
 	k= h[1:5]
 	k[-1]=k[-1][:-1]
@@ -91,14 +105,17 @@ def extract_y_scale(input_file,coordinate,output_file,output_array,xcoordinate,y
 	if abs(xcoordinate - t>= 0.1*yl) :
 		#print output_array[leng-1] - x
 		output_array.append(z)
-	
+	'''
 
 
 
 if __name__ == '__main__':
 	array = []
-	extract_y_scale('pic1.png',133,'test3.png',array)
-	for i in array :
-		print i,
+	y0=0
+	y1=0
+	pos0=0
+	pos1=0
+	scale=0
+	extract_y_scale('pic1.png',133,'test3.png',y0,y1,pos0,pos1,scale)
 
 
