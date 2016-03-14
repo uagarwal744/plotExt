@@ -328,7 +328,7 @@ class GraphThread(QtCore.QThread):
         im2 = np.zeros((h,w,channel),np.uint8)
         for x1,y1,x2,y2 in lines[0]:
             cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)
-        #cv2.imwrite(self.graphfolder+"/houghp.png",im2)
+        cv2.imwrite(self.graphfolder+"/houghp.png",im2)
         return im2
 
     
@@ -364,7 +364,7 @@ class GraphThread(QtCore.QThread):
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
                 if len(approx)<10 and len(approx)>2:
                     x_,y_,w_,h_  = cv2.boundingRect(c)
-                    #cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
+                    cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                     #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -451,13 +451,15 @@ class GraphThread(QtCore.QThread):
             if(self.cflag[i]=="0"):
                 continue
 
-            #cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
+            cv2.drawContours(img, self.cont[i], -1, (0, 0, 255), 2)
             percentin = 0.2
             xstart = max(0,self.x[i]-percentin*self.w[i])
             #xend = min(wi,self.x[i]+self.w[i]+percentin*self.w[i])
             xend = min(wi,self.x[i]+self.w[i]+0.05*self.w[i])
-            ystart = max(0,self.y[i]-percentin*self.h[i])
-            yend = min(hi,self.y[i]+self.h[i]+percentin*self.h[i])
+            #ystart = max(0,self.y[i]-percentin*self.h[i])
+            ystart = max(0,self.y[i]-0.08*self.h[i])
+            yend = min(hi,self.y[i]+self.h[i]+(percentin+0.03)*self.h[i])
+            
             
             graph = img[ystart:yend,xstart:xend]
 
