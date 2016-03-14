@@ -340,7 +340,9 @@ class GraphThread(QtCore.QThread):
         #img = cv2.imread(self.pageImage)
         gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         cv2.imwrite(self.graphfolder+"/gray.png",gray)
-        (cnts, _) = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        temp = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+        print temp
+        cnts = temp[0]
         h,w,channel = image.shape
         hi,wi = h,w
         count_graph = 1
