@@ -46,7 +46,7 @@ def isWhiteOrBlack(x,y,height, w,b, clt,image,colour_found):
 def isBlack(x,y,height,b,clt,image):
 	cnt = 0
 	for i in range(height):	
-		print x,y,height,image.shape
+		#print x,y,height,image.shape
 		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
 		if(curr_label == b):
 			cnt = cnt+1
@@ -404,15 +404,18 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		j=10
 		pos = 0
 		while(1):
+			if(x1-j<0 or x2+j>=image.shape[1]):
+				break
 			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color
 				pos = 1
-				break;
+				break
 			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color				
 				pos = 2				
 				break
 			j = j+1
+
 
 		if(pos==1):
 			cnt = 0
@@ -473,8 +476,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		legend_info.append(temp)
 
 
-	cv2.imshow("as", image)
-	cv2.waitKey(0)
+   # cv2.imshow("as", image)
+	#cv2.waitKey(0)
 
 	return image,legend_info
 

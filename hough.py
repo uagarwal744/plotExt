@@ -7,6 +7,7 @@ import x_scale
 import sys
 import axis
 import h_scale
+import traceback
 def final_scale(img,clusters=2) :
 	
 	#img = cv2.imread(input_file)
@@ -36,30 +37,42 @@ def final_scale(img,clusters=2) :
 	#cv2.imwrite('temp6.jpg',tempimg)
 	markings = h_scale.h_scale(input_file,ans,ans3,ans1)
 	y0=0
-	y1=0
+	y1=1
 	pos0=0
-	pos1=0
-	scale_y=0
+	pos1=1
+	scale_y=1
+	y_pos0=bot_left[1]
+	y_pos1=top_right[1]
+
 	try :
 		
 		#testing.extract_y_scale(input_file,int(ans1),'test3.png',yarr,int(ans),y_pos)
 		y0,y1,y_pos0,y_pos1,scale_y = testing.extract_y_scale(input_file,int(ans1),'test3.png')
-		print 'printing the values'
-		print y0
-		print y1
-		print y_pos0
-		print y_pos1
-		print scale_y
+	except Exception, e :
+		traceback.print_exc()
+		y0 = 0
+		y1 = 1
+		scale_y = 1
+		y_pos0=bot_left[1]
+		y_pos1=top_right[1]
+	
+	try:
 		x_scale.extract_x_scale(input_file,int(ans),'test2.png',xarr,x_pos)
 		#cv2.imwrite('line4.jpg',image1)
 	#cv2.imwrite('line5.jpg',image2)
 		print xarr
 		#scale_y = abs(float(yarr[2])-float(yarr[1]))
 		scale_x = abs(float(xarr[2])-float(xarr[1]))
-	except :
+	except Exception, e :
+		traceback.print_exc()
 		print 'error occured'
+		scale_x=1.0/(len(markings)+1)
+		x0=2*scale_x
+		x1=3*scale_x
 		#return markings
-		return 'line5.jpg',bot_left,top_right,1,0,1,0,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
+		#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
+		print('line5.jpg',bot_left,top_right,scale_x,sc,0,1,y0,y1,markings[1],markings[2],y_pos0,y_pos1)
+		return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x0,x1,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
 	'''
 	print 'x scale'
 	print scale_x
