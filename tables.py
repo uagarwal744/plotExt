@@ -179,9 +179,9 @@ def findParameters(x1,p_x1,y1,p_y1,x2,p_x2,y2,p_y2,scale_x,scale_y,bottom_left,t
 def plot(x_axis,y_axis) :
 	plt.plot(x_axis,y_axis,'ro')
 	plt.axis([min(x_axis) , max(x_axis) , 40 , 100])
-	plt.show()
+	#plt.show()
 
-def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y):
+def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend):
 	table=[]
 	x_=[]
 	fx=[]
@@ -199,8 +199,35 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	# for j in range(len(table[0])):
 	# 	for i in range(len(table)):
 	# 		print table[i][j],
-	# 	print '\n'	
-	# plot(table[0] , table[2])
+
+	table2 = [[] for x in table]
+	miny=10000
+	maxy=-100
+	for i in range(len(table)):
+		for j in range(len(table[i])):
+			if(table[i][j]=="--"):
+				table2[i].append(0)
+			else:
+				table2[i].append(float(table[i][j]))
+		if i!=0:
+			miny=min(miny,min(table2[i]))
+			maxy=max(maxy,max(table2[i]))
+
+	plt.axis([min(table2[0]) , max(table2[0]) , miny ,maxy ])
+	colors=[]
+	for i in range(len(legend)):
+		#print legend[i][0]
+		b=legend[i][1][0]
+		g=legend[i][1][1]
+		r=legend[i][1][2]
+		colors.append((r,g,b))
+
+	# plt.set_color_cycle(colors)
+	# 	print '\n'
+	for i in range(1,len(table)):
+		plt.plot(table2[0],table2[i])
+	plt.show()
+		#plot(table[0] , table[2])
 	return table
 
 def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend):
@@ -219,7 +246,7 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 		masks.append(plotImg)
 		cv2.imwrite("mask %d.png"%(i),plotImg)
 	print 'below'
-	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
+	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend)
 	
 
 
