@@ -7,6 +7,7 @@ import x_scale
 import sys
 import axis
 import h_scale
+import traceback
 def final_scale(img,clusters=2) :
 	
 	#img = cv2.imread(input_file)
@@ -56,8 +57,10 @@ def final_scale(img,clusters=2) :
 		print xarr
 		#scale_y = abs(float(yarr[2])-float(yarr[1]))
 		scale_x = abs(float(xarr[2])-float(xarr[1]))
-	except :
+	except Exception, e:
 		print 'error occured'
+		print e
+		print traceback.print_exc()
 		#return markings
 		return 'line5.jpg',bot_left,top_right,1,0,1,0,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
 	'''

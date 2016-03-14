@@ -9,6 +9,7 @@ from multiprocessing import Pool
 from PyQt4.QtCore import *
 from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
+import write_to_pdf
 #import image_class
 
 import cv2
@@ -69,6 +70,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.progressBar.hide()
         self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
         self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
+        self.savetable.clicked.connect(self.download_table)
         self.manual.hide()
         self.contin.hide()
         self.selectAreaBtn.hide()
@@ -81,6 +83,18 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.lineEdit_2.hide()
         self.lineEdit_3.hide()
         self.lineEdit_4.hide()
+        self.gif.hide()
+
+    def download_table(self):
+        '''still to add
+        name of the plot
+        names from legend in an array of strings
+        call this function in a loop for all the generated graphs
+        '''
+        xz='test.pdf'
+        c=write_to_pdf.createpdf(xz)
+        #write_to_pdf.pdfoutput(c,self.table)
+        write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
 
 
     def change_selected_pdf_item(self):
@@ -93,7 +107,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graphItem_click(item)
     def getTables(self):
         #self.tables = [0 for plot in self.plots ]
-        
+        self.gif.show()
+        self.tableWidget.hide()
+        movie=QtGui.QMovie("loading.gif")
+        self.gif.setMovie(movie)
+        movie.start()
         self.thread_per_plot=[]
         for plot in self.plots:
             temp_thread=plotThread(plot,self.plots.index(plot))
