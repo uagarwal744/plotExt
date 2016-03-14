@@ -237,6 +237,10 @@ class PlotExtractor:
 
         return self.graphList,self.graphName'''
 
+class FinishObj(QtCore.QObject):
+    def __init__(self, val):
+        self.val=val
+
 class ReturnObj(QtCore.QObject):
     def __init__(self, list1, list2, page_no):
         self.list1 = list1
@@ -244,9 +248,9 @@ class ReturnObj(QtCore.QObject):
         self.page_no=page_no
 
 class GraphThread(QtCore.QThread):
-    #finished = QtCore.pyqtSignal(object)
+    finished = QtCore.pyqtSignal(object)
     progress = QtCore.pyqtSignal(object)
-    def __init__(self,pagelist,callback,minLineLength=100,maxLineGap=30,threshArea=1500,percent=70,ang_prec=180,det_prec=0.25,density="300",parent=None):
+    def __init__(self,pagelist,callback, callback2,minLineLength=100,maxLineGap=30,threshArea=1500,percent=70,ang_prec=180,det_prec=0.25,density="300",parent=None):
         """Initializes the class
         Keyword arguments:
         filename -- actual image of the entire pdf
@@ -275,7 +279,7 @@ class GraphThread(QtCore.QThread):
         #self.graphArray = []
         self.graphName = []
         self.graphList = []
-        ##self.finished.connect(callback)
+        self.finished.connect(callback2)
         self.progress.connect(callback)
     
     def graphextract(self):
@@ -300,7 +304,7 @@ class GraphThread(QtCore.QThread):
             ##self.graphList.append(list1)
             ##self.graphName.append(list2)
             #self.polydp(self.houghp())
-
+        self.finished.emit(FinishObj(i))
         ##return self.graphList,self.graphName
 
     def houghp(self):

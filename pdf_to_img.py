@@ -8,8 +8,9 @@ from PyQt4 import QtCore
 
 
 class ResultObj(QtCore.QObject):
-    def __init__(self, val):
+    def __init__(self, val, numPages):
         self.val = val
+        self.numPages=numPages
 
 class ImageThread(QtCore.QThread):
     finished = QtCore.pyqtSignal(object)
@@ -34,8 +35,8 @@ class ImageThread(QtCore.QThread):
 			filename1="{0}{1}new.png".format(input_file,i)
 			img.write(filename)
 			os.system("convert -flatten "+filename+" "+filename1)
-			self.progress.emit(ResultObj(i))
-		self.finished.emit(ResultObj(numPages))
+			self.progress.emit(ResultObj(i, numPages))
+		self.finished.emit(ResultObj(numPages, numPages))
 
     
     def run(self):
