@@ -13,6 +13,14 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>icon.png</normaloff>
+    <normalon>icon.png</normalon>icon.png</iconset>
+  </property>
+  <property name="windowOpacity">
+   <double>1.000000000000000</double>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
@@ -376,7 +384,7 @@
    <property name="minimumSize">
     <size>
      <width>185</width>
-     <height>121</height>
+     <height>157</height>
     </size>
    </property>
    <property name="maximumSize">
@@ -412,6 +420,13 @@
        </property>
        <property name="viewMode">
         <enum>QListView::IconMode</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>0</number>
        </property>
       </widget>
      </item>

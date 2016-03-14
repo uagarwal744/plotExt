@@ -9,6 +9,7 @@ from graphextract_returnArray import PlotExtractor
 import axis
 import legendDetect
 import hough
+from PyQt4 import QtCore
 
 import tables
 
@@ -48,6 +49,22 @@ class Graph:
         self.scale_detection()
         self.legend_detection()
         self.value_calculation()
+
+'''class ResultObj(QtCore.QObject):
+    def __init__(self, table):
+        self.table=table
+
+class TableThread(QtCore.QThread):
+    finished=QtCore.pyqtSignal(object)
+    def __init__(self,GraphObj, callback, parent=None):
+        QtCore.QThread.__init__(self, parent)
+        self.image = GraphObj
+        self.finished.connect(callback)
+    
+    def run(self):
+        self.image.run()
+        self.finished.emit(ResultObj(self.image.table))'''
+
 
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""

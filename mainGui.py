@@ -13,6 +13,23 @@ import image_class
 
 import cv2
 
+class pageThread(QtCore.QThread):
+
+    table_completed = QtCore.pyqtSignal(object, object)
+    def __init__(self, plots, index):
+        QtCore.QThread.__init__(self)
+        self.plots=plots
+        self.index=index
+
+    def run(self):
+        table=[]
+        for plot in self.plots:
+            plot.run()
+            table.append(plot.table)
+            print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
+            print table
+        self.table_completed.emit(table, self.index)
+
 
 class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def __init__(self):
@@ -26,11 +43,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graph_per_page=[]
         self.plot_dic={}
 
-
+        self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
-        self.pdflistWidget.itemClicked.connect(self.pdfItem_click)
-        self.graphlistWidget.itemClicked.connect(self.graphItem_click)
         self.btn_x1.clicked.connect(self.Coordinate)
         self.btn_x2.clicked.connect(self.Coordinate)
         self.btn_y1.clicked.connect(self.Coordinate)
@@ -39,6 +54,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.delete_btn.clicked.connect(self.delete_item)
         self.selectAreaBtn.clicked.connect(self.enableDrag)
         self.undo_btn.clicked.connect(self.undo)
+        self.pdflistWidget.itemClicked.connect(self.pdfItem_click)
+        self.graphlistWidget.itemClicked.connect(self.graphItem_click)
         """disabling buttons before a pdf is chosen"""
         self.runBtn.setEnabled(False)
         self.btn_x1.setEnabled(False)
@@ -49,37 +66,68 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
-        #self.manual.clicked.connect(self.manual_fun)
+        self.manual.clicked.connect(self.manual_fun)
         self.contin.clicked.connect(self.getTables)
+        self.progressBar.hide()
+        self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
+        self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
+        self.manual.hide()
+        self.contin.hide()
+        self.selectAreaBtn.hide()
+        self.proceed_btn.hide()
+        self.btn_x1.hide()
+        self.btn_y2.hide()
+        self.btn_y1.hide()
+        self.btn_x2.hide()
+        self.lineEdit.hide()
+        self.lineEdit_2.hide()
+        self.lineEdit_3.hide()
+        self.lineEdit_4.hide()
 
 
+    def change_selected_pdf_item(self):
+        items=self.pdflistWidget.selectedItems()
+        item=items[0]
+        self.pdfItem_click(item)
+    def change_selected_item(self):
+        items=self.graphlistWidget.selectedItems()
+        item=items[0]
+        self.graphItem_click(item)
     def getTables(self):
+        
+        self.thread_per_page=[]
         for plots in self.plots:
+            temp_thread=pageThread(plots,self.plots.index(plots))
+            temp_thread.table_completed.connect(self.on_table_completion)
+            self.thread_per_page.append(temp_thread)
+            temp_thread.start()
+
+
+
+        '''for plots in self.plots:
             for plot in plots:
-                plot.run()
-                self.tableWidget.setColumnCount(len(plot.table)) #rows and columns of table
-                self.tableWidget.setRowCount(len(plot.table[0]))
-                for row in range(len(plot.table[0])): # add items from array to QTableWidget
-                    for column in range(len(plot.table)):
-                        #item = self.array[0] # each item is a QTableWidgetItem
-                        # add the QTableWidgetItem to QTableWidget, but exception thrown
-                        self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(plot.table[column][row]))            
-                        
+                print plot
+                print '##########################################'
+                self.tThread=image_class.TableThread(plot,self.table_progress)
+                self.tThread.start()
+
                 return'''
-        table=[]
-        for plots in self.plots:
-            for plot in plots:
-                plot.run()
-                table.append(plot.table)
-                break
-        print table
-        self.tableWidget.setColumnCount(len(table)) #rows and columns of table
-        self.tableWidget.setRowCount(len(table[0]))
-        for row in range(len(table[0])): # add items from array to QTableWidget
-            for column in range(len(table)):
+
+    def on_table_completion(self, table, index):
+        self.tables[index]=table
+        print '())()()())()^^^^^^()()()()()'
+        print self.tables
+
+        '''def table_progress(self, result):
+        print '$$$$$$$'
+        print result.table
+        self.tableWidget.setColumnCount(len(result.table)) #rows and columns of table
+        self.tableWidget.setRowCount(len(result.table[0]))
+        for row in range(len(result.table[0])): # add items from array to QTableWidget
+            for column in range(len(result.table)):
                 #item = self.array[0] # each item is a QTableWidgetItem
                 # add the QTableWidgetItem to QTableWidget, but exception thrown
-                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(table[column][row])) '''          
+                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(result.table[column][row])) '''
                         
                 
 
@@ -96,9 +144,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.label_2.show()
         self.proceed_btn.show()
         self.selectAreaBtn.show()
-        self.tableWidget.hide()
+        #self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
+        if len(items)==0:
+            return
         self.pdfItem_click(items[0])
     def removePlot(self,filename):
         print(self.plot_dic)
@@ -138,15 +188,29 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         new_list=[]
         for j in range(len(images)):
             new_list.append(image_class.Graph(images[j],files[j]))
-            print new_list
+            #print new_list
             self.addGraphItem(new_list[-1])
             self.plot_dic[new_list[-1].outer_image_file]=new_list[-1]
+        self.progressBar.setValue(self.progressBar.value()+1)
+        self.statusbar.showMessage('Extracting Graphs from '+str(result.page_no+2)+' page ...')
 
         self.plots.append(new_list)
-    def getGraphs(self):
+        print self.plots
+    def finished_extracting(self, result):
+        self.statusbar.clearMessage()
+        self.progressBar.hide()
+        self.runBtn.hide()
+        self.manual.show()
+        self.contin.show()
 
-        self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract)
+    def getGraphs(self):
+        self.graphlistWidget.clear()
+
+        self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract, self.finished_extracting)
         self.gthread.start()
+        self.progressBar.show()
+        self.progressBar.setValue(0)
+        self.statusbar.showMessage('Extracting Graphs from 1 page ...')
 
         '''images,files = graphextract_returnArray1.PlotExtractor(self.listOfFiles).graphextract()
         for i in range(len(images)):
@@ -175,8 +239,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.isEnabled=False
         rect=self.display_item.currentQRect
         pdf_item=self.pdflistWidget.selectedItems()
-        #pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
-        #self.graph_per_page[int(pg_no)-1]+=1
+        pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
+        self.graph_per_page[int(pg_no)-1]+=1
         img = cv2.imread(str(self.x)+str(int(pg_no)-1)+'.png')
         height, width = img.shape[:2]     # dimensions of original image
         #size of pixmap
@@ -192,11 +256,13 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         ystart=int(top_left.y()*y_ratio)
         xend=int(bottom_right.x()*x_ratio)
         yend=int(bottom_right.y()*y_ratio)
-        graph = img[int(ystart):int(yend),int(xstart):int(xend)]  
-        cv2.imwrite('graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png', graph)
-        item=QtGui.QListWidgetItem(QtGui.QIcon('cd1.png'),QtCore.QString('outt.png'))
+        graph = img[int(ystart):int(yend),int(xstart):int(xend)]
+        p='graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'  
+        cv2.imwrite(p, graph)
+        item=QtGui.QListWidgetItem(QtGui.QIcon(p),QtCore.QString(p))
         self.graphlistWidget.addItem(item)
-        self.plots[int(pg_no)-1].append(image_class.Graph(graph,'graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'))
+        self.plots[int(pg_no)-1].append(image_class.Graph(graph,p))
+        #print self.plots
 
 
 
@@ -263,6 +329,19 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def graphItem_click(self, item):
         self.display_item.setPixmap(QtGui.QPixmap(item.text()).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+        row=self.graphlistWidget.row(item)
+        print row
+        self.tableWidget.setColumnCount(len(self.tables[1][0])) #rows and columns of table
+        self.tableWidget.setRowCount(len(self.tables[1][0][0]))
+        if len(self.tables[1])!=0:
+            print len(self.tables[1][0])
+            print len(self.tables[1][0][0])
+            for column in range(len(self.tables[1][0])): # add items from array to QTableWidget
+                for row in range(len(self.tables[1][0][0])):
+                    #item = self.array[0] # each item is a QTableWidgetItem
+                    # add the QTableWidgetItem to QTableWidget, but exception thrown
+                    self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.tables[1][0][column][row]))
+            
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
@@ -296,6 +375,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_y2.setEnabled(True)
         self.proceed_btn.setEnabled(True)
         self.pdfSelectBtn.setEnabled(True)
+        self.progressBar.hide()
+        self.tables=[[]]*(result.numPages)
+        print self.tables
         #print result.val
 
     def progress_handle(self, result):
@@ -306,13 +388,18 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(result.val+1)))
         self.pdflistWidget.addItem(self.item)
 
+        self.graph_per_page.append(0)
+
         w=self.x+str(result.val)+".png"
         self.listOfFiles.append(str(w))
 
         if result.val==0:
+            self.progressBar.setMaximum(result.numPages)
+            self.progressBar.setValue(1)
             self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
             self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
-        
+        else:
+            self.progressBar.setValue(self.progressBar.value()+1)
 
 
     def openfile(self):
@@ -324,7 +411,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             return
         z=QtCore.QFileInfo(self.x)     #z stores only the file name
         self.pdfSelectBtn.setEnabled(False)
+        self.progressBar.show()
         self.statusbar.showMessage(QString(' Loading '+'1'+' page ....'))
+        # self.statusbar.insertWidget(3,progress_bar)
+        # self.statusbar.progress_bar.setMaximum(6)
+        # self.statusbar.progress_bar.setValue(1)
         self.ithread = ImageThread(self.x,"300", self.loadingFinished, self.progress_handle)
         self.ithread.start()
 
