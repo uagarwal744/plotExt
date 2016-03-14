@@ -4,6 +4,7 @@ import sys
 import os
 import copy
 import math
+import tables
 
 def getKey(item):
 	return item[1]
@@ -91,10 +92,10 @@ def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1
 	masks=plot(img,t_)
 	print "Done"
 	print "Finding parameters"
-	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = findParameters(int(x1),int(p_x1),int(y1),int(p_y1),int(x2),int(p_x2),int(y2),int(p_y2),int(scale_x),int(scale_y),bottom_left,top_right)
+	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = tables.findParameters(int(x1),int(p_x1),int(y1),int(p_y1),int(x2),int(p_x2),int(y2),int(p_y2),int(scale_x),int(scale_y),bottom_left,top_right)
 	print "Done"
 	print "Finding tables"	
-	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
+	return tables.findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
 
 
 
