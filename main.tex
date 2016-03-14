@@ -1,4 +1,4 @@
-\documentclass[12pts]{scrreprt} 
+\documentclass[a4paper,10pt]{scrreprt}
 
 \usepackage[left=10mm,right=10mm,top=1in,bottom=1in]{geometry}
 \usepackage{pseudocode}
@@ -9,7 +9,9 @@
 \usepackage{underscore}
 \usepackage{amssymb}
 \usepackage{pseudocode}
-
+\usepackage{array}
+\usepackage[utf8]{inputenc}
+\setlength{\arrayrulewidth}{0.5mm}
 \date{}
 
 
@@ -36,7 +38,7 @@ This document describes the software requirements, algorithm, results obtained o
 
 \section{Installing Prerequisites} 
 \paragraph{}
-The product stitches randomly torn paper documents in an automated fashion. This product is useful for recovering documents in archival study and investigation science. The product helps in automating the recovery of torn documents, which requires a lot of manual effort otherwise.
+
 
 \section{Installing ....} 
 
@@ -84,6 +86,7 @@ A user manual in pdf format would be made available along with the software.
 To extract all the graphs from a pdf file, first convert all the pdf pages to images. To do this two modules have been used namely PythonMagick and pyPdf. And PdfFileReader is imported from pyPdf module.
 \paragraph{}
 Firstly a blank image file has been created using PythonMagick and required density is assigned to it. When the pdf page is read using this image file, it reads in the specified density. After that all pdf pages are written in image format.
+\\
 \begin{pseudocode}{\textbf{pdf_to_img}}{ }
 /\mbox{*}$ Creating an image file using PythonMagick and assigning density to it.$\\ $img.read reads the input\_file in the specified density(say 200) and $\\$img.write writes the pdf file in image format. $ \mbox{*}/\\
 $img $ \GETS $ PythonMagick.Image() $\\
@@ -122,6 +125,7 @@ $im2$\GETS$np.zeros((h,w,channel),np.uint8)$\\
 $cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)$\\
 $\textbf{return} im2$\\
 \END \\
+\\
 $def \textbf{polydp}(image)$\\
 /\mbox{*}$Does a polydp (shape) approximation on the contours detected$\\
 $image--image returned by the houghp()$\mbox{*}/\\
@@ -227,7 +231,7 @@ The following represents the overall flow of the testing process:
     \item Test documents and reports shall be submitted. Any specifications to be reviewed, revised, or updated shall be handled immediately.
 \end{enumerate}
 
-\section{Testing Process}
+\chapter{Testing Process}
 \paragraph{}
 The diagram above outlines the Test Process approach that will be followed.
 \begin{enumerate}
@@ -238,5 +242,167 @@ The diagram above outlines the Test Process approach that will be followed.
     \item Execute System Tests - The tests identified in the Design/Build Test Procedures will be executed. All results will be documented and Bug Report Forms filled out and given to the Development Team as necessary.
     \item Signoff - Signoff happens when all pre-defined exit criteria have been achieved.
 \end{enumerate}
+\chapter{Testing Strategy}
+\paragraph{}
+The following outlines the types of testing that were done for unit, integration, and system testing. It includes what will be tested, the specific use cases that determine how the testing is done.
+\section{Unit Testing}
+\paragraph{}
+Unit Testing is done at the source or code level for language-specific programming errors such
+as bad syntax, logic errors, or to test particular functions or code modules. The unit test cases
+shall be designed to test the validity of the programs correctness.
+\subsection{White Box Testing}
+\paragraph{}
+In white box testing, the UI is bypassed. Inputs and outputs are tested directly at the code level and the results are compared against specifications. This form of testing ignores the function of the program under test and will focus only on its code and the structure of that code. Test cases are generated that not only cause each condition to take on all possible values at least once, but that cause each such condition to be executed at least once.
+\\
+Yet to be written
+\\
+\subsection{Black Box Testing}
+Black box testing typically involves running through every possible input to verify that it results in the right outputs using the software as an end-user would. We have decided to perform Error guessing and Boundary Value Analysis testing on our application.
+\section{Integration Testing}
+\subsection{Incremental Testing}
+\paragraph{}
+There are 'x' primary modules that were needed to be integrated. The module-1 module, the module-2 module etc etc. These components, once integrated form the complete Blah-Blah application. The following describes these modules as well as the steps that will need to be taken to achieve complete integration.We will be employing an incremental testing strategy to complete the integration.
+\paragraph{}
+\textbf{Module-1:}
+\textbf{Module-2:}
+\\
+\\
+\subsection{System Testing}
+\paragraph{}
+The goals of system testing are to detect faults that can only be exposed by testing the entire integrated system or some major part of it. Generally, system testing is mainly concerned with areas such as performance, security, validation, load/stress, and configuration sensitivity. But in our case we focused only on function validation and performance. And in both cases we used the black-box method of testing.
+\subsection{Function Validation Testing}
+The integrated Blah-Blah Application was tested based on the requirements to ensure that we built the right application. In doing this test, we tried to find the errors in the inputs and outputs, that is, we tested each function to ensure that it properly implements the parsing procedures, and that the results are expected. The behavior of each function are contained in the Software Requirement Specification.
+\paragraph{}
+In addition, we tested:
+\begin{itemize}
+	\item The interfaces to ensure they are functioning as desired (i.e. check if each interface is behaving as expected, specifically verifying the appropriate action is associated with each mouse_click event).
+	\item Some more stuff.
+\end{itemize}
+\subsection{Performance Testing}
+\paragraph{}
+This test was conducted to evaluate the fulfillment of a system with specified performance requirements. It was done using black-box testing method. The following were tested:
+\begin{itemize}
+	\item Setting high number of graphs in the given pdf file and checking the time required for the exraction of all the graphs and tables for each plot.
+	\item Some more stuff
+\end{itemize}
+\chapter{Entry and Exit Criteria}
+\paragraph{}
+This section describes the general criteria by which testing commences, temporarily stopped, resumed and completed within each testing phase. Different features/components may have slight variation of their criteria, in which case, those should be mentioned in the feature test
+plan. The testing phase also maps to the impact level definition when a defect is entered in the bug-tracking phase.
+\section{Unit Testing}
+\paragraph{}
+Unit Testing is done at the source or code level for language-specific programming errors such as bad syntax, logic errors, or to test particular functions or code modules. The unit test cases shall be designed to test the validity of the programs correctness.
+\subsection{Black Box Phase}
+\paragraph{}
+Black box testing typically involves running through every possible input to verify that it results in the right outputs using the software as an end-user would. We will use Equivalence Partitioning and Boundary Value Analysis complexity metrics in order to quantifiably determine how
+many test cases needed to achieve maximum code coverage.
+\paragraph{}
+\textbf{Black Box Entry Criteria}
+\paragraph{}
+The Black Box Entry Criteria will rely on the component specification, and user interface requirements. Things that must be done on entry to the Black Box stage:
+\begin{itemize}
+	\item All functions like so-and-so funtions must be either coded or stubs written.
+	\item The type of Black Box testing Methods will be determined upon entry. We will use so-and-so analysis.
+	\item Some more stuff
+\end{itemize}
+\paragraph{}
+\textbf{Black Box Exit Criteria}
+\paragraph{}
+The Black Box Exit Criteria listed below explains what needs to be completed in-order to exit Black Box phase. To exit the Black Box phase 100\% success rate must be achieved. Things that must be done upon exiting the Black Box stage:
+\begin{itemize}
+	\item Some Stuff.
+\end{itemize}
+\paragraph{}
+\subsection{White Box Testing}
+\paragraph{}
+The White Box criteria apply for purposes of focusing on internal program structure, and dis- cover all internal program errors. Defects will be categorized and the quality of the product will be assessed.
+\\
+\textbf{White Box Entry Criteria}
+\paragraph{}
+The White Box Entry Criteria will rely verifying that the major features work alone but not necessarily in combination; exception handling will not be implemented. The design and human interface are stable. Things that must be done on entry to the White Box stage:
+\begin{itemize}
+	\item All functions so-and-so must be coded.
+	\item The type of White Box testing Methods was determined upon entry. We will use unit testing and test for memory leaks.
+	\item Black Box Testing should be in its late stages.
+	\item Some more stuff
+\end{itemize}
+\paragraph{}
+\textbf{White Box Exit Criteria}
+\paragraph{}
+The Citation Analyzer in the White Box stage should have a generally stable feel to it. White Box testing continued until the Black Box or next milestone criteria were met. To exit the White Box phase 100\% success rate must be achieved. The following describes the state of the product upon exit from the White Box Stage:
+\begin{itemize}
+	\item All funtions like blaa-blah-blah are implemented and tested
+	\item All Branch Testing test cases were generated. The test cases will be generated from the Control Flow diagrams of all functions.
+	\item The graphical interface has been reviewed and found to satisfactory and is stable, that is, no further changes to dialog boxes or other interface elements are planned. Minor changes are acceptable, but must be arranged with the Development and Test Engineers.
+	\item All code bugs that are exposed are corrected.
+\end{itemize}
+\section{Integration Testing}
+\paragraph{}
+There are X modules that will be integrated for Integration testing. Some more Stufffff.
+\subsection{Integration Test Entry Criteria}
+\paragraph{}
+The Integration Test Entry Criteria will rely on these X modules to be operational. 
+Some Stuffffff.
+Things that must be done on entry to the Integration Test stage:
+\begin{itemize}
+	\item All funtions like blah-blah are either coded and/or stubs created.
+	\item Some more stuff.
+\end{itemize}
+\paragraph{}
+\subsecton{Integration Test Exit Criteria}
+\paragraph{}
+The Integration Test Exit Criteria relied on these X modules to be operational.To exit the Integration Testing phase 100\% success rate must be achieved. Things that must be done on exit from the Integration Test stage:
+\begin{itemize}
+	\item All code bugs that were exposed were corrected.
+	\item Some Stuff.
+	\item These X modules are ready for System Testing. Stubs and drivers are replaced with fully functional code.
+	\item Black Box Testing was completed.
+\end{itemize}
+\section{System Testing}
+\paragraph{}
+The System Test criteria apply for purposes of categorizing defects and the assessing the quality level of the product. All elements of these so-and-so modules are meshed together and tested as a whole. System test focuses on functions and performance, reliability, installation, behavior during special conditions, and stress testing.
+\subsection{System Test Entry Criteria}
+\begin{itemize}
+	\item Unit testing of all the modules has been completed.
+	\item System test cases have been documented.
+	\item UI and functionalities to be tested should be frozen.
+	\item Priorities bugs have been fixed.
+	\item Some more Stuff if needed.
+\end{itemize}
+\subsection{System Test Exit Criteria}
+\begin{itemize}
+	\item Application meets all the document requirements and functionalities.
+	\item Defects found during System testing should be fixed and closed.
+	\item All the test cases for the system have been executed and passed.
+	\item No critical defects have been opened which is found during system testing.
+	\item Some more stuff if needed.
+\end{itemize}
+\section{Shipping/Live Release}
+\paragraph{}
+Some Stuff.
+\subsection{Shipping/Live Release Entry Criteria}
+\paragraph{}
+The criteria for entering the final stages are as follows:
+\begin{itemize}
+	\item Some Stuff
+\end{itemize}
+\subsection{Shipping/Live Release Exit Criteria}
+\begin{itemize}
+	\item No critical defects found.
+	\item Some more Stuff.
+\end{itemize}
+\chapter{Deliverables}
+\paragraph{}
+Following is a list of deliverables for our software:
+\begin{itemize}
+	\item Program function specifications
+	\item Program source code
+	\item Test plan document - this document should address testing objectives, criteria, standards, schedule and assignments, and testing tools.
+	\begin{itemize}
+		\item Unit Testing Plan
+		\item Integration Plan
+		\item System Testing Plan
+	\end{itemize}
+\end{itemize}
 \end{document}
 
