@@ -1,5 +1,5 @@
 from PIL import Image as IM
-from PyPDF2 import PdfFileMerger, PdfFileReader
+from pyPdf import PdfFileMerger, PdfFileReader
 import os
 
 def file_merge(filenames):
