@@ -84,11 +84,10 @@ A user manual in pdf format would be made available along with the software.
 To extract all the graphs from a pdf file, first convert all the pdf pages to images. To do this two modules have been used namely PythonMagick and pyPdf. And PdfFileReader is imported from pyPdf module.
 \paragraph{}
 Firstly a blank image file has been created using PythonMagick and required density is assigned to it. When the pdf page is read using this image file, it reads in the specified density. After that all pdf pages are written in image format.
-
-\begin{pseudocode}{pdf_to_img}{ }
-/\mbox{*}$Creating an image file using PythonMagick and assigning density to it.\\img.read reads the input_file in the specified density(say 200) and \\img.write writes the pdf file in image format.$ \mbox{*}/\\
+\begin{pseudocode}{\textbf{pdf_to_img}}{ }
+/\mbox{*}$ Creating an image file using PythonMagick and assigning density to it.$\\ $img.read reads the input\_file in the specified density(say 200) and $\\$img.write writes the pdf file in image format. $ \mbox{*}/\\
 $img $ \GETS $ PythonMagick.Image() $\\
-$img $ \cdot $ density(density) $\\
+$img.density(density) $\\
 $my\_file $ \GETS $ PdfFileReader(file("\{0\}".format(input\_file),"r")) $\\
 $numpages $ \GETS $ my\_file.getNumPages() $\\
 $file $ \GETS $ [ ] $\\ 
@@ -97,7 +96,7 @@ $file $ \GETS $ [ ] $\\
 $img.read("\{0\}[\{1\}]".format(input\_file,i))$\\
 $img.wrire("\{0\}\_image\{1\}.jpg".format(input\_file,i))$\\
 $file.append("\{0\}\_image\{1\}.jpg".format(input\_file,i))$\\
-\END
+\END\\
 \end{pseudocode}
 \subsection{Extracting graphs from an image}
 \paragraph{}
@@ -106,12 +105,76 @@ After converting the pdf file to images all the graphs are extracted from each i
 At first a function is defined which does the probabilistic Hough transform on the image given. In this the image file is read and converted to a gray-scale image using cv2.cvtColor(). After that Adaptive Thresholding, which converts gray-scale image to binary one, is done using cv2.adaptiveThreshold() followed by morphological transformation using cv2.morphologyEx(). And then Image blurring/smoothing is done using cv2.GaussianBlur() followed by straight lines detection using cv2.HoughLinesP().
 \paragraph{}
 After the Hough Transform is done, a function is defined to approximate the shape on the contours detected. In this function contours are detected using cv2.findContours and stored in a list. Now for each contour detected in this list contour area is calculated using cv2.contourArea() and is compared with the threshold area. If this area is greater than the threshold area, the shape of the contour is approximated using cv2.approxPolyDp(). /* If the length of this approximated shape is between two and ten the coordinates of the bounding rectangle of this contour is found using cv2.boundingRect().*/ After doing this the coordinates of the graph were found and this portion of the image is stored in the graphArray and all such graphs were appended to this array.
-\begin{pseudocode}{pdfwithgraph}
-$def \_\_init\_\_$\\
-
-
-
-
+\begin{pseudocode}{\textbf{pdfwithgraph}}{ }
+$def \textbf{houghp} $\\
+/\mbox{*}$Does a Hough Transform (probabilistic) on the image given$\mbox{*}/\\
+$img$\GETS$cv2.imread(self.pageImage)$\\
+$gray$\GETS$cv2.cvtColor(img,cv2.COLOR\_BGR2GRAY$)\\
+$h,w,channel$\GETS$img.shape$\\
+$gray$\GETS$cv2.adaptiveThreshold(gray,255,cv2.ADAPTIVE\_THRESH\_MEAN\_C,cv2.THRESH\_BINARY\_INV,11,7)$\\
+$kernel$\GETS$ np.zeros((5,5),np.uint8)$\\
+$gray$\GETS$cv2.morphologyEx(gray, cv2.MORPH\_OPEN, kernel)$\\
+$gray$\GETS$cv2.GaussianBlur(gray,(5,5),0)$\\
+$lines$\GETS$cv2.HoughLinesP(gray,self.det_prec,np.pi/self.ang_prec,100,self.minLineLength,self.maxLineGap)$\\
+$im2$\GETS$np.zeros((h,w,channel),np.uint8)$\\
+\FOREACH x1,y1,x2,y2\in lines[0] \DO
+\BEGIN 
+$cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)$\\
+$\textbf{return} im2$\\
+\END \\
+$def \textbf{polydp}(image)$\\
+/\mbox{*}$Does a polydp (shape) approximation on the contours detected$\\
+$image--image returned by the houghp()$\mbox{*}/\\
+$img$\GETS$cv2.imread(self.pageImage)$\\
+$gray$\GETS$cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)$\\
+$(cnts, _)$\GETS$cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)$\\
+$h,w,channel$\GETS$image.shape$\\
+$hi,wi$\GETS$h,w$\\
+$count_graph$\GETS$1$\\
+\FOREACH c \in cnts\DO
+\BEGIN 
+\IF cv2.contourArea(c) >self.threshArea \THEN
+\BEGIN 
+$approx$\GETS$cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)$\\
+\IF len(approx)<10 and len(approx)>2 \THEN
+\BEGIN
+$x,y,w,h$\GETS$cv2.boundingRect(c)$\\
+\IF aspectRatio(w,h) is equal to True and h < 0.95*hi and w < 0.95*wi \THEN
+\BEGIN 
+$percentin$\GETS$0.2$\\
+$xstart$\GETS$max(0,x-percentin*w)$\\
+$xend$\GETS$min(wi,x+w+percentin*w)$\\
+$ystart$\GETS$max(0,y-percentin*h)$\\
+$yend$\GETS$min(hi,y+h+percentin*h)$\\
+$graph$\GETS$img[int(ystart):int(yend),int(xstart):int(xend)]$\\
+$graphArray.append(graph)$\\
+$graphName.append(self.graphfolder+"/"+str(count\_graph)+".png")$\\
+$cv2.imwrite(self.graphfolder+"/"+str(count\_graph)+".png",graph)$\\
+$count_graph$\GETS$count_graph + 1$\\
+\END 
+\END
+\END
+\END\\
+\\
+$def \textbf{aspectRatio}(w,h)$\\
+\IF h*1.0/w\ge4 or w*1.0/h\ge4 \THEN
+\BEGIN
+$\textbf{return} False$\\
+\END \\
+$\textbf{return} True$\\
+\\
+$def \textbf{graphextract}$\\
+\FOR countpage\GETS 0 \TO numPages\DO
+\BEGIN
+$graphfolder$\GETS$"output\_page\_"+str(countPage)$\\
+\IF \textbf{not} os.path.exists(graphfolder) \THEN
+\BEGIN 
+$os.makedirs(graphfolder)$\\
+$pageImage$\GETS$pdfImage[countPage]$\\
+$polydp(houghp())$\\
+\END 
+$\textbf{return} graphArray,graphName$\\
+\END 
 \end{pseudocode}
 
 
@@ -142,6 +205,38 @@ The function starts from the leftmost point on the x-axis and each time proceeds
 \chapter{Code Modules and Architectural Diagram}
 
 \chapter{Test Plan}
+\section{Introduction}
+\paragraph{}
+Its objective is to communicate project-wide quality standards and procedures. It portrays a snapshot of the project as of the end of the planning phase. This document will address the different standards that will apply to the unit, integration and system testing of the specified application. Testing criteria under the white box, black box, and system-testing paradigm will be utilized. This paradigm will include, but is not limited to, the testing criteria, methods, and test cases of the overall design.
+\section{Test Objective}
+\paragraph{}
+The objective of this test plan is to find and report as many bugs as possible to improve the integrity of our program. Although exhaustive testing is not possible, a broad range of tests will be exercised to achieve the goal. There will be following functions that can be performed by this application: Search Author, Search Journal, Refine results, view and manage favorites, view recent history. The user interface to utilize these functions is designed to be user-friendly and provide easy access to all the functions.
+\section{Process Overview}
+\paragraph{}
+The following represents the overall flow of the testing process:
+\begin{enumerate}
+    \item Identify the requirements to be tested. All test cases shall be derived using the current Program Specification.
+    \item Identify which particular test(s) will be used to test each module.
+    \item Review the test data and test cases to ensure that the unit has been thoroughly verified and that the test data and test cases are adequate to verify proper operation of the unit.
+    \item Identify the expected results for each test.
+    \item Document the test case configuration, test data, and expected results.
+    \item Perform the test(s).
+    \item Document the test data, test cases, and test configuration used during the testing process. This information shall be submitted via the Unit/System Test Report (STR).
+    \item Successful unit testing is required before the unit is eligible for component integration/system testing.
+    \item Unsuccessful testing requires a Bug Report Form to be generated. This document shall describe the test case, the problem encountered, its possible cause, and the sequence of events that led to the problem. It shall be used as a basis for later technical analysis.
+    \item Test documents and reports shall be submitted. Any specifications to be reviewed, revised, or updated shall be handled immediately.
+\end{enumerate}
 
+\section{Testing Process}
+\paragraph{}
+The diagram above outlines the Test Process approach that will be followed.
+\begin{enumerate}
+    \item Organize Project involves creating a System Test Plan, Schedule and Test Approach, and assigning responsibilities.
+    \item Design/Build System Test involves identifying Test Cycles, Test Cases, Entrance and Exit Criteria, Expected Results, etc. Test Cases and the Data required are identified. The Test conditions are derived from the Software Requirement Specifications.
+    \item Design/Build Test Procedures includes setting up procedures such as Error Management systems and Status reporting.
+    \item Build Test Environment includes requesting/building hardware, software and data setups.
+    \item Execute System Tests - The tests identified in the Design/Build Test Procedures will be executed. All results will be documented and Bug Report Forms filled out and given to the Development Team as necessary.
+    \item Signoff - Signoff happens when all pre-defined exit criteria have been achieved.
+\end{enumerate}
 \end{document}
 
