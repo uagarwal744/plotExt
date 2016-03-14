@@ -112,6 +112,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	
 	# draw_rectangles(image, rect)
 	# cv2.imshow("as",image)
 	# cv2.waitKey(0)
@@ -325,7 +326,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					if(isBlack(temp_x,y,height,b,clt,image)==0):
 						cnt1 = cnt1+1
 						temp_x += 1
-						if(cnt1>10):
+						if(cnt1>20):
 							not_found = 1
 							break
 					else:
@@ -385,11 +386,15 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	print "after up down"
 	print new_rect
 
-	
+
+	'''
 	draw_rectangles(image, new_rect)
 	cv2.imshow("as",image)
 	cv2.waitKey(0)
+	'''
 	colors = []
+	max_extent = -1
+	ignore = []
 	for i in range(len(new_rect)):
 		x1 = new_rect[i][0]
 		y1 = new_rect[i][1]
@@ -405,7 +410,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				break;
 			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color				
-				pos = 2
+				pos = 2				
 				break
 			j = j+1
 
@@ -425,46 +430,62 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				j = j+1
 				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
 					cnt = cnt+1
+		if(max_extent == -1):
+			max_extent = j
 		
+		if(abs(j-max_extent)>100):
+			ignore.append(i)
+
 		colors.append(list(current_color))
 
 	#draw_rectangles(image,new_rect)
-	'''
-	cv2.imshow("as",image)
-	cv2.waitKey(0)
-	'''
+	
+	
+	
+
+	final_rect = []
+	for i in range(len(new_rect)):
+		flag = 0
+		for j in range(len(ignore)):
+			if(i==j):
+				flag = 1
+				break
+		if(flag==0):
+			final_rect.append(new_rect[i])
 
 	#removing the text
 	
-	for i in range(len(new_rect)):
-		for j in range(new_rect[i][1], new_rect[i][3]):
-			for k in range(new_rect[i][0], new_rect[i][2]):
+	for i in range(len(final_rect)):
+		for j in range(final_rect[i][1], final_rect[i][3]):
+			for k in range(final_rect[i][0], final_rect[i][2]):
 				image[j][k][0] = 255;
 				image[j][k][1] = 255;
 				image[j][k][2] = 255;
 	
 	
 	
-	cv2.imwrite("out.jpg", image);
+	#cv2.imwrite("out.jpg", image);
 	legend_info = []
-	for i in range(len(new_rect)):
+	for i in range(len(final_rect)):
 		temp = []
-		temp.append(new_rect[i])
+		temp.append(final_rect[i])
 		temp.append(colors[i])
 		legend_info.append(temp)
 
 
-     
+	cv2.imshow("as", image)
+	cv2.waitKey(0)
+
 	return image,legend_info
 
 #horizontal is x
 def legend_detect(img, x_min, x_max, y_min, y_max):
-	image=cv2.imread(img,cv2.IMREAD_COLOR)
+	#image=cv2.imread(img,cv2.IMREAD_COLOR)
 	# cv2.imshow("lol",image)
 	os.system("tesseract " + img + " scan hocr")
 	return parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("input2.png", 251, 1510, 162, 944)
+#legend_detect("a.jpg", 197,764, 71, 421)
 
 
 	

@@ -4,6 +4,7 @@ import os
 import layout_gene
 import qdarkstyle
 import pdf_to_img
+import write_to_pdf
 from pdf_to_img import ImageThread, ResultObj
 from multiprocessing import Pool
 from PyQt4.QtCore import *
@@ -69,6 +70,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.progressBar.hide()
         self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
         self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
+        self.savetable.clicked.connect(self.download_table)
+
         self.manual.hide()
         self.contin.hide()
         self.selectAreaBtn.hide()
@@ -81,7 +84,16 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.lineEdit_2.hide()
         self.lineEdit_3.hide()
         self.lineEdit_4.hide()
-
+    def download_table(self):
+        '''still to add
+        name of the plot
+        names from legend in an array of strings
+        call this function in a loop for all the generated graphs
+        '''
+        xz='test.pdf'
+        c=write_to_pdf.createpdf(xz)
+        #write_to_pdf.pdfoutput(c,self.table)
+        write_to_pdf.pdfoutput(c,[[1,2,3],[4,5,6],[7,8,9]])
 
     def change_selected_pdf_item(self):
         items=self.pdflistWidget.selectedItems()

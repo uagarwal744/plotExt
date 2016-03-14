@@ -313,6 +313,13 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="QPushButton" name="savetable">
+            <property name="text">
+             <string>Save Tables</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -369,7 +376,7 @@
      <x>0</x>
      <y>0</y>
      <width>1061</width>
-     <height>30</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>

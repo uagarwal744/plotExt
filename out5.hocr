@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+ <head>
+  <title>
+</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <meta name='ocr-system' content='tesseract 3.03' />
+  <meta name='ocr-capabilities' content='ocr_page ocr_carea ocr_par ocr_line ocrx_word'/>
+</head>
+<body>
+  <div class='ocr_page' id='page_1' title='image "input.png"; bbox 0 0 615 537; ppageno 0'>
+   <div class='ocr_carea' id='block_1_1' title="bbox 0 86 24 383">
+    <p class='ocr_par' dir='ltr' id='par_1_1' title="bbox 0 86 23 383">
+     <span class='ocr_line' id='line_1_1' title="bbox 0 86 23 383; textangle 90"><span class='ocrx_word' id='word_1_1' title='bbox 0 328 17 383; x_wconf 85' lang='eng' dir='ltr'>Fault</span> <span class='ocrx_word' id='word_1_2' title='bbox 0 203 17 322; x_wconf 76' lang='eng' dir='ltr'>Occurrence</span> <span class='ocrx_word' id='word_1_3' title='bbox 0 86 23 196; x_wconf 80' lang='eng' dir='ltr'>Fquuency</span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_2' title="bbox 53 125 89 143">
+    <p class='ocr_par' dir='ltr' id='par_1_2' title="bbox 53 125 89 143">
+     <span class='ocr_line' id='line_1_2' title="bbox 53 125 89 143; baseline 0.028 -1"><span class='ocrx_word' id='word_1_4' title='bbox 53 125 89 143; x_wconf 86' lang='eng'>200</span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_3' title="bbox 54 259 89 277">
+    <p class='ocr_par' dir='ltr' id='par_1_3' title="bbox 54 259 89 277">
+     <span class='ocr_line' id='line_1_3' title="bbox 54 259 89 277; baseline 0.029 -1"><span class='ocrx_word' id='word_1_5' title='bbox 54 259 89 277; x_wconf 92' lang='eng'>100</span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_4' title="bbox 234 43 570 47">
+    <p class='ocr_par' dir='ltr' id='par_1_4' title="bbox 234 43 570 47">
+     <span class='ocr_line' id='line_1_4' title="bbox 234 43 570 47; baseline 0 490"><span class='ocrx_word' id='word_1_6' title='bbox 234 43 570 47; x_wconf 95' lang='eng' dir='ltr'> </span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_5' title="bbox 243 54 555 110">
+    <p class='ocr_par' dir='ltr' id='par_1_5' title="bbox 243 55 555 110">
+     <span class='ocr_line' id='line_1_5' title="bbox 243 55 540 79; baseline 0.003 -8"><span class='ocrx_word' id='word_1_7' title='bbox 243 60 286 71; x_wconf 68' lang='eng'><em>+</em></span> <span class='ocrx_word' id='word_1_8' title='bbox 306 55 393 79; x_wconf 76' lang='eng' dir='ltr'>Original</span> <span class='ocrx_word' id='word_1_9' title='bbox 401 55 540 79; x_wconf 76' lang='eng' dir='ltr'>Computation</span> 
+     </span>
+     <span class='ocr_line' id='line_1_6' title="bbox 243 86 555 110; baseline 0.003 -8"><span class='ocrx_word' id='word_1_10' title='bbox 243 90 286 102; x_wconf 89' lang='eng'><strong>+</strong></span> <span class='ocrx_word' id='word_1_11' title='bbox 292 86 408 104; x_wconf 76' lang='eng' dir='ltr'>Redundant</span> <span class='ocrx_word' id='word_1_12' title='bbox 416 86 555 110; x_wconf 76' lang='eng' dir='ltr'>Computation</span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_6' title="bbox 234 44 236 118">
+    <p class='ocr_par' dir='ltr' id='par_1_6' title="bbox 234 44 236 118">
+     <span class='ocr_line' id='line_1_7' title="bbox 234 44 236 118; baseline 0 419"><span class='ocrx_word' id='word_1_13' title='bbox 234 44 236 118; x_wconf 95' lang='eng' dir='ltr'> </span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_7' title="bbox 568 44 570 118">
+    <p class='ocr_par' dir='ltr' id='par_1_7' title="bbox 568 44 570 118">
+     <span class='ocr_line' id='line_1_8' title="bbox 568 44 570 118; baseline 0 419"><span class='ocrx_word' id='word_1_14' title='bbox 568 44 570 118; x_wconf 95' lang='eng' dir='ltr'> </span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_8' title="bbox 234 115 570 119">
+    <p class='ocr_par' dir='ltr' id='par_1_8' title="bbox 234 115 570 119">
+     <span class='ocr_line' id='line_1_9' title="bbox 234 115 570 119; baseline 0 418"><span class='ocrx_word' id='word_1_15' title='bbox 234 115 570 119; x_wconf 95' lang='eng' dir='ltr'> </span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_9' title="bbox 92 27 607 465">
+    <p class='ocr_par' dir='ltr' id='par_1_9' title="bbox 93 27 606 465">
+     <span class='ocr_line' id='line_1_10' title="bbox 93 27 606 465; baseline 0 72"><span class='ocrx_word' id='word_1_16' title='bbox 93 27 606 465; x_wconf 95' lang='eng' dir='ltr'> </span> 
+     </span>
+    </p>
+   </div>
+   <div class='ocr_carea' id='block_1_10' title="bbox 175 482 505 507">
+    <p class='ocr_par' dir='ltr' id='par_1_10' title="bbox 175 482 505 506">
+     <span class='ocr_line' id='line_1_11' title="bbox 175 482 505 506; baseline -0.003 -6"><span class='ocrx_word' id='word_1_17' title='bbox 175 482 219 500; x_wconf 85' lang='eng' dir='ltr'>Fast</span> <span class='ocrx_word' id='word_1_18' title='bbox 225 482 285 500; x_wconf 83' lang='eng' dir='ltr'>Clock</span> <span class='ocrx_word' id='word_1_19' title='bbox 292 482 402 506; x_wconf 85' lang='eng' dir='ltr'>Frequency</span> <span class='ocrx_word' id='word_1_20' title='bbox 410 482 438 504; x_wconf 78' lang='eng' dir='ltr'>(in</span> <span class='ocrx_word' id='word_1_21' title='bbox 444 482 505 504; x_wconf 94' lang='eng' dir='ltr'>MHz)</span> 
+     </span>
+    </p>
+   </div>
+  </div>
+ </body>
+</html>
