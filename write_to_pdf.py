@@ -11,13 +11,27 @@ def createpdf(x):
 	c=canvas.Canvas(x,pagesize=A4)
 	return c
 
-def pdfoutput(c,ar,img='a.jpg',plot="Title of the Plot"):
+def pdfoutput(c,an,img='a.jpg',plot="Title of the Plot"):
 	#Name of Output PDF
 	global z
 	global x
 	global width
 	global height
+	# ar=[['0']*len(an)]*len(an[0])
+	ar=[['0' for x in range(len(an))] for x in range(len(an[0]))] 
 	
+	for e in xrange(len(an)):
+		# f=0
+		for f in xrange(len(an[e])):
+			# print "an is "+an[e][f]+"at e,f"+str(e)+" "+str(f)
+			ar[f][e]=an[e][f]
+			# break
+	
+	for e in range(len(ar)):
+		for f in range(len(ar[0])):
+			if ar[e][f]!="--":
+				ar[e][f]=str(round(float(ar[e][f]),4))
+
 	#New Page...
 	c.translate(0,height)
 
@@ -80,7 +94,7 @@ def pdfoutput(c,ar,img='a.jpg',plot="Title of the Plot"):
 	#Printing the Output Array
 	for i in xrange(len(ar)):
 		for j in xrange(len(ar[0])):
-			c.drawCentredString((j+1.5)*W,-H*(1.7+i)-inch,str(ar[i][j]))
+			c.drawCentredString((j+1.5)*W,-H*(1.7+i)-inch,ar[i][j])
 
 	c.showPage()
 
@@ -89,7 +103,7 @@ def pdfoutput(c,ar,img='a.jpg',plot="Title of the Plot"):
 	c.save()
 	z=z+1
 
-img = 'b.jpg'
-ar=np.zeros((100,8))
-ar[2][4]=2985.5258
 z=0
+cc=createpdf('testing.pdf')
+an=[["--","13.2524145741","12.25"],["1.20","--","125.120214"]]
+pdfoutput(cc,an)
