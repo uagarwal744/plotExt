@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'layout_outline.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Tue Mar 15 00:23:15 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -229,7 +230,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
+<<<<<<< HEAD
         self.menubar.setGeometry(QtCore.QRect(0, 0, 1103, 30))
+=======
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 25))
+>>>>>>> 696c0331877a12e5c9adc29bac6faeece3201c21
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -283,7 +288,11 @@ class Ui_MainWindow(object):
         self.btn_y1.setText(_translate("MainWindow", "Y1", None))
         self.btn_y2.setText(_translate("MainWindow", "Y2", None))
         self.proceed_btn.setText(_translate("MainWindow", "Proceed", None))
+<<<<<<< HEAD
         self.savetable.setText(_translate("MainWindow", "Save Table", None))
+=======
+        self.savetable.setText(_translate("MainWindow", "Save Tables", None))
+>>>>>>> 696c0331877a12e5c9adc29bac6faeece3201c21
         self.pdfSelectBtn.setText(_translate("MainWindow", "Select PDF", None))
         self.runBtn.setText(_translate("MainWindow", "Run", None))
         self.contin.setText(_translate("MainWindow", "Automatic", None))

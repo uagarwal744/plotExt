@@ -4,6 +4,7 @@ import os
 import layout_gene
 import qdarkstyle
 import pdf_to_img
+import write_to_pdf
 from pdf_to_img import ImageThread, ResultObj
 from multiprocessing import Pool
 from PyQt4.QtCore import *
@@ -71,6 +72,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
         self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
         self.savetable.clicked.connect(self.download_table)
+
         self.manual.hide()
         self.contin.hide()
         self.selectAreaBtn.hide()

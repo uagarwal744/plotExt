@@ -3,7 +3,8 @@ import custom_Qlabel
 
 # Form implementation generated from reading ui file 'layout_outline.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Tue Mar 15 00:23:15 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -230,7 +231,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1103, 30))
+        # self.menubar.setGeometry(QtCore.QRect(0, 0, 1103, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)

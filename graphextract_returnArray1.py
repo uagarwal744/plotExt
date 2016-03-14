@@ -342,7 +342,40 @@ class GraphThread(QtCore.QThread):
         cv2.imwrite(self.graphfolder+"/gray.png",gray)
         temp = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
         print temp
-        cnts = temp[0]
+        cnts1 = []
+        for t in temp[0]:
+            if cv2.contourArea(t) >self.threshArea:
+                cnts1.append(t)
+        
+        LENGTH = len(cnts1)
+        status = np.zeros((LENGTH,1))
+
+        for i,cnt1 in enumerate(cnts1):
+            x = i    
+            if i != LENGTH-1:
+                for j,cnt2 in enumerate(cnts1[i+1:]):
+                    x = x+1
+                    dist = self.find_if_close(cnt1,cnt2)
+                    if dist == True:
+                        val = min(status[i],status[x])
+                        status[x] = status[i] = val
+                    else:
+                        if status[x]==status[i]:
+                            status[x] = i+1
+
+        cnts = []
+        maximum = int(status.max())+1
+        for i in xrange(maximum):
+            pos = np.where(status==i)[0]
+            if pos.size != 0:
+                cont = np.vstack(cnts1[i] for i in pos)
+                hull = cv2.convexHull(cont)
+                cnts.append(hull)
+
+        #cnts = []
+        #for h in unified:
+        #   cnts.append(cv2.)
+
         h,w,channel = image.shape
         hi,wi = h,w
         count_graph = 1
@@ -364,7 +397,7 @@ class GraphThread(QtCore.QThread):
                 approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
                 if len(approx)<10 and len(approx)>2:
                     x_,y_,w_,h_  = cv2.boundingRect(c)
-                    # cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
+                    #cv2.rectangle(img,(x_,y_),(x_+w_,y_+h_),(255,0,0))
                     #specify = [x,y,w,h]
                     #a =  int(((-2)*(w+h) + math.sqrt((4*(w+h)*(w+h)+4*4*self.percent*w*h/100)))/8)
                     #graph = img[y-a:y+h+a,x-2*a:x+w+a]
@@ -501,6 +534,16 @@ class GraphThread(QtCore.QThread):
         if(h*1.0/w >= 4 or w*1.0/h >= 4):
             return False
         return True
+
+    def find_if_close(self,cnt1,cnt2):
+        row1,row2 = cnt1.shape[0],cnt2.shape[0]
+        for i in xrange(row1):
+            for j in xrange(row2):
+                dist = np.linalg.norm(cnt1[i]-cnt2[j])
+                if abs(dist) < 50 :
+                    return True
+                elif i==row1-1 and j==row2-1:
+                    return False
 
     def run(self):
         self.graphextract()
