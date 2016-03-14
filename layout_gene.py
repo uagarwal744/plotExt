@@ -3,7 +3,8 @@ import custom_Qlabel
 
 # Form implementation generated from reading ui file 'layout_outline.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Tue Mar 15 00:23:15 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -182,6 +183,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_21.addItem(spacerItem1)
         self.verticalLayout_4.addLayout(self.horizontalLayout_21)
         self.verticalLayout_3.addLayout(self.verticalLayout_4)
+        self.savetable = QtGui.QPushButton(self.centralwidget)
+        self.savetable.setObjectName(_fromUtf8("savetable"))
+        self.verticalLayout_3.addWidget(self.savetable)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_15 = QtGui.QHBoxLayout()
@@ -206,7 +210,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
@@ -258,6 +262,7 @@ class Ui_MainWindow(object):
         self.btn_y1.setText(_translate("MainWindow", "Y1", None))
         self.btn_y2.setText(_translate("MainWindow", "Y2", None))
         self.proceed_btn.setText(_translate("MainWindow", "Proceed", None))
+        self.savetable.setText(_translate("MainWindow", "Save Tables", None))
         self.pdfSelectBtn.setText(_translate("MainWindow", "Select PDF", None))
         self.runBtn.setText(_translate("MainWindow", "Run", None))
         self.contin.setText(_translate("MainWindow", "Automatic", None))

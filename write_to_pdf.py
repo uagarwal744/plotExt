@@ -11,7 +11,7 @@ def createpdf(x):
 	c=canvas.Canvas(x,pagesize=A4)
 	return c
 
-def pdfoutput(c,img,ar):
+def pdfoutput(c,ar,img='a.jpg',plot="Title of the Plot"):
 	#Name of Output PDF
 	global z
 	global x
@@ -43,12 +43,12 @@ def pdfoutput(c,img,ar):
 	#Array to be printed
 	W = width/(len(ar[0])+2)
 	H = (height-inch)/(len(ar)+2)
-	if H>inch:
-		H=inch
+	if H>.5*inch:
+		H=.5*inch
 
 	#Title of the Graph
 	#c.drawString(width/3,-.9*inch,"Title of the Plot")
-	c.drawCentredString(width/2, -.9*inch, "Title of the Plot")
+	c.drawCentredString(width/2, -.9*inch, plot)
 
 	c.setFont("Times-Roman", max(16-.1*len(ar),6))
 	fontsize=max(16-.1*len(ar),6)
