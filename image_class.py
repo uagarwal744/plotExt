@@ -9,6 +9,7 @@ from graphextract_returnArray import PlotExtractor
 import axis
 import legendDetect
 import hough
+from PyQt4 import QtCore
 
 import tables
 
@@ -31,7 +32,7 @@ class Graph:
         self.inner_image_without_legend = self.image_without_legend[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
         cv2.imwrite("inner_image_without_legend.png",self.inner_image_without_legend)
         self.inner_image_file_without_legend = "inner_image_without_legend.png"
-        self.table = tables.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2)
+        self.table = tables.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.inner_image_without_legend,self.legend)
     
     def scale_detection(self):
         self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image)
@@ -48,6 +49,22 @@ class Graph:
         self.scale_detection()
         self.legend_detection()
         self.value_calculation()
+
+'''class ResultObj(QtCore.QObject):
+    def __init__(self, table):
+        self.table=table
+
+class TableThread(QtCore.QThread):
+    finished=QtCore.pyqtSignal(object)
+    def __init__(self,GraphObj, callback, parent=None):
+        QtCore.QThread.__init__(self, parent)
+        self.image = GraphObj
+        self.finished.connect(callback)
+    
+    def run(self):
+        self.image.run()
+        self.finished.emit(ResultObj(self.image.table))'''
+
 
 def main():
     """Main function to execute. Put name of image in the first parameter of constructor"""

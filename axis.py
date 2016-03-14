@@ -128,7 +128,7 @@ def axis(img) :
 	#ans = xpt2[0][1]
 	ans = min(xpt2[0][1],ypt1[0][1],ypt2[0][1])
 	#img1 = img[ans2:ans,ans1:ans3]
-	#cv2.imwrite("bound.png",img1)
+	#cv2.imwrite("bound.png",img1) 
 	os.system("tesseract "+input_file+" out5 hocr")
 	f = open('out5.hocr','r')
 	data=f.read()
