@@ -11,13 +11,14 @@ from PyQt4.QtCore import *
 from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
 import write_to_pdf
+import numpy as np
 #import image_class
 
 import cv2
 
 class plotThread(QtCore.QThread):
 
-    table_completed = QtCore.pyqtSignal(object, object)
+    table_completed = QtCore.pyqtSignal()
     def __init__(self, plot, index):
         QtCore.QThread.__init__(self)
         self.plot=plot
@@ -28,7 +29,12 @@ class plotThread(QtCore.QThread):
         table=self.plot.table
         print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
         print table
-        self.table_completed.emit(table, self.index)
+        self.table_completed.emit()
+
+class popup(QtGui.QWidget):
+    def __init__(self):
+        QtGui.QWidget.__init__(self)
+        self.label=QtGui.QLabel()
 
 
 class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
@@ -85,18 +91,39 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.lineEdit_2.hide()
         self.lineEdit_3.hide()
         self.lineEdit_4.hide()
+        self.plotShowBtn.clicked.connect(self.show_plot)
         self.gif.hide()
+
+    def show_plot(self):
+        img=cv2.imread('plot_from_data.png')
+        cv2.imshow('plot',img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
     def download_table(self):
         '''still to add
         name of the plot
         names from legend in an array of strings
         call this function in a loop for all the generated graphs
+
         '''
-        xz='test.pdf'
-        c=write_to_pdf.createpdf(xz)
+        export_dialog = QtGui.QFileDialog()
+        export_dialog.setWindowTitle('Save PDF')
+        export_dialog.setAcceptMode(QtGui.QFileDialog.AcceptSave)
+        export_dialog.setNameFilter('PDF files (*.pdf)')
+        export_dialog.setDefaultSuffix('pdf')
+        export_dialog.show()
+        #z=export_dialog.selectedFiles()
+        if export_dialog.exec_() == QtGui.QFileDialog.Accepted:
+            location=export_dialog.selectedFiles()[0]
+            print location
+            c=write_to_pdf.createpdf(str(location))
+            write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
+            # print(export_dialog.selectedFiles()[0])
+            #self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
+        # c=write_to_pdf.createpdf(xz)
         #write_to_pdf.pdfoutput(c,self.table)
-        write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
+        # write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
 
 
     def change_selected_pdf_item(self):
@@ -132,10 +159,13 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
                 return'''
 
-    def on_table_completion(self, table, index):
-        pass
+    def on_table_completion(self):
         #self.tables[index]=table
         print '())()()())()^^^^^^()()()()()'
+        self.gif.hide()
+        self.tableWidget.show()
+        items=self.graphlistWidget.selectedItems()
+        self.graphItem_click(items[0])
         #print self.tables
 
         '''def table_progress(self, result):
@@ -465,11 +495,11 @@ def main():
     splash=MySplashScreen('splash.gif')
     splash.show()
     app.processEvents()
-    for count in range(1, 100):
-        splash.showMessage(splash.tr('Processing %1...').arg(count),
-                           QtCore.Qt.AlignBottom+20, QtCore.Qt.black)
-        QtGui.QApplication.processEvents()
-        QtCore.QThread.msleep(15)
+    # for count in range(1, 100):
+    #     splash.showMessage(splash.tr('Processing %1...').arg(count),
+    #                        QtCore.Qt.AlignBottom+20, QtCore.Qt.black)
+    #     QtGui.QApplication.processEvents()
+    #     QtCore.QThread.msleep(15)
     app.setStyleSheet(qdarkstyle.load_stylesheet(pyside=False))
     # this event loop is needed for dispatching of Qt events
     '''Note, that you need to run your initialization code in a separate

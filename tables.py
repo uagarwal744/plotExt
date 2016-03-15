@@ -215,7 +215,7 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	# 	print '\n'
 	for i in range(1,len(table)):
 		plt.plot(table2[0],table2[i])
-	plt.show()
+	plt.savefig('plot_from_data.png')
 		#plot(table[0] , table[2])
 	return table
 
