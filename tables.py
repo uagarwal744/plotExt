@@ -13,6 +13,8 @@ import multiprocessing
 
 def findValue(img,jo,start_x,start_y):
 	a=[]
+	if(jo>=len(img[0])):
+		return -(sys.maxint)
 	for i in range(len(img)):
 		if img[i,jo]>=240:
 			a.append(i)
@@ -219,7 +221,7 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 			table.append(x_)
 		table.append(fx)
 	print 'hi'
-	print len(table[1])
+	#print len(table[1])
 	# for j in range(len(table[0])):
 	# 	for i in range(len(table)):
 	# 		print table[i][j],
