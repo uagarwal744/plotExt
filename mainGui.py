@@ -21,12 +21,16 @@ class plotThread(QtCore.QThread):
     table_completed = QtCore.pyqtSignal()
     def __init__(self, plot, index,manual=False):
         QtCore.QThread.__init__(self)
+        print("iniiiiiiiiiiiiit")
         self.plot=plot
         self.index=index
         self.manual=manual
+        print(self.plot,self.index,self.manual)
 
     def run(self):
+        print("starting")
         if self.manual:
+            print("starting")
             self.plot.run_manual()
         else:
             self.plot.run()
@@ -78,7 +82,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.plotShowBtn.clicked.connect(self.show_plot)
         self.refresh_gui()
         
-
+        self.btmx=[]
+        self.btmy=[]
+        self.btmpt=[]
     def show_plot(self):
         items=self.graphlistWidget.selectedItems()
         item=items[0]
@@ -175,7 +181,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_x2.show()
         self.btn_y1.show()
         self.btn_y2.show()
-        self.contin.hide()
+        # self.contin.hide()
+        self.manual.hide()
         self.lineEdit.show()
         self.lineEdit_2.show()
         self.lineEdit_3.show()
@@ -324,9 +331,37 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         items=self.graphlistWidget.selectedItems()
         item = items[0]
         plot = self.plot_dic[str(item.text())]
+
+        h=self.display_item.pixmap().height()
+        w=self.display_item.pixmap().width() 
+        pdf_item=self.pdflistWidget.selectedItems()
+        pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
+        
+
+        img = cv2.imread(plot.outer_image_file)
+        
+
+
+        height, width = img.shape[:2] 
+
+        t1=self.manual_par[0][0]*float(height)/h
+        t2=self.manual_par[1][0]*float(height)/h
+        t3=self.manual_par[2][0]*float(width)/w
+        t4=self.manual_par[3][0]*float(width)/w
+
+        self.manual_par[0][0]=int(t1)
+        self.manual_par[1][0]=int(t2)
+        self.manual_par[2][0]=int(t3)
+        self.manual_par[3][0]=int(t4)
+
+        
         plot.set_manual(self.manual_par)
+        print("proceeeeeeeeeeeeeeeeeeeeeeeeeeed")
+        self.thread_per_plot2=[]
         temp_thread=plotThread(plot,self.plots.index(plot),True)
+        self.thread_per_plot2.append(temp_thread)
         temp_thread.table_completed.connect(self.on_table_completion)
+        print("before starting")
         temp_thread.start()
 
 
@@ -348,8 +383,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         def getPos(event):
             x = event.pos().x()
             y = event.pos().y()
-            
-            
+            lx=[]    
+            ly=[]
             sender.setChecked(False)
             if sender.text()=='X1':
                 self.axes[0][0]=x
@@ -360,18 +395,23 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 self.axes[1][0]=x
                 self.axes[1][1]=y
                 self.manual_par[1][0]=self.axes[1][0]
+                y_x2=y
                 print 'X2',self.axes[1]
             elif sender.text()=='Y1':
                 self.axes[2][0]=x
                 self.axes[2][1]=y
-                self.manual_par[2][0]=self.axes[2][1]                
+                self.manual_par[2][0]=self.axes[2][1]
+                x_y1=x                
                 print 'Y1',self.axes[2]
             else:
                 self.axes[3][0]=x
                 self.axes[3][1]=y
                 self.manual_par[3][0]=self.axes[3][1]
+                x_y2=x
                 print 'Y2',self.axes[3]
             print "manual_par is",
+            
+
             print self.manual_par 
             self.display_item.setCursor(QtCore.Qt.ArrowCursor)
             self.display_item.mousePressEvent=self.mousePressEvent
