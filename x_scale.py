@@ -67,8 +67,12 @@ def extract_x_scale(input_file,coordinate,output_array,xpos,working_dir) :
 				flag = 1
 				break	
 		if flag == 0 :
-			output_array.append(i.text)
-			xpos.append((int(k[0]),int(k[2])))
+			try:
+				output_array.append(float(i.text))
+				xpos.append((int(k[0]),int(k[2])))
+			except:
+				pass
+			
 
 	
 

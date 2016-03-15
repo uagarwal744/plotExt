@@ -71,7 +71,7 @@ def axis(img,working_dir) :
 	xtop = arrayh[0][1][1]
 	xbottom = xtop
 	i = 1
-	while i<len(arrayv) and arrayv[i][0] > 0.8*float(ymax):
+	while i<len(arrayv) and arrayv[i][0] > 0.6*float(ymax):
 		if arrayv[i][1][0] < yleft :
 			yleft = arrayv[i][1][0]
 			
@@ -86,7 +86,7 @@ def axis(img,working_dir) :
 	i = 1
 	print 'the top is '
 	print xtop
-	while i<len(arrayh) and arrayh[i][0] > 0.6*float(xmax):
+	while i<len(arrayh) and arrayh[i][0] > 0.8*float(xmax):
 		if arrayh[i][1][1] < xtop :
 			xtop = arrayh[i][1][1]
 			
@@ -98,13 +98,9 @@ def axis(img,working_dir) :
 			xpt2 = (arrayh[i][1],arrayh[i][2])
 		i = i+1
 			
-	'''	
-	cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
-	cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
-	cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
-	cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
-	cv2.imwrite('temp6.png',img)
-	'''
+	
+	
+	
 	print 'the lines are'
 	print ypt1
 	print ypt2
@@ -120,14 +116,35 @@ def axis(img,working_dir) :
 	x2_left = min(xpt2[0][0],xpt2[1][0])
 	x2_right = max(xpt2[0][0],ypt2[1][0])
 	'''
+	'''
 	ans1 = max(ypt1[0][0],xpt1[0][0],xpt2[0][0])
 	ans3 = min(ypt2[0][0],xpt1[1][0],xpt2[1][0])
-	#ans1 = ypt1[0][0]
-	#ans3 = ypt2[0][0]
 	ans2 = max(xpt1[0][1],ypt1[1][1],ypt2[1][1])
-	#ans2 = xpt1[0][1]
-	#ans = xpt2[0][1]
 	ans = min(xpt2[0][1],ypt1[0][1],ypt2[0][1])
+	'''
+	ans1 = ypt1[0][0]
+	ans3 = ypt2[0][0]
+	ans2 = xpt1[0][1]
+	ans = xpt2[0][1]
+	if ans1 < min(xpt1[0][0],xpt2[0][0]) :
+		ans1 = 	(xpt1[0][0]+xpt2[0][0])/2
+	if ans3 > max(xpt1[1][0],xpt2[1][0]) + 2 :
+		ans3 = 	(xpt1[1][0]+xpt2[1][0])/2
+	if ans2 < min(ypt1[1][1],ypt2[1][1]) - 2 or ans2> max(ypt1[1][1],ypt2[1][1]) +5 :
+		ans2 = 	(ypt1[1][1]+ypt2[1][1])/2
+	if ans > max(ypt1[0][1],ypt2[0][1]) + 2:
+		ans = 	(ypt1[0][1]+ypt2[0][1])/2
+	'''	
+	ans3 = min(ypt2[0][0],xpt1[1][0],xpt2[1][0])
+	ans2 = max(xpt1[0][1],ypt1[1][1],ypt2[1][1])
+	ans = min(xpt2[0][1],ypt1[0][1],ypt2[0][1])
+	
+	cv2.line(img,ypt2[0],ypt2[1],(0,0,255),2)	
+	cv2.line(img,ypt1[0],ypt1[1],(0,0,255),2)
+	cv2.line(img,xpt2[0],xpt2[1],(0,0,255),2)	
+	cv2.line(img,xpt1[0],xpt1[1],(0,0,255),2)
+	cv2.imwrite('temp6.png',img)	
+	'''
 	#img1 = img[ans2:ans,ans1:ans3]
 	#cv2.imwrite("bound.png",img1) 
 	out_hocr_file=os.path.join(working_dir,"out5")
@@ -151,9 +168,9 @@ def axis(img,working_dir) :
 	#cv2.imwrite('temp6.png',img)
 	
 	if flag == box_l-1 :
-		image3 = image3[ans2+2:ans-2,ans1+2:ans3-3]
-		a,b,c,d = axis(image3)
-		cv2.rectangle(img,(ans1+a+2,ans2+d+2),(ans1+b+2,ans2+c+2),(0,255,0),3)
+		image3 = image3[ans2+1:ans-1,ans1+1:ans3-1]
+		a,b,c,d = axis(image3,working_dir)
+		cv2.rectangle(img,(ans1+a+1,ans2+d+1),(ans1+b+1,ans2+c+1),(0,255,0),3)
 		print ans1
 		print ans3
 		print ans2
@@ -163,7 +180,7 @@ def axis(img,working_dir) :
 		print c
 		print d
 		#cv2.imwrite('temp7.png',img)
-		return ans1+a+2,ans1+b+2,ans2+c+2,ans2+d+2
+		return ans1+a,ans1+b,ans2+c,ans2+d
 	else :
 		print 'no'
 	

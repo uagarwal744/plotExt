@@ -568,11 +568,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				image[j][k][0] = 255;
 				image[j][k][1] = 255;
 				image[j][k][2] = 255;
-	'''
-	draw_rectangles(image, removal_rect)
-	cv2.imshow("as",image)
-	cv2.waitKey(0)
-	'''
+
 	#cv2.imwrite("out.jpg", image);
 	legend_info = []
 	for i in range(len(final_rect)):

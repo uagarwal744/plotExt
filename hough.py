@@ -62,12 +62,21 @@ def final_scale(img,working_dir,clusters=2) :
 		y_pos1=top_right[1]
 	
 	try:
+		count = 1
+		while len(markings)<2 and count < 20:
+			print 'doing it'
+			markings = h_scale.h_scale(input_file,ans-count,ans3,ans1)
+			print markings
+			count = count+1
 		x_scale.extract_x_scale(input_file,int(ans),xarr,x_pos,working_dir)
+		print 'dnsidnfisnfisdnf'
+		print len(xarr)
+		temp = xarr[1]
 		#cv2.imwrite('line4.jpg',image1)
 	#cv2.imwrite('line5.jpg',image2)
-		print xarr
+		
 		#scale_y = abs(float(yarr[2])-float(yarr[1]))
-		scale_x = abs(float(xarr[2])-float(xarr[1]))
+		
 	except Exception, e :
 		traceback.print_exc()
 		print 'error occured'
@@ -99,9 +108,6 @@ def final_scale(img,working_dir,clusters=2) :
 	print (ans2,ans)
 	
 	x_len = len(xarr)
-
-	print xarr[x_len-1]
-	print xarr[x_len-2]
 	print bot_left,top_right
 	print 'x scales are '
 	#print yarr[0]
@@ -109,21 +115,31 @@ def final_scale(img,working_dir,clusters=2) :
 			print i,
 
 	i = x_len-1
-	x1 = xarr[x_len-1]
-	while i >=0 :
+	
+	while i >=1 :
 		try :
 			x1 = float(xarr[i])
+			x2 = float(xarr[i-1])
 			break
 		except :
 			i = i-1
-	l = len(markings)		
+	l = len(markings)
+	scale_x = abs(float(xarr[i])-float(xarr[i-1]))		
 	for j in range(l) :
 		if markings[j]<x_pos[i][1] and markings[j]>x_pos[i][0] :
 			pos1 = j		
-
-
+	print 'the position issadasfsafasf'
+	print pos1
+	print x1
+	print y0
+	print y1
+	print float(x1)-float(scale_x)
+	print markings[pos1]
+	print markings[pos1-1]
+	print y_pos0
+	print y_pos1
 	#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
-	return temp_file,bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),y0,y1,markings[pos1],markings[pos1-1],y_pos0,y_pos1
+	return temp_file,bot_left,top_right,scale_x,scale_y,float(x1)-float(scale_x),x1,y0,y1,markings[pos1-1],markings[pos1],y_pos0,y_pos1
 	#cv2.imwrite(output_file,img)
 
 if __name__ == '__main__':
