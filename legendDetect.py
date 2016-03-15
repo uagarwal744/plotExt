@@ -436,7 +436,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(max_extent == -1):
 			max_extent = j
 		
-		if(abs(j-max_extent)>100):
+		if(abs(j-max_extent)>40):
 			ignore.append(i)
 
 		colors.append(list(current_color))

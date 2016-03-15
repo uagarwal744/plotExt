@@ -41,13 +41,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def __init__(self):
         super(Example, self).__init__()
         self.setupUi(self)
-        self.axes=[['', ''], ['', ''], ['',''], ['','']]
-        self.axes_values=['','','','']
-        self.plots=[]
-        self.listOfFiles = []
-        self.deletedItems=[]         # stores the deleted graphlistWidget items
-        self.graph_per_page=[]
-        self.plot_dic={}
+        
 
         #self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
@@ -62,40 +56,26 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.undo_btn.clicked.connect(self.undo)
         self.pdflistWidget.itemClicked.connect(self.pdfItem_click)
         self.graphlistWidget.itemClicked.connect(self.graphItem_click)
-        """disabling buttons before a pdf is chosen"""
-        self.runBtn.setEnabled(False)
-        self.btn_x1.setEnabled(False)
-        self.btn_x2.setEnabled(False)
-        self.btn_y1.setEnabled(False)
-        self.btn_y2.setEnabled(False)
-        self.proceed_btn.setEnabled(False)
+        
         self.display_item.btnReleased.connect(self.manualAddGraph)
         self.runBtn.clicked.connect(self.getGraphs)
         self.display_item.resizeEvent = self.onResize
         self.manual.clicked.connect(self.manual_fun)
         self.contin.clicked.connect(self.getTables)
-        self.progressBar.hide()
+        
         self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
         self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
         self.savetable.clicked.connect(self.download_table)
-
-        self.manual.hide()
-        self.contin.hide()
-        self.selectAreaBtn.hide()
-        self.proceed_btn.hide()
-        self.btn_x1.hide()
-        self.btn_y2.hide()
-        self.btn_y1.hide()
-        self.btn_x2.hide()
-        self.lineEdit.hide()
-        self.lineEdit_2.hide()
-        self.lineEdit_3.hide()
-        self.lineEdit_4.hide()
         self.plotShowBtn.clicked.connect(self.show_plot)
-        self.gif.hide()
+        self.refresh_gui()
+        
 
     def show_plot(self):
-        img=cv2.imread('plot_from_data.png')
+        items=self.graphlistWidget.selectedItems()
+        item=items[0]
+        ind = self.graphlistWidget.row(item)
+        working_dir = self.plots[ind].working_dir
+        img=cv2.imread(os.path.join(working_dir,'plot_from_data.png'))
         cv2.imshow('plot',img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -453,8 +433,44 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         else:
             self.progressBar.setValue(self.progressBar.value()+1)
 
+    def refresh_gui(self):
+        self.axes=[['', ''], ['', ''], ['',''], ['','']]
+        self.axes_values=['','','','']
+        self.plots=[]
+        self.listOfFiles = []
+        self.deletedItems=[]         # stores the deleted graphlistWidget items
+        self.graph_per_page=[]
+        self.plot_dic={}
+        """disabling buttons before a pdf is chosen"""
+        self.runBtn.setEnabled(False)
+        self.btn_x1.setEnabled(False)
+        self.btn_x2.setEnabled(False)
+        self.btn_y1.setEnabled(False)
+        self.btn_y2.setEnabled(False)
+        self.proceed_btn.setEnabled(False)
+        self.progressBar.hide()
+        self.manual.hide()
+        self.contin.hide()
+        self.selectAreaBtn.hide()
+        self.proceed_btn.hide()
+        self.btn_x1.hide()
+        self.btn_y2.hide()
+        self.btn_y1.hide()
+        self.btn_x2.hide()
+        self.lineEdit.hide()
+        self.lineEdit_2.hide()
+        self.lineEdit_3.hide()
+        self.lineEdit_4.hide()
+        self.graphlistWidget.clear()
+        self.pdflistWidget.clear()
+        self.runBtn.show()
+        self.display_item.setPixmap(QtGui.QPixmap(''))
+        
+        self.gif.hide()
 
     def openfile(self):
+
+        self.refresh_gui()
         
         self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
         #self.x stores the address of the chosen pdf
