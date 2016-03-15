@@ -112,10 +112,60 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
+
+	#KMeans
+	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
+
+	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
+
+	clt = KMeans(n_clusters = 6)
 	
-	# draw_rectangles(image, rect)
-	# cv2.imshow("as",image)
-	# cv2.waitKey(0)
+	clt.fit(img_array)
+
+	ret_labels=clt.labels_
+
+	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
+	b = clt.predict([0.0,0.0,0.0])
+
+	#print bw_labels
+	#removes rectangles which contain coloured pixels
+	to_remove = []
+
+
+	#this part may be corrected later
+	
+	'''
+	
+	for k in range(len(rect)):
+		r = rect[k]
+		cnt = 0
+		height = r[3]-r[1]
+		for i in range(r[0], r[2]):
+			if(isWhiteOrBlack(i,r[1],height,bw_labels[0], bw_labels[1], clt, image, 1)==0):
+				cnt += 1
+				print cnt
+		to_remove.append(k)
+
+	#draw_rectangles(image, rect)
+	cv2.imshow("as",image)
+	cv2.waitKey(0)
+	'''
+	
+	
+	mid_rect = []
+	for i in range(len(rect)):
+		found = 0
+		for j in range(len(to_remove)):
+			if(i==j):
+				found = 1
+				break
+		if(found == 0):
+			mid_rect.append(rect[i])
+	'''
+	draw_rectangles(image, mid_rect)
+	cv2.imshow("as",image)
+	cv2.waitKey(0)
+	'''
 	print('fooooooooooooooooooooooooo')
 	print(image.shape,x_min,x_max,y_min,y_max)
 	#cv2.imshow("as",image)
@@ -130,17 +180,19 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	out = []
 
 	#removes text outside the bounding box
-	for i in range(len(rect)):
-		if(rect[i][0]>x_min and rect[i][1]<y_max and rect[i][0]<x_max and rect[i][1]>y_min):
+	for i in range(len(mid_rect)):
+		if(mid_rect[i][0]>x_min and mid_rect[i][1]<y_max and mid_rect[i][0]<x_max and mid_rect[i][1]>y_min):
 			out.append(i)
 
 	#temp_rect contains the text only inside the bounding box
 	temp_rect = []
 	for i in range(len(out)):
-		temp_rect.append(rect[out[i]])
+		temp_rect.append(mid_rect[out[i]])
 
 	print "After removal of boundary"
 	print len(temp_rect)
+
+
 
 	#we create a array of sets to merge text in the same line
 	arr=[]
@@ -202,21 +254,16 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	
 	print "After merging"
 	print new_rect
-	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
-
-	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
-
-	clt = KMeans(n_clusters = 6)
 	
-	clt.fit(img_array)
-
-	ret_labels=clt.labels_
-
-	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
-	b = clt.predict([0.0,0.0,0.0])
 	
 	
 	#code for detecting legends not detected by ocr
+
+
+	#if nothing i detected
+	if(len(new_rect)==0):
+		empty = []
+		return image,empty
 
 	maxY = new_rect[0][1]
 	pos = 0
@@ -395,6 +442,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	colors = []
 	max_extent = -1
 	ignore = []
+	extent = []
 	for i in range(len(new_rect)):
 		x1 = new_rect[i][0]
 		y1 = new_rect[i][1]
@@ -403,20 +451,29 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		height = new_rect[i][3]-new_rect[i][1]
 		j=10
 		pos = 0
+		one_ext = []
+		temp_x = 0
+
 		while(1):
 			if(x1-j<0 or x2+j>=image.shape[1]):
 				break
 			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color
 				pos = 1
+				#one_ext.append(x1-j)
+				temp_x = x1-j
+				#one_ext.append(y1)
 				break
 			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
 				isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color				
-				pos = 2				
+				pos = 2		
+				one_ext.append(x2+j)
+				one_ext.append(y2)		
 				break
 			j = j+1
 
-
+		if(pos==0):
+			continue
 		if(pos==1):
 			cnt = 0
 			while(cnt<40):
@@ -425,6 +482,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				j= j+1
 				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
 					cnt = cnt+1
+			one_ext.append(x1-j)
+			one_ext.append(y1)
+			one_ext.append(temp_x)
+
 		if(pos==2):
 			cnt = 0
 			while(cnt<40):
@@ -433,17 +494,48 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				j = j+1
 				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
 					cnt = cnt+1
+			one_ext.append(x2+j)
+
+
 		if(max_extent == -1):
 			max_extent = j
 		
 		if(abs(j-max_extent)>40):
 			ignore.append(i)
 
+		one_ext.append(y1+height)
+		extent.append(one_ext)
 		colors.append(list(current_color))
 
 	#draw_rectangles(image,new_rect)
 	
-	
+	removal_rect = []
+	for i in range(len(new_rect)):
+		removal_rect.append(new_rect[i])
+
+	for i in range(len(extent)):
+		removal_rect.append(extent[i])
+
+	minx = removal_rect[0][0]
+	miny = removal_rect[0][1]
+	maxx = removal_rect[0][2]
+	maxy = removal_rect[0][3]
+
+	for r in (removal_rect):
+		if(r[0]<minx):
+			minx = r[0]
+		if(r[1]<miny):
+			miny = r[1]
+		if(r[2]>maxx):
+			maxx = r[2]
+		if(r[3]>maxy):
+			maxy = r[3]
+
+	for i in range(miny, maxy):
+		for j in range(minx, maxx):
+			image[i][j][0] = 255
+			image[i][j][1] = 255
+			image[i][j][2] = 255
 	
 
 	final_rect = []
@@ -465,7 +557,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				image[j][k][1] = 255;
 				image[j][k][2] = 255;
 	
-	
+	#cv2.imshow("as",image)
+	#cv2.waitKey(0)
 	
 	#cv2.imwrite("out.jpg", image);
 	legend_info = []
@@ -490,7 +583,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max,working_dir):
 	os.system("tesseract " + img + " "+out_hocr_file+" hocr")
 	return parse_hocr(out_hocr_file+".hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("a.jpg", 197,764, 71, 421)
+#legend_detect("graph5.jpg", 135,850,75, 525,"")
 
 
 	

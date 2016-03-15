@@ -84,7 +84,7 @@ def topClusters(h_final,clusters):
 
 
 
-def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,inner_image_without_legend,clusters):
+def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,clusters):
 	img=cv2.imread(input_file,cv2.IMREAD_COLOR)
 	h_final=hue_hist(img)
 	t_=topClusters(h_final,clusters)
