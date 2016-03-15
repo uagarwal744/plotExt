@@ -14,6 +14,7 @@ import os
 import uuid
 
 import tables
+import extract_plots_manual
 import time
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -50,6 +51,30 @@ class Graph:
     def scale_detection(self):
         self.inner_image_file,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2 = hough.final_scale(self.image,self.working_dir)
         #print(hough.final_scale(self.image))
+
+    def set_manual(manual_param):
+        print(manual_param)
+        self.pixel_x1,self.value_x1 = manual_param[0]
+        self.pixel_x2,self.value_x2 = manual_param[1]
+        self.pixel_y1,self.value_y1 = manual_param[2]
+        self.pixel_y2,self.value_y2 = manual_param[3]
+        self.num_plot_lines = self.manual_param[4]
+        
+    def run_manual(self):
+        self.axis_detection()
+        graph = self.image[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
+        temp_file = "image.png"
+        temp_file = os.path.join(self.working_dir,temp_file)
+        cv2.imwrite(temp_file,graph)
+        self.legend_detection()
+        if(self.legend == []):
+            self.inner_image_without_legend = self.image_without_legend[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
+            self.inner_image_file_without_legend = os.path.join(self.working_dir,"inner_image_without_legend.png")
+            cv2.imwrite(self.inner_image_file_without_legend,self.inner_image_without_legend)
+            self.table = extract_plots_manual.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines)
+        else:
+            self.value_calculation()
+
     
     def run(self):
         self.axis_detection()

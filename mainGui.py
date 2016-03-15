@@ -19,13 +19,17 @@ import cv2
 class plotThread(QtCore.QThread):
 
     table_completed = QtCore.pyqtSignal()
-    def __init__(self, plot, index):
+    def __init__(self, plot, index,manual=False):
         QtCore.QThread.__init__(self)
         self.plot=plot
         self.index=index
+        self.manual=manual
 
     def run(self):
-        self.plot.run()
+        if self.manual:
+            self.plot.run_manual()
+        else:
+            self.plot.run()
         table=self.plot.table
         print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
         print table
@@ -41,7 +45,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def __init__(self):
         super(Example, self).__init__()
         self.setupUi(self)
-        self.axes=[['', ''], ['', ''], ['',''], ['','']]
+        self.axes=[[0, 0], [0, 0], [0,0], [0,0]]
+
+        self.manual_par=[[0,0],[0,0],[0,0],[0,0],0]
         self.axes_values=['','','','']
         self.plots=[]
         self.listOfFiles = []
@@ -49,6 +55,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graph_per_page=[]
         self.plot_dic={}
 
+        self.cluster_label=QtGui.QLabel()
+        self.cluster_label.setText("Enter the number of colours")
+        self.clusters=QtGui.QLineEdit()
+        self.horizontalLayout_6.addWidget(self.cluster_label)
+        self.horizontalLayout_6.addWidget(self.clusters)
         #self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
@@ -56,7 +67,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_x2.clicked.connect(self.Coordinate)
         self.btn_y1.clicked.connect(self.Coordinate)
         self.btn_y2.clicked.connect(self.Coordinate)
-        self.proceed_btn.clicked.connect(self.fix_axes)
+        self.proceed_btn.clicked.connect(self.proceed_fun)
         self.delete_btn.clicked.connect(self.delete_item)
         self.selectAreaBtn.clicked.connect(self.enableDrag)
         self.undo_btn.clicked.connect(self.undo)
@@ -321,17 +332,27 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.isEnabled=True
         
 
-    def fix_axes(self):
+    def proceed_fun(self):
         #self.x1.setReadOnly(True)mg=cv2.imread("test.pdf0.jpg")
         
         #self.x2.setReadOnly(True)
         #self.y1.setReadOnly(True)
         #self.y2.setReadOnly(True)
-        self.axes_values[0]=self.x1.text()
-        self.axes_values[1]=self.x2.text()
-        self.axes_values[2]=self.y1.text()
-        self.axes_values[3]=self.y2.text()
+        self.manual_par[0][1]=float(self.lineEdit.text())
+        self.manual_par[1][1]=float(self.lineEdit_2.text())
+        self.manual_par[2][1]=float(self.lineEdit_3.text())
+        self.manual_par[3][1]=float(self.lineEdit_4.text())
+        self.manual_par[4] = float(self.clusters.text())
+        items=self.graphlistWidget.selectedItems()
+        item = items[0]
+        plot = self.plot_dic[str(item.text())]
+        plot.set_manual(self.manual_par)
+        temp_thread=plotThread(plot,self.plots.index(plot),True)
+        temp_thread.table_completed.connect(self.on_table_completion)
+        temp_thread.start()
 
+
+        print self.manual_par
     def delete_item(self):
         items=self.graphlistWidget.selectedItems()
         for item in items:
@@ -355,20 +376,25 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             if sender.text()=='X1':
                 self.axes[0][0]=x
                 self.axes[0][1]=y
+                self.manual_par[0][0]=self.axes[0][0]
                 print 'X1',self.axes[0]
             elif sender.text()=='X2':
                 self.axes[1][0]=x
                 self.axes[1][1]=y
+                self.manual_par[1][0]=self.axes[1][0]
                 print 'X2',self.axes[1]
             elif sender.text()=='Y1':
                 self.axes[2][0]=x
                 self.axes[2][1]=y
+                self.manual_par[2][0]=self.axes[2][1]                
                 print 'Y1',self.axes[2]
             else:
                 self.axes[3][0]=x
                 self.axes[3][1]=y
+                self.manual_par[3][0]=self.axes[3][1]
                 print 'Y2',self.axes[3]
-
+            print "manual_par is",
+            print self.manual_par 
             self.display_item.setCursor(QtCore.Qt.ArrowCursor)
             self.display_item.mousePressEvent=self.mousePressEvent
         sender=self.sender()
