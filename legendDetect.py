@@ -222,7 +222,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	#if nothing i detected
 	if(len(new_rect)==0):
 		empty = []
-		return empty
+		return image,empty
 
 	maxY = new_rect[0][1]
 	pos = 0
