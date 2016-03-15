@@ -15,7 +15,7 @@ def createpdf(x):
 	c=canvas.Canvas(x,pagesize=A4)
 	return c
 
-def pdfoutput(c,ans,img,plot=None):
+def pdfoutput(c,ans,img,plot=None,title=None):
 	#Name of Output PDF
 	global z
 	global width
@@ -80,9 +80,10 @@ def pdfoutput(c,ans,img,plot=None):
 				fontsize=15-.5*len(ar[0])
 
 			#Title of X and Y axes
-			title=['X Value']
-			for i in xrange(len(ar[0])-1):
-				title.append('Y ' + str(i+1) + " Value")
+			if title==None:
+				title=['X Value']
+				for i in xrange(len(ar[0])-1):
+					title.append('Y ' + str(i+1) + " Value")
 			for t in xrange(len(title)):
 				if W/(len(title[t])*fontsize) < .55:
 					maxtext=int(W/(fontsize*.55)) - 1
