@@ -10,7 +10,6 @@ from multiprocessing import Pool
 from PyQt4.QtCore import *
 from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
-import write_to_pdf
 import numpy as np
 #import image_class
 
