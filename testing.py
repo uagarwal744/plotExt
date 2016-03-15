@@ -8,23 +8,29 @@ import y_scale_length
 #import ocr_parse
 from bs4 import BeautifulSoup
 
-def extract_y_scale(input_file,coordinate,output_file) :
+def extract_y_scale(input_file,coordinate,working_dir) :
+	print(working_dir)
 	img = cv2.imread(input_file,cv2.IMREAD_GRAYSCALE)
 	rows,cols = img.shape
 	img = img[0:rows,0:coordinate]
 	temp_file = 'temp.png'
+	temp_file = os.path.join(working_dir,temp_file)
 	temp1_file = 'temp1.png'
+	temp1_file = os.path.join(working_dir,temp1_file)
 	cv2.imwrite(temp_file,img)
 	cv2.imwrite(temp1_file,img)
+	output_file = "test3.png"
+	output_file = os.path.join(working_dir,output_file)
 	rotation.rotate(temp_file,output_file,1)
 	img = cv2.imread(output_file,cv2.IMREAD_GRAYSCALE)
 	cv2.imwrite(temp1_file,img)
 	rows,cols = img.shape
-	os.system("tesseract "+output_file+" out1 hocr")
+	out_hocr_file = os.path.join(working_dir,"out1")
+	os.system("tesseract "+output_file+" "+out_hocr_file+" hocr")
 	#os.rename('out.hocr','out.xml')
 	output_array = []
 	y_pos=[]
-	f = open('out1.hocr','r')
+	f = open(out_hocr_file+".hocr",'r')
 	data=f.read()
 	soup = BeautifulSoup(data)
 	'''
@@ -52,8 +58,9 @@ def extract_y_scale(input_file,coordinate,output_file) :
 	img = img[mini:rows,0:cols]
 	cv2.imwrite(temp_file,img)
 	rotation.rotate(temp_file,output_file,0)
-	os.system("tesseract "+output_file+" out hocr")
-	f = open('out.hocr','r')
+	out_hocr_file_2 = os.path.join(working_dir,"out")
+	os.system("tesseract "+output_file+" "+out_hocr_file_2+" hocr")
+	f = open(out_hocr_file_2+".hocr",'r')
 	data=f.read()
 	a = []
 	index = []

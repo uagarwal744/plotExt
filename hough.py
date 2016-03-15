@@ -8,13 +8,16 @@ import sys
 import axis
 import h_scale
 import traceback
-def final_scale(img,clusters=2) :
+import os
+def final_scale(img,working_dir,clusters=2) :
 	
 	#img = cv2.imread(input_file)
 	xarr=[]
 	yarr=[]
 	output_file = 'houghlines3.png'
+	output_file = os.path.join(working_dir,output_file)
 	input_file ='input.png'
+	input_file = os.path.join(working_dir,input_file)
 	#cv2.imwrite(input_file,img)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	edges = cv2.Canny(gray,80,120)
@@ -25,11 +28,13 @@ def final_scale(img,clusters=2) :
 	tempimg = img
 	
 	#cv2.line(image2,(ypt1[0][0],ypt1[0][1]),(ypt1[1][0],ypt1[1][1]),(0,0,255),2)
-	ans1,ans3,ans2,ans = axis.axis(img)
+	ans1,ans3,ans2,ans = axis.axis(img,working_dir)
 	bot_left = (ans1,ans)
 	top_right = (ans3,ans2)
 	image2 = image2[ans2+2:ans-2,ans1+2:ans3-2]
-	cv2.imwrite('line5.jpg',image2)
+	temp_file = 'line5.png'
+	temp_file = os.path.join(working_dir,temp_file)
+	cv2.imwrite(temp_file,image2)
 	#cv2.line(image1,(bot_left),(top_right),(0,0,255),2)
 	y_pos = []
 	x_pos = []
@@ -47,7 +52,7 @@ def final_scale(img,clusters=2) :
 	try :
 		
 		#testing.extract_y_scale(input_file,int(ans1),'test3.png',yarr,int(ans),y_pos)
-		y0,y1,y_pos0,y_pos1,scale_y = testing.extract_y_scale(input_file,int(ans1),'test3.png')
+		y0,y1,y_pos0,y_pos1,scale_y = testing.extract_y_scale(input_file,int(ans1),working_dir)
 	except Exception, e :
 		traceback.print_exc()
 		y0 = 0
@@ -57,7 +62,7 @@ def final_scale(img,clusters=2) :
 		y_pos1=top_right[1]
 	
 	try:
-		x_scale.extract_x_scale(input_file,int(ans),'test2.png',xarr,x_pos)
+		x_scale.extract_x_scale(input_file,int(ans),xarr,x_pos,working_dir)
 		#cv2.imwrite('line4.jpg',image1)
 	#cv2.imwrite('line5.jpg',image2)
 		print xarr
@@ -71,7 +76,7 @@ def final_scale(img,clusters=2) :
 		x1=3*scale_x
 		#return markings
 		#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
-		return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x0,x1,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
+		return temp_file,bot_left,top_right,scale_x,scale_y,x0,x1,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
 	'''
 	print 'x scale'
 	print scale_x
@@ -118,7 +123,7 @@ def final_scale(img,clusters=2) :
 
 
 	#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
-	return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),y0,y1,markings[pos1],markings[pos1-1],y_pos0,y_pos1
+	return temp_file,bot_left,top_right,scale_x,scale_y,x1,float(x1)-float(scale_x),y0,y1,markings[pos1],markings[pos1-1],y_pos0,y_pos1
 	#cv2.imwrite(output_file,img)
 
 if __name__ == '__main__':

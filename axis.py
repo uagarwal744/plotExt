@@ -5,7 +5,7 @@ import math
 import os
 import sys
 from bs4 import BeautifulSoup
-def axis(img) :
+def axis(img,working_dir) :
 
 	#img = cv2.imread(input_file)
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -31,6 +31,7 @@ def axis(img) :
 	xmax1 =-1 
 	ymax1 = -1
 	input_file = 'input.png'
+	input_file = os.path.join(working_dir,input_file)
 	cv2.imwrite(input_file,img)
 	#pixel,example,a,b = extract_plots.extract_plots(input_file,2)
 	for line in lines[0]:
@@ -129,8 +130,9 @@ def axis(img) :
 	ans = min(xpt2[0][1],ypt1[0][1],ypt2[0][1])
 	#img1 = img[ans2:ans,ans1:ans3]
 	#cv2.imwrite("bound.png",img1) 
-	os.system("tesseract "+input_file+" out5 hocr")
-	f = open('out5.hocr','r')
+	out_hocr_file=os.path.join(working_dir,"out5")
+	os.system("tesseract "+input_file+" "+out_hocr_file+" hocr")
+	f = open(out_hocr_file+".hocr",'r')
 	data=f.read()
 	soup = BeautifulSoup(data)
 	flag = 0

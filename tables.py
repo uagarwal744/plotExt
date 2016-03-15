@@ -224,7 +224,7 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 		#plot(table[0] , table[2])
 	return table
 
-def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend):
+def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend,working_dir):
 	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = findParameters(x1,int(p_x1),y1,int(p_y1),x2,int(p_x2),y2,int(p_y2),scale_x,scale_y,bottom_left,top_right)
 	print 'above'
 #	(x,y,z,masks) = extract_plots.extract_plots(input_file,8)
@@ -238,7 +238,8 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 		plotImg = hsv.mark(image_without_legend,b,g,r)
 		print r,g,b
 		masks.append(plotImg)
-		cv2.imwrite("mask %d.png"%(i),plotImg)
+		temp_file = os.path.join(working_dir,"mask_%d.png"%(i))
+		cv2.imwrite(temp_file,plotImg)
 	print 'below'
 	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend)
 	

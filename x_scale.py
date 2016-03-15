@@ -7,7 +7,9 @@ import sys
 #import ocr_parse
 from bs4 import BeautifulSoup
 
-def extract_x_scale(input_file,coordinate,output_file,output_array,xpos) :
+def extract_x_scale(input_file,coordinate,output_array,xpos,working_dir) :
+	output_file = "test2.png"
+	output_file = os.path.join(working_dir,output_file)
 	img = cv2.imread(input_file,cv2.IMREAD_GRAYSCALE)
 	rows,cols = img.shape
 	img = img[coordinate:rows,0:cols]
@@ -44,8 +46,10 @@ def extract_x_scale(input_file,coordinate,output_file,output_array,xpos) :
 		if int(k[3])<min :
 			min = int(k[3])
 	'''
-	os.system("tesseract "+output_file+" out3 hocr")
-	f = open('out3.hocr','r')
+	out_hocr_file = "out3"
+	out_hocr_file = os.path.join(working_dir,out_hocr_file)
+	os.system("tesseract "+output_file+" "+out_hocr_file+" hocr")
+	f = open(out_hocr_file+".hocr",'r')
 	data=f.read()
 	soup = BeautifulSoup(data)
 	for i in soup.find_all('span',{'class':'ocrx_word'}) :

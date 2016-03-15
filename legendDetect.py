@@ -482,11 +482,13 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	return image,legend_info
 
 #horizontal is x
-def legend_detect(img, x_min, x_max, y_min, y_max):
+def legend_detect(img, x_min, x_max, y_min, y_max,working_dir):
 	#image=cv2.imread(img,cv2.IMREAD_COLOR)
 	# cv2.imshow("lol",image)
-	os.system("tesseract " + img + " scan hocr")
-	return parse_hocr("scan.hocr", x_min, x_max, y_min, y_max, img)
+	out_hocr_file = "scan"
+	out_hocr_file = os.path.join(working_dir,out_hocr_file)
+	os.system("tesseract " + img + " "+out_hocr_file+" hocr")
+	return parse_hocr(out_hocr_file+".hocr", x_min, x_max, y_min, y_max, img)
 
 #legend_detect("a.jpg", 197,764, 71, 421)
 
