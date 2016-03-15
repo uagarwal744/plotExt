@@ -218,6 +218,12 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	
 	#code for detecting legends not detected by ocr
 
+
+	#if nothing i detected
+	if(len(new_rect)==0):
+		empty = []
+		return empty
+
 	maxY = new_rect[0][1]
 	pos = 0
 	for i in range(len(new_rect)):
