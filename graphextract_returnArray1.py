@@ -242,10 +242,11 @@ class FinishObj(QtCore.QObject):
         self.val=val
 
 class ReturnObj(QtCore.QObject):
-    def __init__(self, list1, list2, page_no):
+    def __init__(self, list1, list2, page_no,inner_list):
         self.list1 = list1
         self.list2 = list2
         self.page_no=page_no
+        self.inner_list=inner_list
 
 class GraphThread(QtCore.QThread):
     finished = QtCore.pyqtSignal(object)
@@ -297,10 +298,10 @@ class GraphThread(QtCore.QThread):
                 os.makedirs(self.graphfolder)
             self.pageImage = pagelist[i]
             #self.pagecount = i
-            list1,list2 = self.polydp(self.houghp())
+            list1,list2,list3 = self.polydp(self.houghp())
             # print i,list2
             # print "***************"
-            self.progress.emit(ReturnObj(list1, list2, i))
+            self.progress.emit(ReturnObj(list1, list2, i,list3))
             ##self.graphList.append(list1)
             ##self.graphName.append(list2)
             #self.polydp(self.houghp())
@@ -383,6 +384,7 @@ class GraphThread(QtCore.QThread):
         
         list1 = []
         list2 = []
+        inner_list = []
 
         self.x = []
         self.y = []
@@ -493,21 +495,29 @@ class GraphThread(QtCore.QThread):
             ystart = max(0,self.y[i]-0.08*self.h[i])
             yend = min(hi,self.y[i]+self.h[i]+(percentin+0.03)*self.h[i])
             
+            print self.x[i],self.y[i],self.w[i],self.h[i]
+            inner_list.append([int(self.x[i])-int(xstart),int(self.x[i]+self.w[i])-int(xstart),int(self.y[i])-int(ystart),int(self.y[i]+self.h[i])-int(ystart)])
+
             
             graph = img[ystart:yend,xstart:xend]
+            '''
+            h_g,w_g,channel_g = graph.shape
+            im_g = np.zeros((h_g,w_g,channel_g),np.uint8)
+            temp = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+            '''
 
             # list1.append(graph)
             filename = self.graphfolder+"/"+str(count_graph)+".png"
             list2.append(filename)
             cv2.imwrite(filename,graph)
-            if(graph.shape[1]>900):
+            if(graph.shape[1]>5000):
                 os.system("convert -resize 900 "+filename+" "+filename)
                 graph = cv2.imread(filename)
             list1.append(graph)
 
             count_graph = count_graph + 1
         cv2.imwrite(self.graphfolder+"/contour_next.png",img)
-        return list1,list2
+        return list1,list2,inner_list
 
     def pdf_to_img(self): 
         """Convert pdf to png image

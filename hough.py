@@ -9,7 +9,7 @@ import axis
 import h_scale
 import traceback
 import os
-def final_scale(img,working_dir,clusters=2) :
+def final_scale(img,working_dir,yaxis1,yaxis2,xaxis1,xaxis2,clusters=2) :
 	
 	#img = cv2.imread(input_file)
 	xarr=[]
@@ -22,15 +22,28 @@ def final_scale(img,working_dir,clusters=2) :
 	gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	edges = cv2.Canny(gray,80,120)
 	rows, cols ,channels= img.shape
-	
+	print rows
+	print cols
+	cv2.imwrite(input_file,img)
 	image1 = img
 	image2 = img
 	tempimg = img
 	
 	#cv2.line(image2,(ypt1[0][0],ypt1[0][1]),(ypt1[1][0],ypt1[1][1]),(0,0,255),2)
-	ans1,ans3,ans2,ans = axis.axis(img,working_dir)
+	#ans1,ans3,ans2,ans = axis.axis(img,working_dir)
+	ans1 = yaxis1
+	ans3 = yaxis2
+	ans2 = xaxis1
+	ans = xaxis2 
+
 	bot_left = (ans1,ans)
 	top_right = (ans3,ans2)
+	#cv2.rectangle(tempimg,(bot_left),(top_right),(0,255,0),3)
+	#cv2.line(img,(855,0),(855,rows),(0,0,255),2)
+	#cv2.imwrite(input_file,img)
+	print 'the end points are adskandsnfjsnfjsdf'
+	print bot_left
+	print top_right
 	image2 = image2[ans2+2:ans-2,ans1+2:ans3-2]
 	temp_file = 'line5.png'
 	temp_file = os.path.join(working_dir,temp_file)
@@ -68,7 +81,7 @@ def final_scale(img,working_dir,clusters=2) :
 			markings = h_scale.h_scale(input_file,ans-count,ans3,ans1)
 			print markings
 			count = count+1
-		x_scale.extract_x_scale(input_file,int(ans),xarr,x_pos,working_dir)
+		x_scale.extract_x_scale(input_file,int(ans)-2,xarr,x_pos,working_dir)
 		print 'dnsidnfisnfisdnf'
 		print len(xarr)
 		temp = xarr[1]
