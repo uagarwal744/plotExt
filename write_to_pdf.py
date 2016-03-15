@@ -15,12 +15,15 @@ def createpdf(x):
 	c=canvas.Canvas(x,pagesize=A4)
 	return c
 
-def pdfoutput(c,ans,img,plot):
+def pdfoutput(c,ans,img,plot=None):
 	#Name of Output PDF
 	global z
 	global width
 	global height
 	# ar=[['0']*len(an)]*len(an[0])
+
+	if plot==None:
+		plot=['Title of Plot']*len(ans)
 	
 	if len(ans)==len(img) and len(ans)==len(plot):
 		for an in ans:
