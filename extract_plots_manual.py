@@ -84,7 +84,7 @@ def topClusters(h_final,clusters):
 
 
 
-def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,clusters):
+def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,clusters,working_dir):
 	img=cv2.imread(input_file,cv2.IMREAD_COLOR)
 	h_final=hue_hist(img)
 	t_=topClusters(h_final,clusters)
@@ -92,10 +92,11 @@ def run_manual(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1
 	masks=plot(img,t_)
 	print "Done"
 	print "Finding parameters"
-	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = tables.findParameters(int(x1),int(p_x1),int(y1),int(p_y1),int(x2),int(p_x2),int(y2),int(p_y2),int(scale_x),int(scale_y),bottom_left,top_right)
+	print(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,clusters)
+	(ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y) = tables.findParameters(x1,int(p_x1),y1,int(p_y1),x2,int(p_x2),y2,int(p_y2),scale_x,scale_y,bottom_left,top_right)
 	print "Done"
 	print "Finding tables"	
-	return tables.findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
+	return tables.findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,working_dir)
 
 
 

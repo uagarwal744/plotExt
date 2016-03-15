@@ -3,7 +3,7 @@ import custom_Qlabel
 
 # Form implementation generated from reading ui file 'layout_outline.ui'
 #
-# Created: Tue Mar 15 17:55:38 2016
+# Created: Wed Mar 16 03:03:45 2016
 #      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -202,22 +202,20 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem2)
-        self.savetable = QtGui.QPushButton(self.centralwidget)
-        self.savetable.setObjectName(_fromUtf8("savetable"))
-        self.horizontalLayout_4.addWidget(self.savetable)
-        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem3)
         self.plotShowBtn = QtGui.QPushButton(self.centralwidget)
         self.plotShowBtn.setObjectName(_fromUtf8("plotShowBtn"))
         self.horizontalLayout_4.addWidget(self.plotShowBtn)
-        spacerItem4 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout_4.addItem(spacerItem4)
+        spacerItem3 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem3)
         self.verticalLayout_3.addLayout(self.horizontalLayout_4)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.horizontalLayout_15 = QtGui.QHBoxLayout()
         self.horizontalLayout_15.setSizeConstraint(QtGui.QLayout.SetMinimumSize)
         self.horizontalLayout_15.setObjectName(_fromUtf8("horizontalLayout_15"))
+        self.savetable = QtGui.QPushButton(self.centralwidget)
+        self.savetable.setObjectName(_fromUtf8("savetable"))
+        self.horizontalLayout_15.addWidget(self.savetable)
         self.pdfSelectBtn = QtGui.QPushButton(self.centralwidget)
         self.pdfSelectBtn.setObjectName(_fromUtf8("pdfSelectBtn"))
         self.horizontalLayout_15.addWidget(self.pdfSelectBtn)
@@ -289,8 +287,8 @@ class Ui_MainWindow(object):
         self.btn_y1.setText(_translate("MainWindow", "Y1", None))
         self.btn_y2.setText(_translate("MainWindow", "Y2", None))
         self.proceed_btn.setText(_translate("MainWindow", "Proceed", None))
-        self.savetable.setText(_translate("MainWindow", "Save Table", None))
         self.plotShowBtn.setText(_translate("MainWindow", "Plot from Data", None))
+        self.savetable.setText(_translate("MainWindow", "Save Table", None))
         self.pdfSelectBtn.setText(_translate("MainWindow", "Select PDF", None))
         self.runBtn.setText(_translate("MainWindow", "Run", None))
         self.contin.setText(_translate("MainWindow", "Automatic", None))

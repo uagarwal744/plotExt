@@ -23,6 +23,7 @@ class Graph:
     def __init__(self,image,outer_image_file,inner_image_params):
         self.image = image
         self.inner_image_params = inner_image_params
+        self.legend_failed = False
         self.manual_axis = False
         self.manual_legend = False
         self.outer_image_file = outer_image_file
@@ -60,34 +61,46 @@ class Graph:
 
     def set_manual(self,manual_param):
         print(manual_param)
-        self.pixel_x1,self.value_x1 = manual_param[0]
-        self.pixel_x2,self.value_x2 = manual_param[1]
-        self.pixel_y1,self.value_y1 = manual_param[2]
-        self.pixel_y2,self.value_y2 = manual_param[3]
-        self.scale_x=self.value_x2-self.value_x1
-        self.scale_y=self.value_y2-self.value_y1
-        self.num_plot_lines = manual_param[4]
+        sum=0
+        for par in manual_param[:4]:
+            sum+=par[0]+par[1]
+        if(sum!=0):
+            self.pixel_x1,self.value_x1 = manual_param[0]
+            self.pixel_x2,self.value_x2 = manual_param[1]
+            self.pixel_y1,self.value_y1 = manual_param[2]
+            self.pixel_y2,self.value_y2 = manual_param[3]
+            self.scale_x=self.value_x2-self.value_x1
+            self.scale_y=self.value_y2-self.value_y1
+        if(manual_param[4]!=0):
+            self.num_plot_lines = manual_param[4]
+        else:
+            self.num_plot_lines = 3
+        print(self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines)
 
     def run_manual(self):
+        print(self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines)
         #self.axis_detection()
+        self.legend_failed = False
         graph = self.image[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
         temp_file = "image.png"
         temp_file = os.path.join(self.working_dir,temp_file)
         cv2.imwrite(temp_file,graph)
         #self.scale_detection()
-        self.legend_detection()
+        #self.legend_detection()
         if(self.legend == []):
             self.inner_image_without_legend = self.image_without_legend[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
             self.inner_image_file_without_legend = os.path.join(self.working_dir,"inner_image_without_legend.png")
             cv2.imwrite(self.inner_image_file_without_legend,self.inner_image_without_legend)
-            self.table = extract_plots_manual.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.axis_x1,self.axis_x2,self.axis_y1,self.axis_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines)
+            self.table = extract_plots_manual.run_manual(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.value_x1,self.value_x2,self.value_y1,self.value_y2,self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines,self.working_dir)
         else:
             self.value_calculation()
 
     
     def run(self):
-        #self.axis_detection()
+
         graph = self.image[self.inner_image_params[2]:self.inner_image_params[3],self.inner_image_params[0]:self.inner_image_params[1]]
+        self.legend_failed = False
+        self.axis_detection()
         temp_file = "image.png"
         temp_file = os.path.join(self.working_dir,temp_file)
         cv2.imwrite(temp_file,graph)
@@ -97,7 +110,11 @@ class Graph:
         #cv2.destroyAllWindows()
         self.scale_detection()
         self.legend_detection()
+        if(self.legend == []):
+            self.legend_failed = True
+            return -1
         self.value_calculation()
+        return 1
 
 '''class ResultObj(QtCore.QObject):
     def __init__(self, table):
