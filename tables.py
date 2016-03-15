@@ -172,7 +172,7 @@ def plot(x_axis,y_axis) :
 	plt.axis([min(x_axis) , max(x_axis) , 40 , 100])
 	#plt.show()
 
-def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend):
+def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir):
 	table=[]
 	x_=[]
 	fx=[]
@@ -220,8 +220,10 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	# 	print '\n'
 	for i in range(1,len(table)):
 		plt.plot(x_vals[i],table2[i])
-	plt.show()
 		#plot(table[0] , table[2])
+	plot_file = 'plot_from_data.png'
+	plot_file  = os.path.join(working_dir,plot_file)
+	plt.savefig(plot_file)
 	return table
 
 def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend,working_dir):
@@ -241,7 +243,7 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 		temp_file = os.path.join(working_dir,"mask_%d.png"%(i))
 		cv2.imwrite(temp_file,plotImg)
 	print 'below'
-	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend)
+	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir)
 	
 
 
