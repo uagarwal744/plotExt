@@ -72,9 +72,16 @@ def lineInterpolation_x(img):
 		count=0
 		for i in range(len(img)):
 			if img[i,j]==255:
-				count+=1
-				io=i
-				jo=j
+				if (len(x)==0)and(len(y)==0):
+					count+=1
+					io=i
+					jo=j
+				else:
+					d=j-x[len(x)-1]+i-y[len(y)-1]
+					if(d<=30):
+						count+=1
+						io=i
+						jo=j
 		if (count==0)and(prevcount>0):
 			x.append(jo)
 			y.append(io)
@@ -92,7 +99,7 @@ def lineInterpolation_x(img):
 			sq=math.pow(x[p]-x[q],2)+math.pow(y[p]-y[q],2)
 			dist=math.sqrt(sq)
 			if(dist<=20):
-				cv2.line(img1,(x[p],y[p]),(x[q],y[q]),255,1,0)
+				cv2.line(img1,(x[p],y[p]),(x[q],y[q]),255,2,0)
 				p=q
 	return img1
 		
