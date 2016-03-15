@@ -3,7 +3,7 @@ import os
 from bs4 import BeautifulSoup
 import numpy as np
 import cv2
-from sklearn.cluster import KMeans
+#from sklearn.cluster import KMeans
 import warnings
 
 
@@ -29,26 +29,29 @@ def mod(a):
 	return a
 
 #returns true is the vertical strip contains only white or black pixels
-def isWhiteOrBlack(x,y,height, w,b, clt,image,colour_found):
+def isWhiteOrBlack(x,y,height,image,image_orig,colour_found):
 	cnt = 0
 	for i in range(height):	
-		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
-		if(curr_label != w and curr_label != b):
+		#curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
+		#if(curr_label != w and curr_label != b):
+		if((image[y+i][x][2]>20 or image[y+i][x][1]>20) and (image[y+i][x][1]>20 or image[y+i][x][2]<200) ):
 			if(colour_found == 0):
 				del current_color[:]
-				current_color.append(image[y+i][x][0])
-				current_color.append(image[y+i][x][1])
-				current_color.append(image[y+i][x][2])
+				print image[y+i][x]
+				current_color.append(image_orig[y+i][x][0])
+				current_color.append(image_orig[y+i][x][1])
+				current_color.append(image_orig[y+i][x][2])
 			cnt = cnt+1
+
 	if(cnt>0):
 		return 0			
 	return 1
-def isBlack(x,y,height,b,clt,image):
+def isBlack(x,y,height,image):
 	cnt = 0
 	for i in range(height):	
 		#print x,y,height,image.shape
-		curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
-		if(curr_label == b):
+		#curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
+		if((image[y+i][x][2]<20 and image[y+i][x][1]<20)):
 			cnt = cnt+1
 	if(cnt>0):
 		return 1			
@@ -113,9 +116,15 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
 
-	#KMeans
-	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
+	
+	
+	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))	
 
+	image_orig = image
+	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+	#KMeans
+	'''
 	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
 
 	clt = KMeans(n_clusters = 6)
@@ -124,30 +133,39 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	ret_labels=clt.labels_
 
-	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
+	bw_labels=clt.predict([[0.0,0.0,255.0], [0.0,0.0,0.0]])	
 	b = clt.predict([0.0,0.0,0.0])
+	
+
+	print clt.cluster_centers_[b]
 
 	#print bw_labels
+	'''
+	
 	#removes rectangles which contain coloured pixels
+
 	to_remove = []
 
 
 	#this part may be corrected later
 	
-	'''
 	
+	'''
 	for k in range(len(rect)):
 		r = rect[k]
 		cnt = 0
 		height = r[3]-r[1]
 		for i in range(r[0], r[2]):
-			if(isWhiteOrBlack(i,r[1],height,bw_labels[0], bw_labels[1], clt, image, 1)==0):
+			if(isWhiteOrBlack(i,r[1],height,image,image_orig,1)==0):
 				cnt += 1
-				print cnt
-		to_remove.append(k)
-
-	#draw_rectangles(image, rect)
-	cv2.imshow("as",image)
+		print cnt
+		if(cnt > 10):			
+			to_remove.append(k)
+	'''
+	
+	'''
+	draw_rectangles(image_orig, rect)
+	cv2.imshow("as",image_orig)
 	cv2.waitKey(0)
 	'''
 	
@@ -161,15 +179,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				break
 		if(found == 0):
 			mid_rect.append(rect[i])
-	'''
-	draw_rectangles(image, mid_rect)
-	cv2.imshow("as",image)
-	cv2.waitKey(0)
-	'''
-	print('fooooooooooooooooooooooooo')
-	print(image.shape,x_min,x_max,y_min,y_max)
-	#cv2.imshow("as",image)
-	#cv2.waitKey(0)
+	
 	
 	
 	#coordinates of the bounding box
@@ -301,10 +311,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				cnt1 = 0
 				cnt2 = 0
 				while(1):
-					if(isBlack(temp_x,y,height,b,clt,image)==0):
+					if(isBlack(temp_x,y,height,image)==0):
 						cnt1 = cnt1+1
 						temp_x += 1
-						print cnt1
 						if(cnt1>10):
 							not_found = 1
 							break
@@ -322,7 +331,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					cnt=0
 					temp_x = mid
 					while(1):
-						if(isBlack(temp_x,y,height,b,clt,image)==0):
+						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x += 1
 							if(cnt>10):
@@ -337,7 +346,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					cnt=0
 					temp_x = mid
 					while(1):
-						if(isBlack(temp_x,y,height,b,clt,image)==0):
+						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x -= 1
 							if(cnt>10):
@@ -370,7 +379,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				cnt1 = 0
 				cnt2 = 0
 				while(1):					
-					if(isBlack(temp_x,y,height,b,clt,image)==0):
+					if(isBlack(temp_x,y,height,image)==0):
 						cnt1 = cnt1+1
 						temp_x += 1
 						if(cnt1>20):
@@ -390,7 +399,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					cnt=0
 					temp_x = mid
 					while(1):
-						if(isBlack(temp_x,y,height,b,clt,image)==0):
+						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x += 1
 							if(cnt>10):
@@ -405,7 +414,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					cnt=0
 					temp_x = mid
 					while(1):
-						if(isBlack(temp_x,y,height,b,clt,image)==0):
+						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x -= 1
 							if(cnt>10):
@@ -457,15 +466,15 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		while(1):
 			if(x1-j<0 or x2+j>=image.shape[1]):
 				break
-			if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
-				isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color
+			if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)==0):
+				isWhiteOrBlack(x1-j,y1,height,image, image_orig,0) #just for storing the color
 				pos = 1
 				#one_ext.append(x1-j)
 				temp_x = x1-j
 				#one_ext.append(y1)
 				break
-			if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):
-				isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,0) #just for storing the color				
+			if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)==0):
+				isWhiteOrBlack(x2+j,y2,height,image, image_orig,0) #just for storing the color				
 				pos = 2		
 				one_ext.append(x2+j)
 				one_ext.append(y2)		
@@ -477,10 +486,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(pos==1):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)==0):	
-					makeWhite(x1-j,y1,height,image)
+				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)==0):	
+					makeWhite(x1-j,y1,height,image_orig)
 				j= j+1
-				if(isWhiteOrBlack(x1-j,y1,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
+				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)!=0):
 					cnt = cnt+1
 			one_ext.append(x1-j)
 			one_ext.append(y1)
@@ -489,10 +498,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(pos==2):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)==0):			
-					makeWhite(x2+j,y2,height,image)
+				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)==0):			
+					makeWhite(x2+j,y2,height,image_orig)
 				j = j+1
-				if(isWhiteOrBlack(x2+j,y2,height,bw_labels[0], bw_labels[1],clt,image,1)!=0):
+				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)!=0):
 					cnt = cnt+1
 			one_ext.append(x2+j)
 
@@ -531,11 +540,14 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(r[3]>maxy):
 			maxy = r[3]
 
+	image = image_orig
+	
 	for i in range(miny, maxy):
 		for j in range(minx, maxx):
 			image[i][j][0] = 255
 			image[i][j][1] = 255
 			image[i][j][2] = 255
+	
 	
 
 	final_rect = []
@@ -549,17 +561,18 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 			final_rect.append(new_rect[i])
 
 	#removing the text
-	
+	print final_rect
 	for i in range(len(final_rect)):
 		for j in range(final_rect[i][1], final_rect[i][3]):
 			for k in range(final_rect[i][0], final_rect[i][2]):
 				image[j][k][0] = 255;
 				image[j][k][1] = 255;
 				image[j][k][2] = 255;
-	
+	'''
+	draw_rectangles(image, removal_rect)
 	cv2.imshow("as",image)
 	cv2.waitKey(0)
-	
+	'''
 	#cv2.imwrite("out.jpg", image);
 	legend_info = []
 	for i in range(len(final_rect)):
@@ -569,8 +582,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		legend_info.append(temp)
 
 
-   # cv2.imshow("as", image)
-	#cv2.waitKey(0)
+   
 
 	return image,legend_info
 
@@ -583,7 +595,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max,working_dir):
 	os.system("tesseract " + img + " "+out_hocr_file+" hocr")
 	return parse_hocr(out_hocr_file+".hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("graph5.jpg", 135,850,75, 525,"")
+#legend_detect("21.png", 110,660,75,440,"")
 
 
 	
