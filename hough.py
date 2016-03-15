@@ -71,7 +71,6 @@ def final_scale(img,clusters=2) :
 		x1=3*scale_x
 		#return markings
 		#return 'line5.jpg',bot_left,top_right,scale_x,scale_y,xarr[x_len-1],xarr[x_len-2],yarr[0],yarr[1],x_pos[x_len-1],x_pos[x_len-2],y_pos[0],y_pos[1]
-		print('line5.jpg',bot_left,top_right,scale_x,sc,0,1,y0,y1,markings[1],markings[2],y_pos0,y_pos1)
 		return 'line5.jpg',bot_left,top_right,scale_x,scale_y,x0,x1,y0,y1,markings[1],markings[2],y_pos0,y_pos1	
 	'''
 	print 'x scale'

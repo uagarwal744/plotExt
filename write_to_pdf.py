@@ -5,6 +5,7 @@ from reportlab.lib.utils import ImageReader
 import numpy as np
 
 width, height=A4
+z=0
 
 def createpdf(x):
 	#Size of Canvas
@@ -14,7 +15,6 @@ def createpdf(x):
 def pdfoutput(c,an,img='a.jpg',plot="Title of the Plot"):
 	#Name of Output PDF
 	global z
-	global x
 	global width
 	global height
 	# ar=[['0']*len(an)]*len(an[0])
@@ -103,7 +103,7 @@ def pdfoutput(c,an,img='a.jpg',plot="Title of the Plot"):
 	c.save()
 	z=z+1
 
-z=0
-cc=createpdf('testing.pdf')
-an=[["--","13.2524145741","12.25"],["1.20","--","125.120214"]]
-pdfoutput(cc,an)
+if __name__ == '__main__':
+	cc=createpdf('testing.pdf')
+	an=[["--","13.2524145741","12.25"],["1.20","--","125.120214"]]
+	pdfoutput(cc,an)

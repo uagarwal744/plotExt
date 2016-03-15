@@ -109,11 +109,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graphItem_click(item)
     def getTables(self):
         #self.tables = [0 for plot in self.plots ]
-        self.gif.show()
-        self.tableWidget.hide()
-        movie=QtGui.QMovie("loading.gif")
-        self.gif.setMovie(movie)
-        movie.start()
+        #self.gif.show()
+        #self.tableWidget.hide()
+        #movie=QtGui.QMovie("loading.gif")
+        #self.gif.setMovie(movie)
+        #movie.start()
         self.thread_per_plot=[]
         for plot in self.plots:
             temp_thread=plotThread(plot,self.plots.index(plot))

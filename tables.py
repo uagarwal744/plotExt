@@ -192,17 +192,21 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	# 		print table[i][j],
 
 	table2 = [[] for x in table]
+	x_vals = [[] for i in range(len(table))]
 	miny=10000
 	maxy=-100
 	for i in range(len(table)):
 		for j in range(len(table[i])):
 			if(table[i][j]=="--"):
-				table2[i].append(0)
+				#table2[i].append(0)
+				pass
 			else:
+				x_vals[i].append(float(table[0][j]))
 				table2[i].append(float(table[i][j]))
-		if i!=0:
+		if i!=0 and len(table2[i])>0:
 			miny=min(miny,min(table2[i]))
 			maxy=max(maxy,max(table2[i]))
+
 
 	plt.axis([min(table2[0]) , max(table2[0]) , miny ,maxy ])
 	colors=[]
@@ -212,11 +216,10 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 		g=legend[i][1][1]
 		r=legend[i][1][2]
 		colors.append((r,g,b))
-
 	# plt.set_color_cycle(colors)
 	# 	print '\n'
 	for i in range(1,len(table)):
-		plt.plot(table2[0],table2[i])
+		plt.plot(x_vals[i],table2[i])
 	plt.show()
 		#plot(table[0] , table[2])
 	return table
