@@ -11,8 +11,10 @@ import matplotlib.pyplot as plt
 import multiprocessing
 
 
-def findValue(img,jo,start_x,start_y):
+def findValue(img,jo,prevval):
 	a=[]
+	if(jo<0):
+		return -(sys.maxint)
 	if(jo>=len(img[0])):
 		return -(sys.maxint)
 	for i in range(len(img)):
@@ -20,11 +22,30 @@ def findValue(img,jo,start_x,start_y):
 			a.append(i)
 	if len(a)==0:
 		return -(sys.maxint)
-	else:
-		sum=0;
-		for k in range(len(a)):
-			sum+=len(img)-a[k]
-		return (sum/len(a))
+	#else:
+	#	sum=0;
+	#	for k in range(len(a)):
+	#		sum+=len(img)-a[k]
+	#	return (sum/len(a))
+	
+	i=0
+	avg=[]
+	while(i<len(img)):
+		if(img[i,jo]>=240):
+			sum=0
+			count=0
+			while(img[i,jo]>=240):
+				count+=1
+				sum+=len(img)-i
+				i+=1
+			avg.append(sum/count)
+		i+=1
+	min=0
+	ind=0
+	for i in range(len(avg)):
+		if (math.fabs(avg[i]-prevval)<min):
+			ind=i
+	return avg[ind]
 
 
 def lineInterpolation_y(img):
@@ -115,13 +136,14 @@ def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_
 	readings=int(xdiv*10)
 	print "No of readings : "+str(readings)
 	pixeldiff=float(rectsize_x)/readings
+	prev_prevval=0
 	r=0
 	while r<readings:
 		expected=pixeldiff*r
 		prevpixel=int(math.floor(expected))
 		nextpixel=int(math.ceil(expected))
-		prevval=findValue(img,prevpixel,start_x,start_y)
-		nextval=findValue(img,nextpixel,start_x,start_y)
+		prevval=findValue(img,prevpixel,prev_prevval)
+		nextval=findValue(img,nextpixel,prev_prevval)
 		x=(r*unit)+start_x
 		if (prevval==(-(sys.maxint)))and(nextval!=(-(sys.maxint))):
 			val=nextval
@@ -141,6 +163,7 @@ def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_
 			trueval=(float(val)/rectsize_y)*(ydiv*scale_y)+start_y
 			fx.append(str(trueval))
 			x_.append(str(x))
+		prev_prevval=val
 		r+=1
 	#print x_
 	#print fx	
