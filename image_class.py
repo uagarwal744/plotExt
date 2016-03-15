@@ -54,7 +54,9 @@ class Graph:
     def run(self):
         self.axis_detection()
         graph = self.image[self.axis_y1:self.axis_y2,self.axis_x1:self.axis_x2]
-        cv2.imwrite("image.png",graph)
+        temp_file = "image.png"
+        temp_file = os.path.join(self.working_dir,temp_file)
+        cv2.imwrite(temp_file,graph)
         #cv2.namedWindow("image",cv2.CV_WINDOW_NORMAL)
         #cv2.imshow("image",graph)
         #cv2.waitKey(0)
