@@ -17,7 +17,7 @@ import cv2
 
 class plotThread(QtCore.QThread):
 
-    table_completed = QtCore.pyqtSignal()
+    table_completed = QtCore.pyqtSignal(object)
     def __init__(self, plot, index,manual=False):
         QtCore.QThread.__init__(self)
         print("iniiiiiiiiiiiiit")
@@ -36,7 +36,7 @@ class plotThread(QtCore.QThread):
         table=self.plot.table
         print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
         print table
-        self.table_completed.emit()
+        self.table_completed.emit(self.index)
 
 class popup(QtGui.QWidget):
     def __init__(self):
@@ -135,12 +135,15 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         item=items[0]
         self.graphItem_click(item)
     def getTables(self):
-        #self.tables = [0 for plot in self.plots ]
-        #self.gif.show()
-        #self.tableWidget.hide()
-        #movie=QtGui.QMovie("loading.gif")
-        #self.gif.setMovie(movie)
-        #movie.start()
+        self.tables = [0 for plot in self.plots ]
+        self.gif.show()
+        self.tableWidget.hide()
+        movie=QtGui.QMovie("loading.gif")
+        self.gif.setMovie(movie)
+        movie.start()
+        self.gif_check=[]
+        for i in range(len(self.plots)):
+        	self.gif_check.append(0)
         self.thread_per_plot=[]
         for plot in self.plots:
             temp_thread=plotThread(plot,self.plots.index(plot))
@@ -159,11 +162,10 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
                 return'''
 
-    def on_table_completion(self):
+    def on_table_completion(self, index):
         #self.tables[index]=table
         print '())()()())()^^^^^^()()()()()'
-        self.gif.hide()
-        self.tableWidget.show()
+        self.gif_check[index]=1
         items=self.graphlistWidget.selectedItems()
         self.graphItem_click(items[0])
         #print self.tables
@@ -434,14 +436,16 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         print (self.plots)
         if(not hasattr( self.plots[ind],'table')):
             return
-
-        self.tableWidget.setColumnCount(len(self.plots[ind].table)) #rows and columns of table
-        self.tableWidget.setRowCount(len(self.plots[ind].table[0]))
-        for column in range(len(self.plots[ind].table)): # add items from array to QTableWidget
-            for row in range(len(self.plots[ind].table[0])):
-                #item = self.array[0] # each item is a QTableWidgetItem
-                # add the QTableWidgetItem to QTableWidget, but exception thrown
-                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
+        if self.gif_check[ind]==1:
+        	self.gif.hide()
+        	self.tableWidget.show()
+	        self.tableWidget.setColumnCount(len(self.plots[ind].table)) #rows and columns of table
+	        self.tableWidget.setRowCount(len(self.plots[ind].table[0]))
+	        for column in range(len(self.plots[ind].table)): # add items from array to QTableWidget
+	            for row in range(len(self.plots[ind].table[0])):
+	                #item = self.array[0] # each item is a QTableWidgetItem
+	                # add the QTableWidgetItem to QTableWidget, but exception thrown
+	                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
             
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
