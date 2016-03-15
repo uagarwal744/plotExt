@@ -3,7 +3,8 @@ import custom_Qlabel
 
 # Form implementation generated from reading ui file 'layout_outline.ui'
 #
-# Created by: PyQt4 UI code generator 4.11.4
+# Created: Tue Mar 15 17:55:38 2016
+#      by: PyQt4 UI code generator 4.10.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -180,6 +181,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_19.addWidget(self.lineEdit_4)
         self.horizontalLayout_13.addLayout(self.horizontalLayout_19)
         self.verticalLayout_5.addLayout(self.horizontalLayout_13)
+        self.horizontalLayout_6 = QtGui.QHBoxLayout()
+        self.horizontalLayout_6.setObjectName(_fromUtf8("horizontalLayout_6"))
+        self.verticalLayout_5.addLayout(self.horizontalLayout_6)
         self.verticalLayout_4.addLayout(self.verticalLayout_5)
         self.horizontalLayout_21 = QtGui.QHBoxLayout()
         self.horizontalLayout_21.setObjectName(_fromUtf8("horizontalLayout_21"))
@@ -193,8 +197,8 @@ class Ui_MainWindow(object):
         self.verticalLayout_4.addLayout(self.horizontalLayout_21)
         self.verticalLayout_3.addLayout(self.verticalLayout_4)
         self.horizontalLayout_4 = QtGui.QHBoxLayout()
-        self.horizontalLayout_4.setContentsMargins(7, -1, 7, -1)
         self.horizontalLayout_4.setSpacing(6)
+        self.horizontalLayout_4.setContentsMargins(7, -1, 7, -1)
         self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
         spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem2)
@@ -233,7 +237,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 30))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1061, 25))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)

@@ -8,6 +8,8 @@ import hough
 import extract_plots
 import hsv
 import matplotlib.pyplot as plt
+import multiprocessing
+
 
 def findValue(img,jo,start_x,start_y):
 	a=[]
@@ -167,30 +169,8 @@ def findParameters(x1,p_x1,y1,p_y1,x2,p_x2,y2,p_y2,scale_x,scale_y,bottom_left,t
 	print "Origin X = "+str(start_x)+" Y = "+str(start_y)
 	return (ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
 
-def plot(x_axis,y_axis) :
-	plt.plot(x_axis,y_axis,'ro')
-	plt.axis([min(x_axis) , max(x_axis) , 40 , 100])
-	#plt.show()
-
-def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir):
-	table=[]
-	x_=[]
-	fx=[]
-	for i in range(len(masks)):
-		masks[i]=lineInterpolation_x(masks[i])
-		masks[i]=lineInterpolation_y(masks[i])
-	for i in range(len(masks)):
-		(x_,fx)=approxTable(masks[i],ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
-
-		if(i==0):
-			table.append(x_)
-		table.append(fx)
-	print 'hi'
-	print len(table[1])
-	# for j in range(len(table[0])):
-	# 	for i in range(len(table)):
-	# 		print table[i][j],
-
+def plot(data) :
+	table,working_dir = data
 	table2 = [[] for x in table]
 	x_vals = [[] for i in range(len(table))]
 	miny=10000
@@ -210,12 +190,12 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 
 	plt.axis([min(table2[0]) , max(table2[0]) , miny ,maxy ])
 	colors=[]
-	for i in range(len(legend)):
-		#print legend[i][0]
-		b=legend[i][1][0]
-		g=legend[i][1][1]
-		r=legend[i][1][2]
-		colors.append((r,g,b))
+	# for i in range(len(legend)):
+	# 	#print legend[i][0]
+	# 	b=legend[i][1][0]
+	# 	g=legend[i][1][1]
+	# 	r=legend[i][1][2]
+	# 	colors.append((r,g,b))
 	# plt.set_color_cycle(colors)
 	# 	print '\n'
 	for i in range(1,len(table)):
@@ -224,6 +204,31 @@ def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale
 	plot_file = 'plot_from_data.png'
 	plot_file  = os.path.join(working_dir,plot_file)
 	plt.savefig(plot_file)
+
+def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir):
+	table=[]
+	x_=[]
+	fx=[]
+	for i in range(len(masks)):
+		masks[i]=lineInterpolation_x(masks[i])
+		masks[i]=lineInterpolation_y(masks[i])
+	for i in range(len(masks)):
+		(x_,fx)=approxTable(masks[i],ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y)
+
+		if(i==0):
+			table.append(x_)
+		table.append(fx)
+	print 'hi'
+	print len(table[1])
+	# for j in range(len(table[0])):
+	# 	for i in range(len(table)):
+	# 		print table[i][j],
+ 	pool = multiprocessing.Pool()
+	arr = [(table,working_dir)]
+	pool.map(plot, arr)
+
+
+	
 	return table
 
 def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p_y1,p_y2,image_without_legend,legend,working_dir):

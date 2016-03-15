@@ -10,7 +10,6 @@ from multiprocessing import Pool
 from PyQt4.QtCore import *
 from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
-import write_to_pdf
 import numpy as np
 #import image_class
 
@@ -19,13 +18,21 @@ import cv2
 class plotThread(QtCore.QThread):
 
     table_completed = QtCore.pyqtSignal()
-    def __init__(self, plot, index):
+    def __init__(self, plot, index,manual=False):
         QtCore.QThread.__init__(self)
+        print("iniiiiiiiiiiiiit")
         self.plot=plot
         self.index=index
+        self.manual=manual
+        print(self.plot,self.index,self.manual)
 
     def run(self):
-        self.plot.run()
+        print("starting")
+        if self.manual:
+            print("starting")
+            self.plot.run_manual()
+        else:
+            self.plot.run()
         table=self.plot.table
         print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
         print table
@@ -41,8 +48,13 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def __init__(self):
         super(Example, self).__init__()
         self.setupUi(self)
-        
 
+
+        self.cluster_label=QtGui.QLabel()
+        self.cluster_label.setText("Enter the number of colours")
+        self.clusters=QtGui.QLineEdit()
+        self.horizontalLayout_6.addWidget(self.cluster_label)
+        self.horizontalLayout_6.addWidget(self.clusters)
         #self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
@@ -50,7 +62,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_x2.clicked.connect(self.Coordinate)
         self.btn_y1.clicked.connect(self.Coordinate)
         self.btn_y2.clicked.connect(self.Coordinate)
-        self.proceed_btn.clicked.connect(self.fix_axes)
+        self.proceed_btn.clicked.connect(self.proceed_fun)
         self.delete_btn.clicked.connect(self.delete_item)
         self.selectAreaBtn.clicked.connect(self.enableDrag)
         self.undo_btn.clicked.connect(self.undo)
@@ -69,7 +81,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.plotShowBtn.clicked.connect(self.show_plot)
         self.refresh_gui()
         
-
+        self.btmx=[]
+        self.btmy=[]
+        self.btmpt=[]
     def show_plot(self):
         items=self.graphlistWidget.selectedItems()
         item=items[0]
@@ -94,11 +108,17 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         export_dialog.setDefaultSuffix('pdf')
         export_dialog.show()
         #z=export_dialog.selectedFiles()
+        tables=[]
+        images=[]
         if export_dialog.exec_() == QtGui.QFileDialog.Accepted:
             location=export_dialog.selectedFiles()[0]
             print location
             c=write_to_pdf.createpdf(str(location))
-            write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
+            for i in range(len(self.plots)):
+                tables.append(self.plots[i].table)
+                images.append(self.plots[i].outer_image_file)
+
+            write_to_pdf.pdfoutput(c,tables,images)
             # print(export_dialog.selectedFiles()[0])
             #self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
         # c=write_to_pdf.createpdf(xz)
@@ -166,7 +186,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btn_x2.show()
         self.btn_y1.show()
         self.btn_y2.show()
-        self.contin.hide()
+        # self.contin.hide()
+        self.manual.hide()
         self.lineEdit.show()
         self.lineEdit_2.show()
         self.lineEdit_3.show()
@@ -301,17 +322,55 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.isEnabled=True
         
 
-    def fix_axes(self):
+    def proceed_fun(self):
         #self.x1.setReadOnly(True)mg=cv2.imread("test.pdf0.jpg")
         
         #self.x2.setReadOnly(True)
         #self.y1.setReadOnly(True)
         #self.y2.setReadOnly(True)
-        self.axes_values[0]=self.x1.text()
-        self.axes_values[1]=self.x2.text()
-        self.axes_values[2]=self.y1.text()
-        self.axes_values[3]=self.y2.text()
+        self.manual_par[0][1]=float(self.lineEdit.text())
+        self.manual_par[1][1]=float(self.lineEdit_2.text())
+        self.manual_par[2][1]=float(self.lineEdit_3.text())
+        self.manual_par[3][1]=float(self.lineEdit_4.text())
+        self.manual_par[4] = float(self.clusters.text())
+        items=self.graphlistWidget.selectedItems()
+        item = items[0]
+        plot = self.plot_dic[str(item.text())]
 
+        h=self.display_item.pixmap().height()
+        w=self.display_item.pixmap().width() 
+        pdf_item=self.pdflistWidget.selectedItems()
+        pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
+        
+
+        img = cv2.imread(plot.outer_image_file)
+        
+
+
+        height, width = img.shape[:2] 
+
+        t1=self.manual_par[0][0]*float(height)/h
+        t2=self.manual_par[1][0]*float(height)/h
+        t3=self.manual_par[2][0]*float(width)/w
+        t4=self.manual_par[3][0]*float(width)/w
+
+        self.manual_par[0][0]=int(t1)
+        self.manual_par[1][0]=int(t2)
+        self.manual_par[2][0]=int(t3)
+        self.manual_par[3][0]=int(t4)
+
+        
+        plot.set_manual(self.manual_par)
+        print("proceeeeeeeeeeeeeeeeeeeeeeeeeeed")
+        self.thread_per_plot2=[]
+        temp_thread=plotThread(plot,self.plots.index(plot),True)
+        self.thread_per_plot2.append(temp_thread)
+        temp_thread.table_completed.connect(self.on_table_completion)
+        print("before starting")
+        temp_thread.start()
+
+
+        print self.manual_par
     def delete_item(self):
         items=self.graphlistWidget.selectedItems()
         for item in items:
@@ -329,26 +388,36 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         def getPos(event):
             x = event.pos().x()
             y = event.pos().y()
-            
-            
+            lx=[]    
+            ly=[]
             sender.setChecked(False)
             if sender.text()=='X1':
                 self.axes[0][0]=x
                 self.axes[0][1]=y
+                self.manual_par[0][0]=self.axes[0][0]
                 print 'X1',self.axes[0]
             elif sender.text()=='X2':
                 self.axes[1][0]=x
                 self.axes[1][1]=y
+                self.manual_par[1][0]=self.axes[1][0]
+                y_x2=y
                 print 'X2',self.axes[1]
             elif sender.text()=='Y1':
                 self.axes[2][0]=x
                 self.axes[2][1]=y
+                self.manual_par[2][0]=self.axes[2][1]
+                x_y1=x                
                 print 'Y1',self.axes[2]
             else:
                 self.axes[3][0]=x
                 self.axes[3][1]=y
+                self.manual_par[3][0]=self.axes[3][1]
+                x_y2=x
                 print 'Y2',self.axes[3]
+            print "manual_par is",
+            
 
+            print self.manual_par 
             self.display_item.setCursor(QtCore.Qt.ArrowCursor)
             self.display_item.mousePressEvent=self.mousePressEvent
         sender=self.sender()
@@ -434,7 +503,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.progressBar.setValue(self.progressBar.value()+1)
 
     def refresh_gui(self):
-        self.axes=[['', ''], ['', ''], ['',''], ['','']]
+        self.manual_par=[[0,0],[0,0],[0,0],[0,0],0]
+        self.axes=[[0, 0], [0, 0], [0,0], [0,0]]
         self.axes_values=['','','','']
         self.plots=[]
         self.listOfFiles = []
