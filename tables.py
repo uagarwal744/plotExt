@@ -214,7 +214,7 @@ def plot(data) :
 	plot_file  = os.path.join(working_dir,plot_file)
 	plt.savefig(plot_file)
 
-def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir):
+def findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,working_dir):
 	table=[]
 	x_=[]
 	fx=[]
