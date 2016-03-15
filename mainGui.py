@@ -10,7 +10,6 @@ from multiprocessing import Pool
 from PyQt4.QtCore import *
 from graphextract_returnArray1 import GraphThread, ReturnObj
 import image_class
-import write_to_pdf
 import numpy as np
 #import image_class
 
@@ -94,11 +93,17 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         export_dialog.setDefaultSuffix('pdf')
         export_dialog.show()
         #z=export_dialog.selectedFiles()
+        tables=[]
+        images=[]
         if export_dialog.exec_() == QtGui.QFileDialog.Accepted:
             location=export_dialog.selectedFiles()[0]
             print location
             c=write_to_pdf.createpdf(str(location))
-            write_to_pdf.pdfoutput(c,self.plots[0].table,self.plots[0].outer_image_file)
+            for i in range(len(self.plots)):
+                tables.append(self.plots[i].table)
+                images.append(self.plots[i].outer_image_file)
+
+            write_to_pdf.pdfoutput(c,tables,images)
             # print(export_dialog.selectedFiles()[0])
             #self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
         # c=write_to_pdf.createpdf(xz)
