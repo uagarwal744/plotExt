@@ -112,7 +112,49 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 
 	image=cv2.imread(img,cv2.IMREAD_COLOR)
+
+	#KMeans
+	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
+
+	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
+
+	clt = KMeans(n_clusters = 6)
 	
+	clt.fit(img_array)
+
+	ret_labels=clt.labels_
+
+	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
+	b = clt.predict([0.0,0.0,0.0])
+
+
+	#removes rectangles which contain coloured pixels
+	to_remove = []
+	for k in range(len(rect)):
+		r = rect[k]
+		cnt = 0
+		for i in range(r[1],r[3]):
+			for j in range(r[0],r[2]):
+				curr_label = clt.predict([image[i][j][0],image[i][j][1],image[i][j][2]])
+				if(curr_label != bw_labels[0] and curr_label != bw_labels[1]):
+					cnt = cnt+1
+				if(cnt>5):
+					break
+			if(cnt>5):
+				break
+		if(cnt>5):
+			to_remove.append(k)
+
+	mid_rect = []
+	for i in range(len(rect)):
+		found = 0
+		for j in range(len(to_remove)):
+			if(i==j):
+				found = 1
+				break
+		if(found == 0):
+			mid_rect.append(rect)
+		
 	# draw_rectangles(image, rect)
 	# cv2.imshow("as",image)
 	# cv2.waitKey(0)
@@ -130,14 +172,14 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	out = []
 
 	#removes text outside the bounding box
-	for i in range(len(rect)):
-		if(rect[i][0]>x_min and rect[i][1]<y_max and rect[i][0]<x_max and rect[i][1]>y_min):
+	for i in range(len(mid_rect)):
+		if(mid_rect[i][0]>x_min and mid_rect[i][1]<y_max and mid_rect[i][0]<x_max and mid_rect[i][1]>y_min):
 			out.append(i)
 
 	#temp_rect contains the text only inside the bounding box
 	temp_rect = []
 	for i in range(len(out)):
-		temp_rect.append(rect[out[i]])
+		temp_rect.append(mid_rect[out[i]])
 
 	print "After removal of boundary"
 	print len(temp_rect)
@@ -202,18 +244,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	
 	print "After merging"
 	print new_rect
-	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))
-
-	img_array = image.reshape(image.shape[0] * image.shape[1], 3)
-
-	clt = KMeans(n_clusters = 6)
 	
-	clt.fit(img_array)
-
-	ret_labels=clt.labels_
-
-	bw_labels=clt.predict([[255.0,255.0,255.0], [0.0,0.0,0.0]])	
-	b = clt.predict([0.0,0.0,0.0])
 	
 	
 	#code for detecting legends not detected by ocr
@@ -496,7 +527,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max,working_dir):
 	os.system("tesseract " + img + " "+out_hocr_file+" hocr")
 	return parse_hocr(out_hocr_file+".hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("a.jpg", 197,764, 71, 421)
+#legend_detect("a.jpg", 197,764, 71, 421,"plotExt")
 
 
 	
