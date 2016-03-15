@@ -227,6 +227,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.label_2.show()
         self.proceed_btn.show()
         self.selectAreaBtn.show()
+        self.clusters.show()
+        self.cluster_label.show()
         #self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
@@ -287,7 +289,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def getGraphs(self):
         self.graphlistWidget.clear()
-        self.selectAreaBtn.show()
+        
         self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract, self.finished_extracting)
         self.gthread.start()
         self.progressBar.show()
@@ -305,7 +307,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.plots.append(new_list)
 
         print self.plots'''
-
+        self.selectAreaBtn.show()
 
 
     def undo(self):
@@ -360,6 +362,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         #self.x2.setReadOnly(True)
         #self.y1.setReadOnly(True)
         #self.y2.setReadOnly(True)
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnCount(0)
         try:
             self.manual_par[0][1]=float(self.lineEdit.text())
             self.manual_par[1][1]=float(self.lineEdit_2.text())
@@ -528,6 +532,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 	                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
         self.savetable.show()
         self.plotShowBtn.show()
+        self.manual.show()
             
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
