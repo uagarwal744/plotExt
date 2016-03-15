@@ -18,6 +18,7 @@ import cv2
 class plotThread(QtCore.QThread):
 
     table_completed = QtCore.pyqtSignal(object)
+    automatic_failed = QtCore.pyqtSignal(object)
     def __init__(self, plot, index,manual=False):
         QtCore.QThread.__init__(self)
         print("iniiiiiiiiiiiiit")
@@ -32,7 +33,11 @@ class plotThread(QtCore.QThread):
             print("starting")
             self.plot.run_manual()
         else:
-            self.plot.run()
+            res = self.plot.run()
+            if res == -1:
+                self.automatic_failed.emit(self.index)
+                return
+
         table=self.plot.table
         print '^^^^^^^^^^$$$$$$######^^^^^^^^^'
         print table
@@ -57,6 +62,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.horizontalLayout_6.addWidget(self.clusters)
         #self.tables=[]
         self.pdfSelectBtn.clicked.connect(self.openfile)
+
         self.pdfSelectBtn.setCursor(QtCore.Qt.PointingHandCursor)
         self.btn_x1.clicked.connect(self.Coordinate)
         self.btn_x2.clicked.connect(self.Coordinate)
@@ -65,6 +71,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.proceed_btn.clicked.connect(self.proceed_fun)
         self.delete_btn.clicked.connect(self.delete_item)
         self.selectAreaBtn.clicked.connect(self.enableDrag)
+        self.selectAreaBtn.setText("Manually Select Plot")
+        self.contin.setText("Continue")
+
         self.undo_btn.clicked.connect(self.undo)
         self.pdflistWidget.itemClicked.connect(self.pdfItem_click)
         self.graphlistWidget.itemClicked.connect(self.graphItem_click)
@@ -75,12 +84,19 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.manual.clicked.connect(self.manual_fun)
         self.contin.clicked.connect(self.getTables)
         
+        self.label_2.hide()
+        self.savetable.hide()
+
         self.graphlistWidget.itemSelectionChanged.connect(self.change_selected_item)
         self.pdflistWidget.itemSelectionChanged.connect(self.change_selected_pdf_item)
         self.savetable.clicked.connect(self.download_table)
         self.plotShowBtn.clicked.connect(self.show_plot)
         self.refresh_gui()
         
+        self.cluster_label.hide()
+        self.clusters.hide()
+        self.plotShowBtn.hide()
+
         self.btmx=[]
         self.btmy=[]
         self.btmpt=[]
@@ -136,6 +152,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.graphItem_click(item)
     def getTables(self):
         self.tables = [0 for plot in self.plots ]
+        self.selectAreaBtn.hide()
+        self.contin.hide()
         self.gif.show()
         self.tableWidget.hide()
         movie=QtGui.QMovie("loading.gif")
@@ -148,6 +166,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         for plot in self.plots:
             temp_thread=plotThread(plot,self.plots.index(plot))
             temp_thread.table_completed.connect(self.on_table_completion)
+            temp_thread.automatic_failed.connect(self.automatic_failed)
             self.thread_per_plot.append(temp_thread)
             temp_thread.start()
 
@@ -161,6 +180,17 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
                 self.tThread.start()
 
                 return'''
+
+    def automatic_failed(self,index):
+        items=self.graphlistWidget.selectedItems()
+        if(len(items)==0):
+            return
+        item = items[0]
+        self.graphItem_click(item)
+
+        
+
+
 
     def on_table_completion(self, index):
         #self.tables[index]=table
@@ -197,6 +227,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.label_2.show()
         self.proceed_btn.show()
         self.selectAreaBtn.show()
+        self.clusters.show()
+        self.cluster_label.show()
         #self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
@@ -252,12 +284,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.statusbar.clearMessage()
         self.progressBar.hide()
         self.runBtn.hide()
-        self.manual.show()
+        #self.manual.show()
         self.contin.show()
 
     def getGraphs(self):
         self.graphlistWidget.clear()
-
+        
         self.gthread = GraphThread(self.listOfFiles, self.progress_of_extract, self.finished_extracting)
         self.gthread.start()
         self.progressBar.show()
@@ -275,7 +307,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.plots.append(new_list)
 
         print self.plots'''
-
+        self.selectAreaBtn.show()
 
 
     def undo(self):
@@ -330,11 +362,24 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         #self.x2.setReadOnly(True)
         #self.y1.setReadOnly(True)
         #self.y2.setReadOnly(True)
-        self.manual_par[0][1]=float(self.lineEdit.text())
-        self.manual_par[1][1]=float(self.lineEdit_2.text())
-        self.manual_par[2][1]=float(self.lineEdit_3.text())
-        self.manual_par[3][1]=float(self.lineEdit_4.text())
-        self.manual_par[4] = float(self.clusters.text())
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.setColumnCount(0)
+        try:
+            self.manual_par[0][1]=float(self.lineEdit.text())
+            self.manual_par[1][1]=float(self.lineEdit_2.text())
+            self.manual_par[2][1]=float(self.lineEdit_3.text())
+            self.manual_par[3][1]=float(self.lineEdit_4.text())
+        except Exception,e:
+            self.manual_par[0][1]=0
+            self.manual_par[1][1]=0
+            self.manual_par[2][1]=0
+            self.manual_par[3][1]=0
+
+        try:
+            self.manual_par[4] = float(self.clusters.text())
+        except Exception, e:
+            self.manual_par[4] = 2
+
         items=self.graphlistWidget.selectedItems()
         item = items[0]
         plot = self.plot_dic[str(item.text())]
@@ -430,10 +475,49 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
 
     def graphItem_click(self, item):
+
         self.display_item.setPixmap(QtGui.QPixmap(item.text()).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
         ind=self.graphlistWidget.row(item)
         print ind
         print (self.plots)
+        if(self.plots[ind].legend_failed):
+            #popup
+
+            self.w = popup()
+            self.w.setGeometry(QRect(100, 100, 400, 200))
+            self.w.show()
+            #hide automatic
+            self.contin.hide()
+
+            #display manual stuff
+            #self.manual.show()
+            self.btn_x1.show()
+            self.btn_x2.show()
+            self.btn_y1.show()
+            self.btn_y2.show()
+            self.lineEdit.show()
+            self.lineEdit_2.show()
+            self.lineEdit_3.show()
+            self.lineEdit_4.show()
+            self.proceed_btn.show()
+            self.clusters.show()
+            self.cluster_label.show()
+        else:
+            self.manual.hide()
+            self.btn_x1.hide()
+            self.btn_x2.hide()
+            self.btn_y1.hide()
+            self.btn_y2.hide()
+            self.lineEdit.hide()
+            self.lineEdit_2.hide()
+            self.lineEdit_3.hide()
+            self.lineEdit_4.hide()
+            self.proceed_btn.hide()
+            self.clusters.hide()
+            self.cluster_label.hide()
+
+
+
         if(not hasattr( self.plots[ind],'table')):
             return
         if self.gif_check[ind]==1:
@@ -446,6 +530,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 	                #item = self.array[0] # each item is a QTableWidgetItem
 	                # add the QTableWidgetItem to QTableWidget, but exception thrown
 	                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
+        self.savetable.show()
+        self.plotShowBtn.show()
+        self.manual.show()
             
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
