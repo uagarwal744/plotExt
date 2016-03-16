@@ -310,7 +310,7 @@ class GraphThread(QtCore.QThread):
 
     def houghp(self):
         """Does a Hough Transform (probabilistic) on the image given"""
-        global img
+        # global img
         img = cv2.imread(self.pageImage)
         #print self.pdfImage
         gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -338,7 +338,7 @@ class GraphThread(QtCore.QThread):
         Keyword arguments:
         image -- image returned by the houghp()
         """
-        #img = cv2.imread(self.pageImage)
+        img = cv2.imread(self.pageImage)
         gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
         cv2.imwrite(self.graphfolder+"/gray.png",gray)
         temp = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
