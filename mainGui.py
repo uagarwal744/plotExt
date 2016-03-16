@@ -38,12 +38,6 @@ class plotThread(QtCore.QThread):
         print table
         self.table_completed.emit(self.index)
 
-class popup(QtGui.QWidget):
-    def __init__(self):
-        QtGui.QWidget.__init__(self)
-        self.label=QtGui.QLabel()
-
-
 class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def __init__(self):
         super(Example, self).__init__()
@@ -84,6 +78,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.btmx=[]
         self.btmy=[]
         self.btmpt=[]
+
+    def closeEvent(self, event):
+    	result = QtGui.QMessageBox.question(self,"Confirm Exit...","Are you sure you want to exit ?",QtGui.QMessageBox.Yes| QtGui.QMessageBox.No)
+    	event.ignore()
+    	if result==QtGui.QMessageBox.Yes:
+    		event.accept()
     def show_plot(self):
         items=self.graphlistWidget.selectedItems()
         item=items[0]
@@ -135,13 +135,15 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         item=items[0]
         self.graphItem_click(item)
     def getTables(self):
-        self.tables = [0 for plot in self.plots ]
+
+        # self.tables = [0 for plot in self.plots ]
+        self.selectAreaBtn.hide()
         self.gif.show()
         self.tableWidget.hide()
         movie=QtGui.QMovie("loading.gif")
         self.gif.setMovie(movie)
         movie.start()
-        self.gif_check=[]
+        
         for i in range(len(self.plots)):
         	self.gif_check.append(0)
         self.thread_per_plot=[]
@@ -151,21 +153,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
             self.thread_per_plot.append(temp_thread)
             temp_thread.start()
 
-
-
-        '''for plots in self.plots:
-            for plot in plots:
-                print plot
-                print '##########################################'
-                self.tThread=image_class.TableThread(plot,self.table_progress)
-                self.tThread.start()
-
-                return'''
-
     def on_table_completion(self, index):
         #self.tables[index]=table
-        print '())()()())()^^^^^^()()()()()'
+        
         self.gif_check[index]=1
+        print '())()()())()^^^^^^()()()()()',self.gif_check
         items=self.graphlistWidget.selectedItems()
         self.graphItem_click(items[0])
         #print self.tables
@@ -254,7 +246,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.statusbar.clearMessage()
         self.progressBar.hide()
         self.runBtn.hide()
-        self.manual.show()
+        self.selectAreaBtn.show()
         self.contin.show()
 
     def getGraphs(self):
@@ -437,10 +429,29 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         print ind
         print (self.plots)
         if(not hasattr( self.plots[ind],'table')):
-            return
+        	if len(self.gif_check)==0:
+        		return
+        	if self.gif_check[ind]==0:
+	        	self.gif.show()
+		        self.tableWidget.hide()
+		        movie=QtGui.QMovie("loading.gif")
+		        self.gif.setMovie(movie)
+		        movie.start()
+		        self.plotShowBtn.hide()
+
+        	
+        # if self.gif_check[ind]==0:
+        # 	print '{{{{&&&******&&&'
+        # 	self.gif.show()
+	       #  self.tableWidget.hide()
+	       #  movie=QtGui.QMovie("loading.gif")
+	       #  self.gif.setMovie(movie)
+	       #  movie.start()
         if self.gif_check[ind]==1:
+        	print '^^^*****#####^^^^'
         	self.gif.hide()
         	self.tableWidget.show()
+        	self.plotShowBtn.show()
 	        self.tableWidget.setColumnCount(len(self.plots[ind].table)) #rows and columns of table
 	        self.tableWidget.setRowCount(len(self.plots[ind].table[0]))
 	        for column in range(len(self.plots[ind].table)): # add items from array to QTableWidget
@@ -448,6 +459,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 	                #item = self.array[0] # each item is a QTableWidgetItem
 	                # add the QTableWidgetItem to QTableWidget, but exception thrown
 	                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
+		    count=0
+		    for i in range(len(self.plots)):
+		    	if self.gif_check[i]==1:
+		    		count+=1
+		    if count==len(self.plots):
+		    	self.savetable.show()
             
     def pdfItem_click(self, item):
         loc=self.x+str(int(item.text())-1)+"new.png"
@@ -541,18 +558,24 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.pdflistWidget.clear()
         self.runBtn.show()
         self.display_item.setPixmap(QtGui.QPixmap(''))
-        
+        self.label_2.hide()
+        self.cluster_label.hide()
+        self.clusters.hide()
+        self.plotShowBtn.hide()
+        self.savetable.hide()
         self.gif.hide()
+        self.gif_check=[]
 
     def openfile(self):
 
-        self.refresh_gui()
-        
         self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
         #self.x stores the address of the chosen pdf
         print self.x
         if self.x=="":      # No file is Chosen
             return
+        self.refresh_gui()
+        
+        
         z=QtCore.QFileInfo(self.x)     #z stores only the file name
         self.pdfSelectBtn.setEnabled(False)
         self.progressBar.show()

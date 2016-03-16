@@ -29,6 +29,13 @@
        <enum>QLayout::SetMaximumSize</enum>
       </property>
       <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Extracted Plots</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="sizeConstraint">
          <enum>QLayout::SetMinimumSize</enum>
@@ -93,6 +100,9 @@
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>Delete plot</string>
+            </property>
             <property name="text">
              <string>X</string>
             </property>
@@ -146,7 +156,7 @@
              </size>
             </property>
             <property name="text">
-             <string>TextLabel</string>
+             <string/>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
@@ -198,6 +208,58 @@
              </widget>
             </item>
             <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>7</number>
+              </property>
+              <property name="rightMargin">
+               <number>7</number>
+              </property>
+              <item>
+               <spacer name="horizontalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="plotShowBtn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
+                <property name="text">
+                 <string>Plot from Data</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7"/>
+            </item>
+            <item>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
                <widget class="QLabel" name="label_2">
@@ -215,6 +277,9 @@
                  <layout class="QHBoxLayout" name="horizontalLayout_18">
                   <item>
                    <widget class="QPushButton" name="btn_x1">
+                    <property name="cursor">
+                     <cursorShape>PointingHandCursor</cursorShape>
+                    </property>
                     <property name="text">
                      <string>X1</string>
                     </property>
@@ -232,6 +297,9 @@
                  <layout class="QHBoxLayout" name="horizontalLayout_17">
                   <item>
                    <widget class="QPushButton" name="btn_x2">
+                    <property name="cursor">
+                     <cursorShape>PointingHandCursor</cursorShape>
+                    </property>
                     <property name="text">
                      <string>X2</string>
                     </property>
@@ -256,6 +324,9 @@
                  <layout class="QHBoxLayout" name="horizontalLayout_20">
                   <item>
                    <widget class="QPushButton" name="btn_y1">
+                    <property name="cursor">
+                     <cursorShape>PointingHandCursor</cursorShape>
+                    </property>
                     <property name="text">
                      <string>Y1</string>
                     </property>
@@ -273,6 +344,9 @@
                  <layout class="QHBoxLayout" name="horizontalLayout_19">
                   <item>
                    <widget class="QPushButton" name="btn_y2">
+                    <property name="cursor">
+                     <cursorShape>PointingHandCursor</cursorShape>
+                    </property>
                     <property name="text">
                      <string>Y2</string>
                     </property>
@@ -310,6 +384,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="proceed_btn">
+                <property name="cursor">
+                 <cursorShape>PointingHandCursor</cursorShape>
+                </property>
                 <property name="text">
                  <string>Proceed</string>
                 </property>
@@ -332,52 +409,6 @@
             </item>
            </layout>
           </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <property name="spacing">
-             <number>6</number>
-            </property>
-            <property name="leftMargin">
-             <number>7</number>
-            </property>
-            <property name="rightMargin">
-             <number>7</number>
-            </property>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="plotShowBtn">
-              <property name="text">
-               <string>Plot from Data</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
          </layout>
         </item>
        </layout>
@@ -388,14 +419,10 @@
          <enum>QLayout::SetMinimumSize</enum>
         </property>
         <item>
-         <widget class="QPushButton" name="savetable">
-          <property name="text">
-           <string>Save Table</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pdfSelectBtn">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
            <string>Select PDF</string>
           </property>
@@ -403,29 +430,57 @@
         </item>
         <item>
          <widget class="QPushButton" name="runBtn">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
-           <string>Run</string>
+           <string>Extract Plots</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="contin">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
-           <string>Automatic</string>
+           <string>Continue</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="selectAreaBtn">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+          <property name="text">
+           <string>Manually Select Plot</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="manual">
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
            <string>Manual</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="selectAreaBtn">
+         <widget class="QPushButton" name="savetable">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
           <property name="text">
-           <string>Select Area</string>
+           <string>Save Tables</string>
           </property>
          </widget>
         </item>
@@ -441,7 +496,7 @@
      <x>0</x>
      <y>0</y>
      <width>1061</width>
-     <height>25</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
