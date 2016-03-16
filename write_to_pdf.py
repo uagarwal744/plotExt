@@ -1,4 +1,5 @@
 #mine
+#outside reprository
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.units import inch,cm
@@ -15,7 +16,7 @@ def createpdf(x):
 	c=canvas.Canvas(x,pagesize=A4)
 	return c
 
-def pdfoutput(c,ans,img,plot=None,title=None):
+def pdfoutput(c,ans,img,clrs=None,plot=None,title=None):
 	#Name of Output PDF
 	global z
 	global width
@@ -89,6 +90,11 @@ def pdfoutput(c,ans,img,plot=None,title=None):
 					maxtext=int(W/(fontsize*.55)) - 1
 					title[t]=title[t].replace(title[t][maxtext:],"...")
 			for i in xrange(len(ar[0])):
+				if clrs!=None:	
+					if i==0:
+						c.setFillColorRGB(0,0,0)
+					else :
+						c.setFillColorRGB(clrs[z][i-1][0],clrs[z][i-1][1],clrs[z][i-1][2])
 				c.drawCentredString((i+1.5)*W,-inch-.7*H,title[i])
 
 			#Size of the Grid
@@ -104,6 +110,11 @@ def pdfoutput(c,ans,img,plot=None,title=None):
 			#Printing the Output Array
 			for i in xrange(len(ar)):
 				for j in xrange(len(ar[0])):
+					if clrs!=None:
+						if j==0:
+							c.setFillColorRGB(0,0,0)
+						else :
+							c.setFillColorRGB(clrs[z][j-1][0],clrs[z][j-1][1],clrs[z][j-1][2])
 					c.drawCentredString((j+1.5)*W,-H*(1.7+i)-inch,ar[i][j])
 
 			c.showPage()
@@ -119,10 +130,17 @@ if __name__ == '__main__':
 	cc=createpdf('testing.pdf')
 	img=[]
 	plot=[]
-	for m in xrange(5):
+	for m in xrange(5):	
 		img.append("a.jpg")
 	for m in xrange(5):
 		plot.append("table of a")
 	
-	an=[[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]]]
-	pdfoutput(cc,an,img,plot)
+	#an=[[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]],[["--","13.2524145741","12.25"],["1.20","--","125.120214"]]]
+	ar=np.zeros((5,10))
+	an=[ar,ar,ar,ar,ar]
+	clr=[(255,0,0),(0,255,0),(0,0,255),(0,255,255)]
+	clrs=[]
+	for m in xrange(5):	
+		clrs.append(clr)
+
+	pdfoutput(cc,an,img,clrs,plot)

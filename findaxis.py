@@ -35,27 +35,29 @@ def findaxis(img):
     im2 = np.zeros((h,w,channel),np.uint8)
     for x1,y1,x2,y2 in lines[0]:
         cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)
+    cv2.imwrite("houghp.png",im2)
 
     gray = cv2.cvtColor(im2,cv2.COLOR_BGR2GRAY)
     # cv2.imwrite(graphfolder+"/gray.png",gray)
-    cnts1 = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+    cnts1 = cv2.findContours(gray, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[0]
     # print temp
     # cnts1 = []
     # for t in temp[0]:
     #     if cv2.contourArea(t) >threshArea:
     #         cnts1.append(t)
-    
-    h,w,channel = image.shape
-    hi,wi = h,w
-    
     LENGTH = len(cnts1)
     status = np.zeros((LENGTH,1))
 
+    h,w,channel = img.shape
+    hi,wi = h,w
+
+    
     for i,cnt1 in enumerate(cnts1):
         x_,y_,w_,h_  = cv2.boundingRect(cnt1)
         if h_ >= 0.95*hi or w_ >= 0.95*wi:
             continue
         x = i    
+        
         if i != LENGTH-1:
             for j,cnt2 in enumerate(cnts1[i+1:]):
                 x_,y_,w_,h_  = cv2.boundingRect(cnt2)
@@ -88,8 +90,10 @@ def findaxis(img):
     cont = []
     cflag = []
 
+    # print len(cnts1)
     for c in cnts1:
         # if cv2.contourArea(c) >threshArea:
+        # cv2.drawContours(img, [c], -1, (0, 0, 255), 2)
         if 1:
             approx = cv2.approxPolyDP(c,0.01*cv2.arcLength(c,True),True)
             if len(approx)<10 and len(approx)>2:
@@ -115,10 +119,18 @@ def findaxis(img):
                 continue
             if x_>=x[j] and y_>=y[j] and (x_+w_)<=(x[j]+w[j]) and (y_+h_)<=(y[j]+h[j]):
                 cflag[i]="0"
-    
+    # print"r"
+    # print len(cflag)
     for i in range(len(cflag)): 
         if(cflag[i]=="0"):
             continue
         else:
+            # print "s"
+            # graph = img[y[i]:y[i]+h[i],x[i]:x[i]+w[i]]
+            # cv2.imwrite("test.png",graph)
             return int(x[i]),int(x[i]+w[i]),int(y[i]),int(y[i]+h[i])
 
+
+
+# f = raw_input()
+# findaxis(cv2.imread(f))
