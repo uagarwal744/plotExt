@@ -496,10 +496,11 @@ class GraphThread(QtCore.QThread):
             yend = min(hi,self.y[i]+self.h[i]+(percentin+0.03)*self.h[i])
             
             print self.x[i],self.y[i],self.w[i],self.h[i]
-            inner_list.append([int(self.x[i])-int(xstart),int(self.x[i]+self.w[i])-int(xstart),int(self.y[i])-int(ystart),int(self.y[i]+self.h[i])-int(ystart)])
+            
 
             
             graph = img[ystart:yend,xstart:xend]
+            graph1 = graph
             '''
             h_g,w_g,channel_g = graph.shape
             im_g = np.zeros((h_g,w_g,channel_g),np.uint8)
@@ -507,14 +508,25 @@ class GraphThread(QtCore.QThread):
             '''
 
             # list1.append(graph)
+            x1 = int(self.x[i])-int(xstart)
+            x2 = int(self.x[i]+self.w[i])-int(xstart)
+            y1 = int(self.y[i])-int(ystart)
+            y2 = int(self.y[i]+self.h[i])-int(ystart)
             filename = self.graphfolder+"/"+str(count_graph)+".png"
             list2.append(filename)
             cv2.imwrite(filename,graph)
-            if(graph.shape[1]>5000):
+            if(graph.shape[1]>900):
                 os.system("convert -resize 900 "+filename+" "+filename)
                 graph = cv2.imread(filename)
-            list1.append(graph)
+                change0 = float(graph.shape[1])/graph1.shape[1]
+                change1 = float(graph.shape[0])/graph1.shape[0]
+                x1 = int(x1 * change0)
+                x2 = int(x2 * change0)
+                y1 = int(y1 * change1)
+                y2 = int(y2 * change1)
 
+            list1.append(graph)
+            inner_list.append([x1,x2,y1,y2])
             count_graph = count_graph + 1
         cv2.imwrite(self.graphfolder+"/contour_next.png",img)
         return list1,list2,inner_list
