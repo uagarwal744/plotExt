@@ -16,7 +16,7 @@ import uuid
 import tables
 import extract_plots_manual
 import time
-current_milli_time = lambda: int(round(time.time() * 1000))
+# current_milli_time = lambda: int(round(time.time() * 1000))
 
 class Graph:
     outer_dir = "plot_dir"
