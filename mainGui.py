@@ -141,6 +141,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
         # self.tables = [0 for plot in self.plots ]
         self.selectAreaBtn.hide()
+        self.contin.setEnabled(False)
         self.gif.show()
         self.tableWidget.hide()
         #movie=QtGui.QMovie("loading.gif")
@@ -192,7 +193,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.lineEdit_4.show()
         self.label_2.show()
         self.proceed_btn.show()
-        self.selectAreaBtn.show()
+        self.clusters.show()
+        self.cluster_label.show()
+        # self.selectAreaBtn.show()
         #self.tableWidget.hide()
     def onResize(self, event):
         items=self.pdflistWidget.selectedItems()
@@ -434,10 +437,25 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
 
     def graphItem_click(self, item):
+    	self.btn_x1.hide()
+        self.btn_x2.hide()
+        self.btn_y1.hide()
+        self.btn_y2.hide()
+        # self.contin.hide()
+        self.manual.hide()
+        self.lineEdit.hide()
+        self.lineEdit_2.hide()
+        self.lineEdit_3.hide()
+        self.lineEdit_4.hide()
+        self.label_2.hide()
+        self.proceed_btn.hide()
+        self.clusters.hide()
+        self.cluster_label.hide()
         self.display_item.setPixmap(QtGui.QPixmap(item.text()).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
         ind=self.graphlistWidget.row(item)
         print ind
         print (self.plots)
+
         if(not hasattr( self.plots[ind],'table')):
         	if len(self.gif_check)==0:
         		return
@@ -449,6 +467,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 		        self.gif.setMovie(movie)
 		        movie.start()
 		        self.plotShowBtn.hide()
+		        self.manual.hide()
+
 
         	
         # if self.gif_check[ind]==0:
@@ -463,12 +483,16 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         	self.gif.hide()
         	self.tableWidget.show()
         	self.plotShowBtn.show()
+        	
 	        self.tableWidget.setColumnCount(len(self.plots[ind].table)) #rows and columns of table
 	        self.tableWidget.setRowCount(len(self.plots[ind].table[0]))
+	        itm=QtGui.QTableWidgetItem('X')
+	        self.tableWidget.setHorizontalHeaderItem(0,itm)
+	        for i in range(1,len(self.plots[ind].table)):
+	        	itm=QtGui.QTableWidgetItem('Y'+str(i))
+	        	self.tableWidget.setHorizontalHeaderItem(i,itm)
 	        for column in range(len(self.plots[ind].table)): # add items from array to QTableWidget
 	            for row in range(len(self.plots[ind].table[0])):
-	                #item = self.array[0] # each item is a QTableWidgetItem
-	                # add the QTableWidgetItem to QTableWidget, but exception thrown
 	                self.tableWidget.setItem(row, column, QtGui.QTableWidgetItem(self.plots[ind].table[column][row]))
 		    count=0
 		    for i in range(len(self.plots)):
@@ -476,6 +500,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 		    		count+=1
 		    if count==len(self.plots):
 		    	self.savetable.show()
+		    	self.contin.hide()
+		    self.manual.show()
             
     def pdfItem_click(self, item):
 	working_dir='plot_dir'
@@ -484,26 +510,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
 
     def loadingFinished(self, result):
-        '''self.numpages = result.val
-        y = self.numpages
-        #y=pdf_to_img.pdf_to_img1(self.x, "300")
-        for i in range(y):
-            self.graph_per_page.append(0)
-        self.pdflistWidget.clear()
-
-        
-        for i in range(y):
-            w=self.x+str(i)+"new.png"
-            
-            self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(i+1)))
-            self.pdflistWidget.addItem(self.item)
-
-        for i in range(y):
-            w=self.x+str(i)+".png"
-            self.listOfFiles.append(str(w))
-        self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
-        self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
-        '''
         self.statusbar.clearMessage()
         self.runBtn.setEnabled(True)
         self.btn_x1.setEnabled(True)
@@ -513,9 +519,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.proceed_btn.setEnabled(True)
         self.pdfSelectBtn.setEnabled(True)
         self.progressBar.hide()
-        #self.tables=[[]]*(result.numPages)
-        #print self.tables
-        #print result.val
 
     def progress_handle(self, result):
         
@@ -574,6 +577,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.lineEdit_4.hide()
         self.graphlistWidget.clear()
         self.pdflistWidget.clear()
+        self.tableWidget.clear()
         self.runBtn.show()
         self.display_item.setPixmap(QtGui.QPixmap(''))
         self.label_2.hide()
@@ -600,9 +604,6 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.pdfSelectBtn.setEnabled(False)
         self.progressBar.show()
         self.statusbar.showMessage(QString(' Loading '+'1'+' page ....'))
-        # self.statusbar.insertWidget(3,progress_bar)
-        # self.statusbar.progress_bar.setMaximum(6)
-        # self.statusbar.progress_bar.setValue(1)
         self.ithread = ImageThread(self.x,"300", self.loadingFinished, self.progress_handle)
         self.ithread.start()
 
