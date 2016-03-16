@@ -9,7 +9,6 @@ import extract_plots
 import hsv
 import matplotlib.pyplot as plt
 import multiprocessing
-import matplotlib.cm as cm
 
 
 def findValue(img,jo,prevval):
@@ -201,9 +200,6 @@ def plot(data) :
 	table,working_dir = data
 	table2 = [[] for x in table]
 	x_vals = [[] for i in range(len(table))]
-	if(len(table)==0):
-		return
-
 	miny=10000
 	maxy=-100
 	for i in range(len(table)):
@@ -229,10 +225,8 @@ def plot(data) :
 	# 	colors.append((r,g,b))
 	# plt.set_color_cycle(colors)
 	# 	print '\n'
-	colors = iter(cm.rainbow(np.linspace(0, 1, len(table)-1)))
 	for i in range(1,len(table)):
-		plt.scatter(x_vals[i],table2[i],color=next(colors))
-		#plt.plot(x_vals[i],table2[i])
+		plt.plot(x_vals[i],table2[i])
 		#plot(table[0] , table[2])
 	plot_file = 'plot_from_data.png'
 	plot_file  = os.path.join(working_dir,plot_file)
@@ -270,16 +264,27 @@ def run(input_file,bottom_left,top_right,scale_x,scale_y,x1,x2,y1,y2,p_x1,p_x2,p
 #	(x,y,z,masks) = extract_plots.extract_plots(input_file,8)
 #	print z
 	masks=[]
+	b_=[]
+	g_=[]
+	r_=[]
 	for i in range(len(legend)):
-		print legend[i][0]
 		b=legend[i][1][0]
 		g=legend[i][1][1]
 		r=legend[i][1][2]
-		plotImg = hsv.mark(image_without_legend,b,g,r)
-		print r,g,b
-		masks.append(plotImg)
-		temp_file = os.path.join(working_dir,"mask_%d.png"%(i))
-		cv2.imwrite(temp_file,plotImg)
+		cnt=0
+		for j in range(len(b_)):
+			if (b==b_[j])and(g==g_[j])and(r==r_[j]):
+				cnt+=1
+		if(cnt==0):
+			b_.append(b)
+			g_.append(g)
+			r_.append(r)
+			print legend[i][0]
+			plotImg = hsv.mark(image_without_legend,b,g,r)
+			print r,g,b
+			masks.append(plotImg)
+			temp_file = os.path.join(working_dir,"mask_%d.png"%(i))
+			cv2.imwrite(temp_file,plotImg)
 	print 'below'
 	return findTables(masks,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y,legend,working_dir)
 	
