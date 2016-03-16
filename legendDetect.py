@@ -11,7 +11,7 @@ import warnings
 
 
 
-current_color = []
+#current_color = []
 
 def draw_rectangles(img,pos):	
 	for x in pos:
@@ -29,7 +29,7 @@ def mod(a):
 	return a
 
 #returns true is the vertical strip contains only white or black pixels
-def isWhiteOrBlack(x,y,height,image,image_orig,colour_found):
+def isWhiteOrBlack(x,y,height,image,image_orig,colour_found,current_color):
 	cnt = 0
 	if(x>=image.shape[1] or y+height>=image.shape[0] or x<=0 or y<=0):
 		return 1
@@ -480,19 +480,19 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		pos = 0
 		one_ext = []
 		temp_x = 0
-
+		current_color = []
 		while(1):
 			if(x1-j<0 or x2+j>=image.shape[1]):
 				break
-			if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)==0):
-				isWhiteOrBlack(x1-j,y1,height,image, image_orig,0) #just for storing the color
+			if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1,current_color)==0):
+				isWhiteOrBlack(x1-j,y1,height,image, image_orig,0,current_color) #just for storing the color
 				pos = 1
 				#one_ext.append(x1-j)
 				temp_x = x1-j
 				#one_ext.append(y1)
 				break
-			if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)==0):
-				isWhiteOrBlack(x2+j,y2,height,image, image_orig,0) #just for storing the color				
+			if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1,current_color)==0):
+				isWhiteOrBlack(x2+j,y2,height,image, image_orig,0,current_color) #just for storing the color				
 				pos = 2		
 				one_ext.append(x2+j)
 				one_ext.append(y2)		
@@ -504,30 +504,32 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		if(pos==1):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)==0):	
-					makeWhite(x1-j,y1,height,image_orig)
+				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1,current_color)==0):	
+					#makeWhite(x1-j,y1,height,image_orig)
+					pass
 				j= j+1
-				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)!=0):
+				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1,current_color)!=0):
 					cnt = cnt+1
-			if(x1-j <= image_orig.shape[1]):
+			if(x1-j <= 0):
 				one_ext.append(image_orig.shape[1])
 			else:
-				one_ext.append(x1-j)
+				one_ext.append(x1-j+35)
 			one_ext.append(y1)
 			one_ext.append(temp_x)
 
 		if(pos==2):
 			cnt = 0
 			while(cnt<40):
-				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)==0):			
-					makeWhite(x2+j,y2,height,image_orig)
+				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1,current_color)==0):			
+					#makeWhite(x2+j,y2,height,image_orig)
+					pass
 				j = j+1
-				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)!=0):
+				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1,current_color)!=0):
 					cnt = cnt+1
 			if(x2+j >= image_orig.shape[1]):
 				one_ext.append(image_orig.shape[1]-2)
 			else:
-				one_ext.append(x2+j)
+				one_ext.append(x2+j-35)
 
 
 		if(max_extent == -1):
@@ -569,13 +571,11 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	
 
 	#this part removes complete rectangle
-	'''
 	for i in range(miny, maxy):
 		for j in range(minx, maxx):
 			image[i][j][0] = 255
 			image[i][j][1] = 255
 			image[i][j][2] = 255
-	'''
 	
 
 	final_rect = []
@@ -608,6 +608,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	
 
+	#draw_rectangles(image,extent)
 	return image,legend_info
 
 #horizontal is x

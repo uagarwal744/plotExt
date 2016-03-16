@@ -9,6 +9,7 @@ import extract_plots
 import hsv
 import matplotlib.pyplot as plt
 import multiprocessing
+import matplotlib.cm as cm
 
 
 def findValue(img,jo,prevval):
@@ -200,6 +201,9 @@ def plot(data) :
 	table,working_dir = data
 	table2 = [[] for x in table]
 	x_vals = [[] for i in range(len(table))]
+	if(len(table)==0):
+		return
+
 	miny=10000
 	maxy=-100
 	for i in range(len(table)):
@@ -225,8 +229,10 @@ def plot(data) :
 	# 	colors.append((r,g,b))
 	# plt.set_color_cycle(colors)
 	# 	print '\n'
+	colors = iter(cm.rainbow(np.linspace(0, 1, len(table)-1)))
 	for i in range(1,len(table)):
-		plt.plot(x_vals[i],table2[i])
+		plt.scatter(x_vals[i],table2[i],color=next(colors))
+		#plt.plot(x_vals[i],table2[i])
 		#plot(table[0] , table[2])
 	plot_file = 'plot_from_data.png'
 	plot_file  = os.path.join(working_dir,plot_file)

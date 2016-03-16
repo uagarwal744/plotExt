@@ -1,4 +1,5 @@
 from PyQt4 import QtCore, QtGui
+import shutil
 import sys, time
 import os
 import layout_gene
@@ -81,9 +82,11 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def closeEvent(self, event):
     	result = QtGui.QMessageBox.question(self,"Confirm Exit...","Are you sure you want to exit ?",QtGui.QMessageBox.Yes| QtGui.QMessageBox.No)
-    	event.ignore()
+	shutil.rmtree(image_class.Graph.outer_dir,ignore_errors=True)
+	event.ignore()
     	if result==QtGui.QMessageBox.Yes:
     		event.accept()
+
     def show_plot(self):
         items=self.graphlistWidget.selectedItems()
         item=items[0]
@@ -140,7 +143,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         self.selectAreaBtn.hide()
         self.gif.show()
         self.tableWidget.hide()
-        movie=QtGui.QMovie("loading.gif")
+        #movie=QtGui.QMovie("loading.gif")
+        movie=QtGui.QMovie("fireloading3.gif")
         self.gif.setMovie(movie)
         movie.start()
         
@@ -287,7 +291,12 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         pdf_item=self.pdflistWidget.selectedItems()
         pg_no=pdf_item[0].text()   #x stores the page no of pdf file currently selected
         self.graph_per_page[int(pg_no)-1]+=1
-        img = cv2.imread(str(self.x)+str(int(pg_no)-1)+'.png')
+
+
+	filename = str(self.pdf_name)+str(int(pg_no)-1)+'.png'
+	working_dir='plot_dir'
+	filename= os.path.join(working_dir,filename)
+        img = cv2.imread(filename)
         height, width = img.shape[:2]     # dimensions of original image
         #size of pixmap
         h=self.display_item.pixmap().height()
@@ -304,6 +313,7 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         yend=int(bottom_right.y()*y_ratio)
         graph = img[int(ystart):int(yend),int(xstart):int(xend)]
         p='graph'+str(pg_no)+str(self.graph_per_page[int(pg_no)-1])+'.png'  
+	p=os.path.join(working_dir,p)
         cv2.imwrite(p, graph)
         item=QtGui.QListWidgetItem(QtGui.QIcon(p),QtCore.QString(p))
         self.graphlistWidget.addItem(item)
@@ -434,7 +444,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
         	if self.gif_check[ind]==0:
 	        	self.gif.show()
 		        self.tableWidget.hide()
-		        movie=QtGui.QMovie("loading.gif")
+			#movie=QtGui.QMovie("loading.gif")
+			movie=QtGui.QMovie("fireloading3.gif")
 		        self.gif.setMovie(movie)
 		        movie.start()
 		        self.plotShowBtn.hide()
@@ -467,7 +478,9 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 		    	self.savetable.show()
             
     def pdfItem_click(self, item):
-        loc=self.x+str(int(item.text())-1)+"new.png"
+	working_dir='plot_dir'
+        loc=self.pdf_name+str(int(item.text())-1)+"new.png"
+	loc = os.path.join(working_dir,str(loc))
         self.display_item.setPixmap(QtGui.QPixmap(loc).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
 
     def loadingFinished(self, result):
@@ -506,22 +519,27 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
 
     def progress_handle(self, result):
         
+	working_dir = 'plot_dir'
         self.statusbar.showMessage(QString(' Loading '+str(result.val+2)+' page ....'))
-        w=self.x+str(result.val)+"new.png"
+        w=self.pdf_name+str(result.val)+"new.png"
+	w = os.path.join(working_dir,str(w))
             
         self.item=QtGui.QListWidgetItem(QtGui.QIcon(w),QtCore.QString(str(result.val+1)))
         self.pdflistWidget.addItem(self.item)
 
         self.graph_per_page.append(0)
 
-        w=self.x+str(result.val)+".png"
+        w=self.pdf_name+str(result.val)+".png"
+	w = os.path.join(working_dir,str(w))
         self.listOfFiles.append(str(w))
 
         if result.val==0:
             self.progressBar.setMaximum(result.numPages)
             self.progressBar.setValue(1)
             self.pdflistWidget.setItemSelected(self.pdflistWidget.item(0), True)
-            self.display_item.setPixmap(QtGui.QPixmap(self.x+"0new.png").scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
+	    file_name = self.pdf_name+"0new.png"
+	    file_name = os.path.join(working_dir,str(file_name))
+            self.display_item.setPixmap(QtGui.QPixmap(file_name).scaled(self.display_item.size(), QtCore.Qt.KeepAspectRatio,QtCore.Qt.SmoothTransformation))
         else:
             self.progressBar.setValue(self.progressBar.value()+1)
 
@@ -569,6 +587,8 @@ class Example(QtGui.QMainWindow, layout_gene.Ui_MainWindow):
     def openfile(self):
 
         self.x = QtGui.QFileDialog.getOpenFileName(self, 'OpenFile', filter='*pdf')
+	self.pdf_name = os.path.basename(str(self.x))
+	
         #self.x stores the address of the chosen pdf
         print self.x
         if self.x=="":      # No file is Chosen
