@@ -99,7 +99,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 			#removes words which contain no alphabet
 			
 			word = i.text.strip(" ")			
-			flag = 0;
+			flag = 0
+			dashcount=0
 			for j in range(len(word)):
 				if(word[j]>='a' and word[j]<='z'):
 					flag = 1
@@ -107,7 +108,9 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				if(word[j]>='A' and word[j]<='Z'):
 					flag = 1
 					break				
-			if(flag==0):
+				if(ord(word[j]) >= 5000):
+					dashcount+=1
+			if(flag==0 or dashcount>0):
 				continue
 			
 			#remove ends
@@ -485,14 +488,16 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 			if(x1-j<0 or x2+j>=image.shape[1]):
 				break
 			if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1,current_color)==0):
-				isWhiteOrBlack(x1-j,y1,height,image, image_orig,0,current_color) #just for storing the color
+				for z in range(3):
+					isWhiteOrBlack(x1-j,y1,height,image, image_orig,0,current_color) #just for storing the color
 				pos = 1
 				#one_ext.append(x1-j)
 				temp_x = x1-j
 				#one_ext.append(y1)
 				break
 			if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1,current_color)==0):
-				isWhiteOrBlack(x2+j,y2,height,image, image_orig,0,current_color) #just for storing the color				
+				for z in range(3):
+					isWhiteOrBlack(x2+j,y2,height,image, image_orig,0,current_color) #just for storing the color				
 				pos = 2		
 				one_ext.append(x2+j)
 				one_ext.append(y2)		

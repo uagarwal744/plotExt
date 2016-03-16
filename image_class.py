@@ -5,7 +5,6 @@ import math
 import PythonMagick
 from pyPdf import PdfFileReader
 import os,sys
-from graphextract_returnArray import PlotExtractor
 import axis
 import legendDetect
 import hough
@@ -16,13 +15,14 @@ import uuid
 import tables
 import extract_plots_manual
 import time
+import findaxis
 # current_milli_time = lambda: int(round(time.time() * 1000))
 
 class Graph:
     outer_dir = "plot_dir"
-    def __init__(self,image,outer_image_file,inner_image_params):
+    def __init__(self,image,outer_image_file,inner_image_params=[]):
         self.image = image
-        self.inner_image_params = inner_image_params
+        self.num_plot_lines = 0;
         self.manual_axis = False
         self.manual_legend = False
         self.outer_image_file = outer_image_file
@@ -32,6 +32,10 @@ class Graph:
         self.working_dir = os.path.join(Graph.outer_dir,inner_dir)
         if not os.path.exists(self.working_dir):
             os.makedirs(self.working_dir)
+        if(inner_image_params==[]):
+            self.inner_image_params = findaxis.findaxis(self.image)
+        else:
+            self.inner_image_params = inner_image_params
 
     def axis_detection(self):
         #self.resized_image=cv2.imread(self.outer_image_file)
@@ -75,13 +79,13 @@ class Graph:
         temp_file = os.path.join(self.working_dir,temp_file)
         cv2.imwrite(temp_file,graph)
         #self.scale_detection()
-        self.legend_detection()
-        if(self.legend == []):
-            self.inner_image_without_legend = self.image_without_legend[self.inner_image_params[2]:self.inner_image_params[3],self.inner_image_params[0]:self.inner_image_params[1]]
+        if(self.num_plot_lines != 0):
+            self.inner_image_without_legend = self.image[self.inner_image_params[2]:self.inner_image_params[3],self.inner_image_params[0]:self.inner_image_params[1]]
             self.inner_image_file_without_legend = os.path.join(self.working_dir,"inner_image_without_legend.png")
             cv2.imwrite(self.inner_image_file_without_legend,self.inner_image_without_legend)
             self.table = extract_plots_manual.run(self.inner_image_file_without_legend,self.axis_bot_left,self.axis_top_right,self.scale_x,self.scale_y,self.inner_image_params[0],self.inner_image_params[1],self.inner_image_params[2],self.inner_image_params[3],self.pixel_x1,self.pixel_x2,self.pixel_y1,self.pixel_y2,self.num_plot_lines)
         else:
+            self.legend_detection()
             self.value_calculation()
 
     
@@ -116,19 +120,20 @@ class TableThread(QtCore.QThread):
 
 
 def main():
+    pass
     """Main function to execute. Put name of image in the first parameter of constructor"""
-    pdfName  = raw_input()
-    G = PlotExtractor(pdfName,200,50,1500,70)
-    ga,na,ia = G.graphextract()
-    print(ga,na)
-    graphImages = []
+    #pdfName  = raw_input()
+    #G = PlotExtractor(pdfName,200,50,1500,70)
+    #ga,na,ia = G.graphextract()
+    #print(ga,na)
+    #graphImages = []
     
-    for i in range(len(ga)):
-        for j in range(len(ga[i])):
-            graphImages.append(Graph(ga[i][j],na[i][j],ia[i][j]))
-    for G in graphImages:
-        G.run()
-        break;
+    #for i in range(len(ga)):
+        #for j in range(len(ga[i])):
+            #graphImages.append(Graph(ga[i][j],na[i][j],ia[i][j]))
+    #for G in graphImages:
+        #G.run()
+    #    break;
 
 
 
