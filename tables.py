@@ -32,18 +32,18 @@ def findValue(img,jo,prevval):
 	avg=[]
 	while(i<len(img)):
 		if(img[i,jo]>=240):
-			sum=0
+			summ=0
 			count=0
-			while(img[i,jo]>=240):
+			while(i<len(img))and(img[i,jo]>=240):
 				count+=1
-				sum+=len(img)-i
+				summ+=len(img)-i
 				i+=1
-			avg.append(sum/count)
+			avg.append(summ/count)
 		i+=1
-	min=0
+	mini=sys.maxint
 	ind=0
 	for i in range(len(avg)):
-		if (math.fabs(avg[i]-prevval)<min):
+		if (math.fabs(avg[i]-prevval)<mini):
 			ind=i
 	return avg[ind]
 
@@ -123,6 +123,7 @@ def lineInterpolation_x(img):
 def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_x,scale_y):
 	fx=[]
 	x_=[]
+	val=-1
 	xdiv=float(rectsize_x)/ppdiv_x
 	ydiv=float(rectsize_y)/ppdiv_y
 	unit=float(scale_x)/10
@@ -156,7 +157,8 @@ def approxTable(img,ppdiv_x,ppdiv_y,rectsize_x,rectsize_y,start_x,start_y,scale_
 			trueval=(float(val)/rectsize_y)*(ydiv*scale_y)+start_y
 			fx.append(str(trueval))
 			x_.append(str(x))
-		prev_prevval=val
+		if(val!=-1):
+			prev_prevval=val
 		r+=1
 	#print x_
 	#print fx	
