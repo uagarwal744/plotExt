@@ -31,13 +31,17 @@ def mod(a):
 #returns true is the vertical strip contains only white or black pixels
 def isWhiteOrBlack(x,y,height,image,image_orig,colour_found):
 	cnt = 0
+	if(x>=image.shape[1] or y+height>=image.shape[0] or x<=0 or y<=0):
+		return 1
+
 	for i in range(height):	
 		#curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
 		#if(curr_label != w and curr_label != b):
+		
+
 		if((image[y+i][x][2]>20 or image[y+i][x][1]>20) and (image[y+i][x][1]>20 or image[y+i][x][2]<200) ):
 			if(colour_found == 0):
 				del current_color[:]
-				print image[y+i][x]
 				current_color.append(image_orig[y+i][x][0])
 				current_color.append(image_orig[y+i][x][1])
 				current_color.append(image_orig[y+i][x][2])
@@ -48,6 +52,9 @@ def isWhiteOrBlack(x,y,height,image,image_orig,colour_found):
 	return 1
 def isBlack(x,y,height,image):
 	cnt = 0
+	if(x>=image.shape[1] or y+height>=image.shape[0] or x<=0 or y<=0):
+		return 0
+
 	for i in range(height):	
 		#print x,y,height,image.shape
 		#curr_label = clt.predict([image[y+i][x][0],image[y+i][x][1],image[y+i][x][2]])
@@ -121,6 +128,11 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	image=cv2.dilate(cv2.erode(image,(5,5)),(5,5))	
 
 	image_orig = image
+	'''
+	draw_rectangles(image_orig,rect)
+	cv2.imshow("as",image_orig)
+	cv2.waitKey(0)
+	'''
 	image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
 	#KMeans
@@ -314,7 +326,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 					if(isBlack(temp_x,y,height,image)==0):
 						cnt1 = cnt1+1
 						temp_x += 1
-						if(cnt1>10):
+						if(cnt1>20):
 							not_found = 1
 							break
 					else:
@@ -334,7 +346,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x += 1
-							if(cnt>10):
+							if(cnt>20):
 								break
 						else:
 							cnt = 0
@@ -349,7 +361,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x -= 1
-							if(cnt>10):
+							if(cnt>20):
 								break
 						else:
 							cnt = 0
@@ -371,6 +383,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 	while(1):
 		y = y-height
 		not_found = 0
+		#draw_rectangles(image_orig, new_rect[0][0], y, new_rect[0][2], y+height)
+		#cv2.rectangle(image_orig,(new_rect[0][0], y),( new_rect[0][2], y+height),(0,255,0),2)
+		
+
 		if(y-height > y_min):
 			if(isPresent(new_rect,y,height)==1):
 				continue
@@ -383,12 +399,13 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 						cnt1 = cnt1+1
 						temp_x += 1
 						if(cnt1>20):
+							print "pass"
 							not_found = 1
 							break
 					else:
 						cnt2 = cnt2+1
 						temp_x += 1
-						if(cnt2>5):
+						if(cnt2>0):
 							break;
 				if(not_found==1):
 					break
@@ -402,7 +419,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x += 1
-							if(cnt>10):
+							if(cnt>20):
 								break
 						else:
 							cnt = 0
@@ -417,7 +434,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 						if(isBlack(temp_x,y,height,image)==0):
 							cnt += 1
 							temp_x -= 1
-							if(cnt>10):
+							if(cnt>20):
 								break
 						else:
 							cnt = 0
@@ -445,7 +462,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	'''
 	draw_rectangles(image, new_rect)
-	cv2.imshow("as",image)
+	
+	cv2.imshow("as",image_orig)
 	cv2.waitKey(0)
 	'''
 	colors = []
@@ -491,7 +509,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				j= j+1
 				if(isWhiteOrBlack(x1-j,y1,height,image, image_orig,1)!=0):
 					cnt = cnt+1
-			one_ext.append(x1-j)
+			if(x1-j <= image_orig.shape[1]):
+				one_ext.append(image_orig.shape[1])
+			else:
+				one_ext.append(x1-j)
 			one_ext.append(y1)
 			one_ext.append(temp_x)
 
@@ -503,7 +524,10 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 				j = j+1
 				if(isWhiteOrBlack(x2+j,y2,height,image, image_orig,1)!=0):
 					cnt = cnt+1
-			one_ext.append(x2+j)
+			if(x2+j >= image_orig.shape[1]):
+				one_ext.append(image_orig.shape[1]-2)
+			else:
+				one_ext.append(x2+j)
 
 
 		if(max_extent == -1):
@@ -516,7 +540,6 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		extent.append(one_ext)
 		colors.append(list(current_color))
 
-	#draw_rectangles(image,new_rect)
 	
 	removal_rect = []
 	for i in range(len(new_rect)):
@@ -524,6 +547,8 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	for i in range(len(extent)):
 		removal_rect.append(extent[i])
+
+	
 
 	minx = removal_rect[0][0]
 	miny = removal_rect[0][1]
@@ -542,12 +567,15 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 
 	image = image_orig
 	
+
+	#this part removes complete rectangle
+	'''
 	for i in range(miny, maxy):
 		for j in range(minx, maxx):
 			image[i][j][0] = 255
 			image[i][j][1] = 255
 			image[i][j][2] = 255
-	
+	'''
 	
 
 	final_rect = []
@@ -578,7 +606,7 @@ def parse_hocr(filename, x_min, x_max, y_min, y_max, img):
 		legend_info.append(temp)
 
 
-   
+	
 
 	return image,legend_info
 
@@ -591,7 +619,7 @@ def legend_detect(img, x_min, x_max, y_min, y_max,working_dir):
 	os.system("tesseract " + img + " "+out_hocr_file+" hocr")
 	return parse_hocr(out_hocr_file+".hocr", x_min, x_max, y_min, y_max, img)
 
-#legend_detect("21.png", 110,660,75,440,"")
+#legend_detect("graph1.jpg", 150,800,35,500,"")
 
 
 	
