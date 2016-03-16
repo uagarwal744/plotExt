@@ -31,7 +31,7 @@ def findaxis(img):
     #gray = cv2.bilateralFilter(gray,9,75,75)
     gray = cv2.GaussianBlur(gray,(3,3),0)
     #edges = cv2.Canny(gray,50,150,apertureSize = 3)
-    lines = cv2.HoughLinesP(gray,det_prec,np.pi/ang_prec,100,minLineLength,maxLineGap)
+    lines = cv2.HoughLinesP(gray,0.25,np.pi/180,100,100,30)
     im2 = np.zeros((h,w,channel),np.uint8)
     for x1,y1,x2,y2 in lines[0]:
         cv2.line(im2,(x1,y1),(x2,y2),(0,255,0),2)
@@ -44,14 +44,23 @@ def findaxis(img):
     # for t in temp[0]:
     #     if cv2.contourArea(t) >threshArea:
     #         cnts1.append(t)
-    '''
+    
+    h,w,channel = image.shape
+    hi,wi = h,w
+    
     LENGTH = len(cnts1)
     status = np.zeros((LENGTH,1))
 
     for i,cnt1 in enumerate(cnts1):
+        x_,y_,w_,h_  = cv2.boundingRect(cnt1)
+        if h_ >= 0.95*hi or w_ >= 0.95*wi:
+            continue
         x = i    
         if i != LENGTH-1:
             for j,cnt2 in enumerate(cnts1[i+1:]):
+                x_,y_,w_,h_  = cv2.boundingRect(cnt2)
+                if h_ >= 0.95*hi or w_ >= 0.95*wi:
+                    continue
                 x = x+1
                 dist = find_if_close(cnt1,cnt2)
                 if dist == True:
@@ -69,9 +78,8 @@ def findaxis(img):
             cont = np.vstack(cnts1[i] for i in pos)
             hull = cv2.convexHull(cont)
             cnts.append(hull)
-    '''
-    h,w,channel = image.shape
-    hi,wi = h,w
+    
+    
         
     x = []
     y = []
