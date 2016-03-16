@@ -41,7 +41,7 @@ def final_scale(img,working_dir,yaxis1,yaxis2,xaxis1,xaxis2,clusters=2) :
 	#cv2.rectangle(tempimg,(bot_left),(top_right),(0,255,0),3)
 	#cv2.line(img,(855,0),(855,rows),(0,0,255),2)
 	#cv2.imwrite(input_file,img)
-	print 'the end points are adskandsnfjsnfjsdf'
+	#print 'the end points are adskandsnfjsnfjsdf'
 	print bot_left
 	print top_right
 	image2 = image2[ans2+2:ans-2,ans1+2:ans3-2]
@@ -76,8 +76,8 @@ def final_scale(img,working_dir,yaxis1,yaxis2,xaxis1,xaxis2,clusters=2) :
 	
 	try:
 		count = 1
-		while len(markings)<2 and count < 20:
-			print 'doing it'
+		while len(markings)<3 and count < 30:
+			#print 'doing it'
 			markings = h_scale.h_scale(input_file,ans-count,ans3,ans1)
 			print markings
 			count = count+1
@@ -141,7 +141,7 @@ def final_scale(img,working_dir,yaxis1,yaxis2,xaxis1,xaxis2,clusters=2) :
 	for j in range(l) :
 		if markings[j]<x_pos[i][1] and markings[j]>x_pos[i][0] :
 			pos1 = j		
-	print 'the position issadasfsafasf'
+	#print 'the position issadasfsafasf'
 	print pos1
 	print x1
 	print y0
